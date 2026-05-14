@@ -458,24 +458,17 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 </footer>
 
 <script>
-const products = [
-  {id:'26858611',name:'Fully Loved (Dark)',cat:'fun',badge:'New',img:'https://www.vistecprints.com/ssc/i/decorated_product_design_image_quality/26858611/200/200/0/design.jpg'},
-  {id:'26858596',name:'Fully Loved',cat:'fun',badge:'',img:'https://www.vistecprints.com/ssc/i/decorated_product_design_image_quality/26858596/200/200/0/design.jpg'},
-  {id:'26758806',name:"I'm ok/broken Hoodie",cat:'fun',badge:'',img:'https://www.vistecprints.com/ssc/i/decorated_product_design_image_quality/26758806/200/200/0/design.jpg'},
-  {id:'26758371',name:"I'm ok/broken",cat:'fun',badge:'',img:'https://www.vistecprints.com/ssc/i/decorated_product_design_image_quality/26758371/200/200/0/design.jpg'},
-  {id:'24029261',name:'Anime V3-41',cat:'anime',badge:'Hot',img:'https://www.vistecprints.com/ssc/i/decorated_product_design_image_quality/24029261/200/200/0/design.jpg'},
-  {id:'24029256',name:'Anime V3-21',cat:'anime',badge:'',img:'https://www.vistecprints.com/ssc/i/decorated_product_design_image_quality/24029256/200/200/0/design.jpg'},
-  {id:'24029251',name:'Anime V3-35',cat:'anime',badge:'',img:'https://www.vistecprints.com/ssc/i/decorated_product_design_image_quality/24029251/200/200/0/design.jpg'},
-  {id:'24029246',name:'Anime V3-33',cat:'anime',badge:'',img:'https://www.vistecprints.com/ssc/i/decorated_product_design_image_quality/24029246/200/200/0/design.jpg'},
-  {id:'24047506',name:'Boots on the Ground 8',cat:'boots',badge:'',img:'https://www.vistecprints.com/ssc/i/decorated_product_design_image_quality/24047506/200/200/0/design.jpg'},
-  {id:'24047486',name:'Boots on the Ground 7',cat:'boots',badge:'',img:'https://www.vistecprints.com/ssc/i/decorated_product_design_image_quality/24047486/200/200/0/design.jpg'},
-  {id:'26647681',name:'Woman of My Dreams',cat:'fun',badge:'',img:'https://www.vistecprints.com/ssc/i/decorated_product_design_image_quality/26647681/200/200/0/design.jpg'},
-  {id:'25237556',name:'Heritage Party',cat:'jesus',badge:'',img:'https://www.vistecprints.com/ssc/i/decorated_product_design_image_quality/25237556/200/200/0/design.jpg'},
-];
+let products = [];
+let activecat = 'all';
 
 function renderProducts(cat) {
+  activecat = cat;
   const grid = document.getElementById('productsGrid');
   const filtered = cat === 'all' ? products : products.filter(p => p.cat === cat);
+  if (!filtered.length) {
+    grid.innerHTML = '<p style="color:var(--gray);padding:40px 0;">No products in this category yet.</p>';
+    return;
+  }
   grid.innerHTML = filtered.map(p => `
     <div class="product-card" onclick="window.open('https://www.vistecprints.com/shop/view_product/${p.id}','_blank')">
       <div class="product-img">
@@ -484,9 +477,10 @@ function renderProducts(cat) {
       </div>
       <div class="product-info">
         <div class="product-name">${p.name}</div>
-        <div class="product-brand">Gildan &middot; DTF Print</div>
+        <div class="product-brand">${p.garment ? p.garment + ' &middot; ' : ''}DTF Print</div>
         <div class="product-action">
           <button class="add-btn" onclick="event.stopPropagation();window.open('https://www.vistecprints.com/shop/view_product/${p.id}','_blank')">Add to Cart</button>
+          ${p.price ? `<span style="color:var(--gold);font-weight:600;font-size:14px;">${p.price}</span>` : ''}
         </div>
       </div>
     </div>
@@ -501,7 +495,10 @@ document.getElementById('catTabs').addEventListener('click', e => {
   renderProducts(btn.dataset.cat);
 });
 
-renderProducts('all');
+fetch('products.json')
+  .then(r => r.json())
+  .then(data => { products = data; renderProducts('all'); })
+  .catch(() => { products = []; renderProducts('all'); });
 
 function handleSignup(e) {
   e.preventDefault();
