@@ -14,6 +14,9 @@ function loadProducts($file) {
 }
 
 function saveProducts($file, $products) {
+    if (!is_writable($file) && !is_writable(dirname($file))) {
+        die('Error: products.json is not writable. Go to File Manager, right-click products.json → Permissions → set to 666.');
+    }
     file_put_contents($file, json_encode(array_values($products), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 }
 
@@ -286,7 +289,7 @@ tr:hover td{background:#fafafa;}
         <tbody>
           <?php foreach ($products as $i => $p):
             $imgSrc = $p['img'] ?? '';
-            $isLocal = $imgSrc && !str_starts_with($imgSrc, 'http');
+            $isLocal = $imgSrc && strpos($imgSrc, 'http') !== 0;
             $displaySrc = $isLocal ? '../' . $imgSrc : $imgSrc;
           ?>
           <tr data-cat="<?= htmlspecialchars($p['cat']) ?>">
