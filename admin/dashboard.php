@@ -17,6 +17,26 @@ function saveProducts($file, $products) {
     file_put_contents($file, json_encode(array_values($products), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 }
 
+function handleImageUpload($cat) {
+    if (empty($_FILES['img_file']['name'])) return null;
+
+    $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    $mime    = $_FILES['img_file']['type'];
+    if (!in_array($mime, $allowed)) return null;
+
+    $uploadDir = __DIR__ . '/../images/' . $cat . '/';
+    if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
+    $ext      = strtolower(pathinfo($_FILES['img_file']['name'], PATHINFO_EXTENSION));
+    $filename = uniqid('img_') . '.' . $ext;
+    $dest     = $uploadDir . $filename;
+
+    if (move_uploaded_file($_FILES['img_file']['tmp_name'], $dest)) {
+        return 'images/' . $cat . '/' . $filename;
+    }
+    return null;
+}
+
 $categories = [
     'fun'      => 'Fun Print',
     'anime'    => 'Anime',
@@ -25,42 +45,38 @@ $categories = [
     'jesus'    => 'Jesus Christ',
 ];
 
-$message = '';
-$msgType = 'success';
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
+    $action   = $_POST['action'] ?? '';
     $products = loadProducts($jsonFile);
 
-    if ($action === 'add') {
-        $products[] = [
+    if ($action === 'add' || $action === 'edit') {
+        $cat      = trim($_POST['cat'] ?? 'fun');
+        $uploaded = handleImageUpload($cat);
+        $img      = $uploaded ?? trim($_POST['img'] ?? '');
+
+        $product = [
             'id'      => trim($_POST['id'] ?? uniqid('vp_')),
             'name'    => trim($_POST['name'] ?? ''),
-            'cat'     => trim($_POST['cat'] ?? 'fun'),
+            'cat'     => $cat,
             'badge'   => trim($_POST['badge'] ?? ''),
-            'img'     => trim($_POST['img'] ?? ''),
+            'img'     => $img,
             'price'   => trim($_POST['price'] ?? ''),
             'garment' => trim($_POST['garment'] ?? ''),
         ];
-        saveProducts($jsonFile, $products);
-        $message = 'Product added successfully!';
-    }
 
-    if ($action === 'edit') {
-        $idx = (int)($_POST['index'] ?? -1);
-        if (isset($products[$idx])) {
-            $products[$idx] = [
-                'id'      => trim($_POST['id'] ?? $products[$idx]['id']),
-                'name'    => trim($_POST['name'] ?? ''),
-                'cat'     => trim($_POST['cat'] ?? 'fun'),
-                'badge'   => trim($_POST['badge'] ?? ''),
-                'img'     => trim($_POST['img'] ?? ''),
-                'price'   => trim($_POST['price'] ?? ''),
-                'garment' => trim($_POST['garment'] ?? ''),
-            ];
-            saveProducts($jsonFile, $products);
-            $message = 'Product updated successfully!';
+        if ($action === 'add') {
+            $products[] = $product;
+            $msg = 'Product added successfully!';
+        } else {
+            $idx = (int)($_POST['index'] ?? -1);
+            if (isset($products[$idx])) {
+                if (empty($product['img'])) $product['img'] = $products[$idx]['img'];
+                $products[$idx] = $product;
+                $msg = 'Product updated successfully!';
+            }
         }
+        saveProducts($jsonFile, $products);
+        $msgType = 'success';
     }
 
     if ($action === 'delete') {
@@ -68,16 +84,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($products[$idx])) {
             array_splice($products, $idx, 1);
             saveProducts($jsonFile, $products);
-            $message = 'Product deleted.';
+            $msg = 'Product deleted.';
             $msgType = 'warning';
         }
     }
 
-    header('Location: dashboard.php?msg=' . urlencode($message) . '&type=' . $msgType);
+    header('Location: dashboard.php?msg=' . urlencode($msg ?? '') . '&type=' . ($msgType ?? 'success'));
     exit;
 }
 
-$products = loadProducts($jsonFile);
+$products  = loadProducts($jsonFile);
 $flashMsg  = $_GET['msg'] ?? '';
 $flashType = $_GET['type'] ?? 'success';
 ?><!DOCTYPE html>
@@ -89,10 +105,9 @@ $flashType = $_GET['type'] ?? 'success';
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-:root{--gold:#D49848;--gold-l:#E8B96A;--black:#0a0a0a;--dark:#111;--dark2:#1a1a1a;--dark3:#222;--white:#fff;--off:#F0EDE8;--gray:#888;--red:#e05555;}
+:root{--gold:#D49848;--gold-l:#E8B96A;--black:#0a0a0a;--dark:#111;--white:#fff;--gray:#888;--red:#e05555;}
 body{background:#f4f4f4;font-family:'DM Sans',sans-serif;font-size:14px;}
 
-/* SIDEBAR */
 .sidebar{position:fixed;top:0;left:0;bottom:0;width:220px;background:var(--black);display:flex;flex-direction:column;z-index:50;}
 .sb-logo{padding:24px 20px;border-bottom:1px solid #1a1a1a;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--gold);}
 .sb-logo span{color:var(--white);}
@@ -106,7 +121,6 @@ body{background:#f4f4f4;font-family:'DM Sans',sans-serif;font-size:14px;}
 .sb-footer a:hover{color:var(--red);}
 .sb-footer svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;}
 
-/* MAIN */
 .main{margin-left:220px;min-height:100vh;}
 .topbar{background:#fff;border-bottom:1px solid #e8e8e8;padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
 .topbar h1{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:#111;}
@@ -120,22 +134,19 @@ body{background:#f4f4f4;font-family:'DM Sans',sans-serif;font-size:14px;}
 .btn-sm{padding:6px 14px;font-size:11px;}
 .content{padding:28px 32px;}
 
-/* FLASH */
 .flash{padding:12px 18px;border-radius:3px;margin-bottom:24px;font-size:13px;font-weight:500;}
 .flash-success{background:#f0faf4;border:1px solid #a3d9b5;color:#1e7e45;}
 .flash-warning{background:#fff8f0;border:1px solid #f5c88a;color:#9a5c00;}
 
-/* STATS */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
 .stat-card{background:#fff;border:1px solid #e8e8e8;border-radius:3px;padding:20px 24px;}
 .stat-card .num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--gold);line-height:1;}
 .stat-card .lbl{font-size:12px;color:#888;letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
 
-/* TABLE */
 .table-wrap{background:#fff;border:1px solid #e8e8e8;border-radius:3px;overflow:hidden;}
-.table-header{padding:16px 24px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;}
+.table-header{padding:16px 24px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
 .table-header h2{font-size:15px;font-weight:600;color:#111;}
-.filter-tabs{display:flex;gap:4px;}
+.filter-tabs{display:flex;gap:4px;flex-wrap:wrap;}
 .ftab{background:transparent;border:1px solid #e0e0e0;color:#888;padding:6px 14px;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:2px;transition:all 0.15s;}
 .ftab.active,.ftab:hover{background:var(--gold);border-color:var(--gold);color:#000;}
 table{width:100%;border-collapse:collapse;}
@@ -144,11 +155,11 @@ th{padding:12px 16px;text-align:left;font-size:11px;letter-spacing:1.5px;text-tr
 td{padding:12px 16px;border-bottom:1px solid #f5f5f5;vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:#fafafa;}
-.prod-img{width:52px;height:52px;object-fit:cover;border-radius:2px;background:#f0f0f0;display:block;}
-.prod-img-placeholder{width:52px;height:52px;background:#f0f0f0;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#bbb;letter-spacing:1px;}
+.prod-img{width:56px;height:56px;object-fit:cover;border-radius:3px;background:#f0f0f0;display:block;border:1px solid #eee;}
+.prod-img-placeholder{width:56px;height:56px;background:#f0f0f0;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#bbb;letter-spacing:1px;border:1px solid #eee;}
 .prod-name{font-weight:500;color:#111;}
 .prod-id{font-size:11px;color:#aaa;margin-top:2px;}
-.cat-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:0.5px;}
+.cat-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;}
 .cat-fun{background:#fff3e0;color:#e65c00;}
 .cat-anime{background:#e8f0ff;color:#1a56cc;}
 .cat-boots{background:#f0ffe0;color:#2d6a00;}
@@ -158,29 +169,48 @@ tr:hover td{background:#fafafa;}
 .actions{display:flex;gap:6px;}
 
 /* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.open{display:flex;}
-.modal{background:#fff;width:100%;max-width:560px;border-radius:4px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
-.modal-head{background:var(--black);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;}
+.modal{background:#fff;width:100%;max-width:580px;border-radius:4px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);max-height:90vh;overflow-y:auto;}
+.modal-head{background:var(--black);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
 .modal-head h3{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--white);}
-.modal-close{background:none;border:none;color:#666;cursor:pointer;font-size:20px;line-height:1;padding:4px;}
+.modal-close{background:none;border:none;color:#666;cursor:pointer;font-size:22px;line-height:1;padding:4px;}
 .modal-close:hover{color:#fff;}
 .modal-body{padding:24px;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .form-group{margin-bottom:16px;}
 .form-group label{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#888;margin-bottom:6px;font-weight:600;}
-.form-group input,.form-group select{width:100%;border:1px solid #ddd;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;border-radius:2px;outline:none;color:#111;background:#fff;}
+.form-group input,.form-group select{width:100%;border:1px solid #ddd;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;border-radius:2px;outline:none;color:#111;}
 .form-group input:focus,.form-group select:focus{border-color:var(--gold);}
 .form-group .hint{font-size:11px;color:#aaa;margin-top:4px;}
-.img-preview{width:80px;height:80px;object-fit:cover;border-radius:2px;border:1px solid #eee;display:none;margin-top:8px;}
+
+/* IMAGE UPLOAD */
+.img-upload-area{border:2px dashed #ddd;border-radius:4px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;background:#fafafa;}
+.img-upload-area:hover{border-color:var(--gold);background:#fffbf5;}
+.img-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.img-upload-area svg{width:32px;height:32px;stroke:#ccc;fill:none;stroke-width:1.5;margin-bottom:8px;}
+.img-upload-area p{font-size:13px;color:#aaa;margin:0;}
+.img-upload-area span{font-size:11px;color:#bbb;}
+.upload-preview-wrap{display:none;align-items:center;gap:12px;margin-top:12px;padding:10px;background:#f5f5f5;border-radius:3px;}
+.upload-preview-wrap img{width:60px;height:60px;object-fit:cover;border-radius:3px;border:1px solid #eee;}
+.upload-preview-wrap .preview-info{flex:1;}
+.upload-preview-wrap .preview-name{font-size:12px;font-weight:500;color:#333;}
+.upload-preview-wrap .preview-size{font-size:11px;color:#aaa;}
+.upload-preview-wrap .remove-img{background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;line-height:1;}
+.current-img-wrap{display:flex;align-items:center;gap:10px;padding:10px;background:#f5f5f5;border-radius:3px;margin-bottom:10px;}
+.current-img-wrap img{width:56px;height:56px;object-fit:cover;border-radius:3px;border:1px solid #eee;}
+.current-img-wrap .cur-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;}
+.current-img-wrap .cur-path{font-size:12px;color:#555;word-break:break-all;}
+.divider{text-align:center;color:#ccc;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:12px 0;position:relative;}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:#eee;}
+.divider::before{left:0;}.divider::after{right:0;}
+
 .modal-foot{padding:16px 24px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:10px;}
 .empty-state{text-align:center;padding:60px 20px;color:#bbb;}
-.empty-state svg{width:48px;height:48px;stroke:#ddd;fill:none;stroke-width:1.5;margin-bottom:12px;}
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sb-logo">VISTEC<span>PRINTS</span></div>
   <div class="sb-label">Manage</div>
@@ -206,7 +236,6 @@ tr:hover td{background:#fafafa;}
   </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main">
   <div class="topbar">
     <h1>Decorated Products</h1>
@@ -217,12 +246,10 @@ tr:hover td{background:#fafafa;}
   </div>
 
   <div class="content">
-
     <?php if ($flashMsg): ?>
     <div class="flash flash-<?= htmlspecialchars($flashType) ?>"><?= htmlspecialchars($flashMsg) ?></div>
     <?php endif; ?>
 
-    <!-- STATS -->
     <div class="stats">
       <div class="stat-card"><div class="num"><?= count($products) ?></div><div class="lbl">Total Products</div></div>
       <div class="stat-card"><div class="num"><?= count(array_filter($products, fn($p) => $p['cat'] === 'anime')) ?></div><div class="lbl">Anime</div></div>
@@ -230,7 +257,6 @@ tr:hover td{background:#fafafa;}
       <div class="stat-card"><div class="num"><?= count(array_filter($products, fn($p) => !empty($p['badge']))) ?></div><div class="lbl">Featured</div></div>
     </div>
 
-    <!-- TABLE -->
     <div class="table-wrap">
       <div class="table-header">
         <h2>All Products</h2>
@@ -243,10 +269,7 @@ tr:hover td{background:#fafafa;}
       </div>
 
       <?php if (empty($products)): ?>
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
-        <p>No products yet. Click <strong>Add Product</strong> to get started.</p>
-      </div>
+      <div class="empty-state"><p>No products yet. Click <strong>Add Product</strong> to get started.</p></div>
       <?php else: ?>
       <table id="productTable">
         <thead>
@@ -261,11 +284,15 @@ tr:hover td{background:#fafafa;}
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($products as $i => $p): ?>
+          <?php foreach ($products as $i => $p):
+            $imgSrc = $p['img'] ?? '';
+            $isLocal = $imgSrc && !str_starts_with($imgSrc, 'http');
+            $displaySrc = $isLocal ? '../' . $imgSrc : $imgSrc;
+          ?>
           <tr data-cat="<?= htmlspecialchars($p['cat']) ?>">
             <td>
-              <?php if (!empty($p['img'])): ?>
-              <img src="<?= htmlspecialchars($p['img']) ?>" alt="" class="prod-img" onerror="this.style.display='none'"/>
+              <?php if ($imgSrc): ?>
+              <img src="<?= htmlspecialchars($displaySrc) ?>" alt="" class="prod-img" onerror="this.style.display='none'"/>
               <?php else: ?>
               <div class="prod-img-placeholder">NO IMG</div>
               <?php endif; ?>
@@ -297,7 +324,7 @@ tr:hover td{background:#fafafa;}
   </div>
 </div>
 
-<!-- ADD / EDIT MODAL -->
+<!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-head">
@@ -305,9 +332,10 @@ tr:hover td{background:#fafafa;}
       <button class="modal-close" onclick="closeModal()">&times;</button>
     </div>
     <div class="modal-body">
-      <form method="POST" id="productForm">
+      <form method="POST" id="productForm" enctype="multipart/form-data">
         <input type="hidden" name="action" id="formAction" value="add"/>
         <input type="hidden" name="index" id="formIndex" value=""/>
+        <input type="hidden" name="img" id="fImgExisting" value=""/>
 
         <div class="form-row">
           <div class="form-group">
@@ -316,7 +344,7 @@ tr:hover td{background:#fafafa;}
           </div>
           <div class="form-group">
             <label>Category *</label>
-            <select name="cat" id="fCat">
+            <select name="cat" id="fCat" onchange="updateUploadHint()">
               <?php foreach ($categories as $key => $label): ?>
               <option value="<?= $key ?>"><?= $label ?></option>
               <?php endforeach; ?>
@@ -325,15 +353,45 @@ tr:hover td{background:#fafafa;}
         </div>
 
         <div class="form-group">
-          <label>Product ID (DecoNetwork / VistecPrints ID)</label>
-          <input type="text" name="id" id="fId" placeholder="e.g. 26858611"/>
-          <div class="hint">Used to link to vistecprints.com/shop/view_product/{id}</div>
+          <label>Product Image</label>
+
+          <!-- Current image (edit mode) -->
+          <div class="current-img-wrap" id="currentImgWrap" style="display:none;">
+            <img id="currentImgThumb" src="" alt=""/>
+            <div>
+              <div class="cur-label">Current Image</div>
+              <div class="cur-path" id="currentImgPath"></div>
+            </div>
+          </div>
+
+          <!-- Upload area -->
+          <div class="img-upload-area" id="uploadArea">
+            <input type="file" name="img_file" id="imgFileInput" accept="image/jpeg,image/png,image/webp,image/gif" onchange="previewUpload(this)"/>
+            <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+            <p id="uploadHint">Click or drag to upload image</p>
+            <span id="uploadSub">Saves to <strong>images/<span id="catFolder">fun</span>/</strong> &nbsp;|&nbsp; JPG, PNG, WEBP</span>
+          </div>
+
+          <!-- Upload preview -->
+          <div class="upload-preview-wrap" id="uploadPreviewWrap">
+            <img id="uploadPreviewImg" src="" alt=""/>
+            <div class="preview-info">
+              <div class="preview-name" id="uploadPreviewName"></div>
+              <div class="preview-size" id="uploadPreviewSize"></div>
+            </div>
+            <button type="button" class="remove-img" onclick="removeUpload()" title="Remove">&times;</button>
+          </div>
+
+          <div class="divider" id="urlDivider">or use external URL</div>
+
+          <input type="url" id="fImgUrl" placeholder="https://www.vistecprints.com/ssc/i/..." style="width:100%;border:1px solid #ddd;padding:10px 12px;font-size:13px;font-family:inherit;border-radius:2px;outline:none;color:#111;" oninput="document.getElementById('fImgExisting').value=this.value"/>
+          <div class="hint" style="margin-top:4px;">Paste a URL only if not uploading a file above</div>
         </div>
 
         <div class="form-group">
-          <label>Image URL</label>
-          <input type="url" name="img" id="fImg" placeholder="https://www.vistecprints.com/ssc/i/..." oninput="previewImg(this.value)"/>
-          <img id="imgPreview" class="img-preview" src="" alt="Preview"/>
+          <label>Product ID (DecoNetwork / VistecPrints ID)</label>
+          <input type="text" name="id" id="fId" placeholder="e.g. 26858611"/>
+          <div class="hint">Links to vistecprints.com/shop/view_product/{id}</div>
         </div>
 
         <div class="form-row">
@@ -370,12 +428,18 @@ function openModal(edit) {
     document.getElementById('formIndex').value = '';
     document.getElementById('submitBtn').textContent = 'Add Product';
     document.getElementById('productForm').reset();
-    document.getElementById('imgPreview').style.display = 'none';
+    document.getElementById('fImgExisting').value = '';
+    document.getElementById('fImgUrl').value = '';
+    document.getElementById('currentImgWrap').style.display = 'none';
+    document.getElementById('uploadPreviewWrap').style.display = 'none';
+    updateUploadHint();
   }
 }
+
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('open');
 }
+
 function editProduct(idx, data) {
   openModal(true);
   document.getElementById('modalTitle').textContent = 'Edit Product';
@@ -385,22 +449,55 @@ function editProduct(idx, data) {
   document.getElementById('fName').value    = data.name    || '';
   document.getElementById('fCat').value     = data.cat     || 'fun';
   document.getElementById('fId').value      = data.id      || '';
-  document.getElementById('fImg').value     = data.img     || '';
   document.getElementById('fPrice').value   = data.price   || '';
   document.getElementById('fBadge').value   = data.badge   || '';
   document.getElementById('fGarment').value = data.garment || '';
-  previewImg(data.img || '');
+  document.getElementById('fImgExisting').value = data.img || '';
+
+  // Show current image
+  if (data.img) {
+    const src = data.img.startsWith('http') ? data.img : '../' + data.img;
+    document.getElementById('currentImgThumb').src = src;
+    document.getElementById('currentImgPath').textContent = data.img;
+    document.getElementById('currentImgWrap').style.display = 'flex';
+    document.getElementById('fImgUrl').value = data.img.startsWith('http') ? data.img : '';
+  } else {
+    document.getElementById('currentImgWrap').style.display = 'none';
+  }
+
+  document.getElementById('uploadPreviewWrap').style.display = 'none';
+  updateUploadHint();
 }
-function previewImg(url) {
-  const img = document.getElementById('imgPreview');
-  if (url) { img.src = url; img.style.display = 'block'; }
-  else { img.style.display = 'none'; }
+
+function updateUploadHint() {
+  const cat = document.getElementById('fCat').value;
+  document.getElementById('catFolder').textContent = cat;
 }
+
+function previewUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('uploadPreviewImg').src = e.target.result;
+    document.getElementById('uploadPreviewName').textContent = file.name;
+    document.getElementById('uploadPreviewSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+    document.getElementById('uploadPreviewWrap').style.display = 'flex';
+    document.getElementById('fImgExisting').value = '';
+    document.getElementById('fImgUrl').value = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeUpload() {
+  document.getElementById('imgFileInput').value = '';
+  document.getElementById('uploadPreviewWrap').style.display = 'none';
+}
+
 document.getElementById('modalOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
 
-// Category filter tabs
 document.querySelectorAll('.ftab').forEach(btn => {
   btn.addEventListener('click', function() {
     document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
