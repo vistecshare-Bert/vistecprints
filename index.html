@@ -26,8 +26,8 @@ body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-se
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,10,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,152,72,0.15);padding:0 5%;}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;height:68px;}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:var(--gold);text-decoration:none;}
-.logo span{color:var(--white);}
+.logo{text-decoration:none;display:flex;align-items:center;}
+.logo img{height:46px;width:auto;display:block;}
 .nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
 .nav-links a{color:var(--gray);text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500;transition:color 0.2s;}
 .nav-links a:hover{color:var(--gold);}
@@ -190,7 +190,7 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="#" class="logo">VISTEC<span>PRINTS</span></a>
+    <a href="#" class="logo"><img src="Images/Logo.png" alt="Vistec GraphX"/></a>
     <ul class="nav-links">
       <li><a href="#products">Shop</a></li>
       <li><a href="#canvas">Products</a></li>
