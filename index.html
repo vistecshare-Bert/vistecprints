@@ -295,7 +295,7 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 .zl-close{background:transparent;border:none;cursor:pointer;color:var(--gray);padding:6px;display:flex;align-items:center;transition:color 0.2s;flex-shrink:0;}
 .zl-close:hover{color:var(--offwhite);}
 .zl-img-wrap{flex:1;overflow:hidden;position:relative;background:var(--dark3);min-height:260px;max-height:60vh;user-select:none;-webkit-user-select:none;}
-.zl-img-wrap img{width:100%;height:100%;object-fit:contain;transform-origin:center center;transition:transform 0.07s linear;will-change:transform;display:block;pointer-events:none;-webkit-user-drag:none;}
+.zl-img-wrap img{position:absolute;width:100%;height:100%;top:0;left:0;object-fit:contain;display:block;pointer-events:none;-webkit-user-drag:none;image-rendering:-webkit-optimize-contrast;image-rendering:high-quality;}
 .zl-hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.72);color:var(--offwhite);font-size:12px;letter-spacing:0.5px;padding:8px 18px;border-radius:20px;white-space:nowrap;pointer-events:none;transition:opacity 0.5s;}
 .zl-bottom{display:flex;align-items:center;padding:14px 20px;border-top:1px solid rgba(255,255,255,0.07);gap:14px;flex-shrink:0;flex-wrap:wrap;}
 .zl-zoom-ctrl{display:flex;align-items:center;gap:8px;}
@@ -997,15 +997,36 @@ function zlAddToCart() { closeZoom(); if (zlProduct) openSizeModal(zlProduct.id)
 function applyZl() {
   const wrap = document.getElementById('zlImgWrap');
   const img = document.getElementById('zlImg');
-  if (zlScale <= 1) { zlScale = 1; zlOffX = 0; zlOffY = 0; }
-  else {
-    const maxX = (wrap.offsetWidth * (zlScale - 1)) / 2;
-    const maxY = (wrap.offsetHeight * (zlScale - 1)) / 2;
+  const ww = wrap.offsetWidth;
+  const wh = wrap.offsetHeight;
+
+  if (zlScale <= 1) {
+    zlScale = 1; zlOffX = 0; zlOffY = 0;
+    img.style.width = '100%'; img.style.height = '100%';
+    img.style.top = '0'; img.style.left = '0';
+    img.style.objectFit = 'contain';
+    img.style.cursor = 'zoom-in';
+  } else {
+    const iw = img.naturalWidth || ww;
+    const ih = img.naturalHeight || wh;
+    const baseRatio = Math.min(ww / iw, wh / ih);
+    const baseW = iw * baseRatio;
+    const baseH = ih * baseRatio;
+    const scaledW = baseW * zlScale;
+    const scaledH = baseH * zlScale;
+
+    const maxX = Math.max(0, (scaledW - ww) / 2);
+    const maxY = Math.max(0, (scaledH - wh) / 2);
     zlOffX = Math.max(-maxX, Math.min(maxX, zlOffX));
     zlOffY = Math.max(-maxY, Math.min(maxY, zlOffY));
+
+    img.style.objectFit = 'fill';
+    img.style.width = scaledW + 'px';
+    img.style.height = scaledH + 'px';
+    img.style.left = ((ww - scaledW) / 2 + zlOffX) + 'px';
+    img.style.top  = ((wh - scaledH) / 2 + zlOffY) + 'px';
+    img.style.cursor = zlDragging ? 'grabbing' : 'grab';
   }
-  img.style.transform = `translate(${zlOffX}px,${zlOffY}px) scale(${zlScale})`;
-  img.style.cursor = zlScale > 1 ? (zlDragging ? 'grabbing' : 'grab') : 'zoom-in';
   document.getElementById('zlScaleLabel').textContent = zlScale.toFixed(1) + '×';
 }
 function zoomBy(delta) {
