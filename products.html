@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>VistecPrints &mdash; Custom Apparel Charlotte NC</title>
+<title>Shop &mdash; VistecPrints Custom Apparel Charlotte NC</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -31,156 +31,81 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,10,0.9
 .nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
 .nav-links a{color:var(--gray);text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500;transition:color 0.2s;}
 .nav-links a:hover{color:var(--gold);}
+.nav-links a.active{color:var(--gold);}
 .nav-cta{background:var(--gold);color:var(--black);padding:10px 22px;border-radius:2px;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:background 0.2s;}
 .nav-cta:hover{background:var(--gold-light);}
 .nav-phone{color:var(--gold);font-size:13px;font-weight:500;}
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
 .hamburger span{display:block;width:24px;height:2px;background:var(--gold);}
 
-/* HERO */
-.hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:120px 5% 80px;}
-.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#000 0%,#0d0d0d 50%,#111 100%);}
-.hero-pattern{position:absolute;inset:0;opacity:0.04;background-image:repeating-linear-gradient(45deg,#D49848 0,#D49848 1px,transparent 0,transparent 50%);background-size:30px 30px;}
-.hero-glow{position:absolute;top:-20%;right:-10%;width:700px;height:700px;background:radial-gradient(circle,rgba(212,152,72,0.08) 0%,transparent 70%);pointer-events:none;}
-.hero-content{position:relative;z-index:1;max-width:700px;}
-.hero-badge{display:inline-block;border:1px solid var(--gold-dim);color:var(--gold);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:6px 16px;margin-bottom:28px;}
-.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(72px,12vw,130px);line-height:0.9;letter-spacing:2px;color:var(--white);margin-bottom:0;}
-.hero h1 .gold{color:var(--gold);}
-.hero-sub{font-size:clamp(14px,2vw,17px);color:var(--gray);margin:28px 0 44px;max-width:480px;line-height:1.7;font-weight:300;}
-.hero-actions{display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
-.btn-primary{background:var(--gold);color:var(--black);padding:16px 36px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:all 0.2s;}
-.btn-primary:hover{background:var(--gold-light);transform:translateY(-2px);}
-.btn-outline{border:1px solid rgba(212,152,72,0.4);color:var(--offwhite);padding:16px 36px;font-size:13px;font-weight:500;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:all 0.2s;}
-.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
-.hero-stats{position:absolute;bottom:60px;right:5%;display:flex;gap:60px;z-index:1;}
-.stat-item{text-align:center;}
-.stat-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--gold);line-height:1;}
-.stat-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-top:4px;}
-.hero-scroll{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:1;}
-.hero-scroll span{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gray2);}
-.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,var(--gold-dim),transparent);animation:scrollPulse 2s ease-in-out infinite;}
-@keyframes scrollPulse{0%,100%{opacity:0.3;}50%{opacity:1;}}
+/* PAGE HERO */
+.page-hero{padding:160px 5% 70px;background:var(--dark);position:relative;overflow:hidden;border-bottom:1px solid rgba(212,152,72,0.1);}
+.page-hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#000 0%,#0d0d0d 60%,#111 100%);}
+.page-hero-pattern{position:absolute;inset:0;opacity:0.03;background-image:repeating-linear-gradient(45deg,#D49848 0,#D49848 1px,transparent 0,transparent 50%);background-size:30px 30px;}
+.page-hero-glow{position:absolute;top:-30%;right:-5%;width:600px;height:600px;background:radial-gradient(circle,rgba(212,152,72,0.07) 0%,transparent 70%);pointer-events:none;}
+.page-hero-inner{position:relative;z-index:1;}
+.page-breadcrumb{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--gray2);letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;}
+.page-breadcrumb a{color:var(--gray);text-decoration:none;transition:color 0.2s;}
+.page-breadcrumb a:hover{color:var(--gold);}
+.page-breadcrumb span{color:var(--gray2);}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,100px);line-height:0.9;letter-spacing:2px;color:var(--white);}
+.page-title .gold{color:var(--gold);}
+.page-subtitle{font-size:15px;color:var(--gray);margin-top:18px;font-weight:300;max-width:480px;line-height:1.7;}
+.page-hero-stats{display:flex;gap:40px;margin-top:32px;flex-wrap:wrap;}
+.ph-stat{display:flex;flex-direction:column;}
+.ph-stat-num{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--gold);line-height:1;}
+.ph-stat-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-top:3px;}
 
 /* MARQUEE */
-.marquee-section{background:var(--gold);padding:14px 0;overflow:hidden;}
-.marquee-track{display:flex;gap:0;animation:marquee 20s linear infinite;width:max-content;}
-.marquee-item{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:3px;color:var(--black);padding:0 40px;white-space:nowrap;}
+.marquee-section{background:var(--gold);padding:12px 0;overflow:hidden;}
+.marquee-track{display:flex;animation:marquee 20s linear infinite;width:max-content;}
+.marquee-item{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:var(--black);padding:0 36px;white-space:nowrap;}
 .marquee-dot{color:rgba(0,0,0,0.3);}
 @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 
-/* SECTION COMMON */
-section{padding:100px 5%;}
-.section-label{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;display:block;}
-.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,6vw,70px);line-height:0.95;color:var(--white);margin-bottom:20px;}
-.section-desc{color:var(--gray);font-size:15px;line-height:1.8;max-width:480px;font-weight:300;}
+/* SHOP MAIN */
+.shop-section{padding:60px 5% 100px;}
 
-/* FEATURES */
-.features{background:var(--dark);}
-.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:rgba(212,152,72,0.1);margin-top:60px;border:1px solid rgba(212,152,72,0.1);}
-.feature-card{background:var(--dark);padding:48px 36px;position:relative;overflow:hidden;transition:background 0.3s;}
-.feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--gold),transparent);opacity:0;transition:opacity 0.3s;}
-.feature-card:hover{background:var(--dark2);}
-.feature-card:hover::before{opacity:1;}
-.feature-icon{width:48px;height:48px;margin-bottom:24px;position:relative;}
-.feature-icon svg{width:100%;height:100%;stroke:var(--gold);fill:none;stroke-width:1.5;}
-.feature-num{font-family:'Bebas Neue',sans-serif;font-size:60px;color:rgba(212,152,72,0.06);position:absolute;top:20px;right:24px;line-height:1;}
-.feature-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--white);margin-bottom:12px;}
-.feature-desc{font-size:14px;color:var(--gray);line-height:1.7;font-weight:300;}
+/* TOOLBAR */
+.shop-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px;}
+.results-count{font-size:13px;color:var(--gray);letter-spacing:0.5px;}
+.results-count strong{color:var(--offwhite);}
+.sort-select{background:var(--dark2);border:1px solid var(--dark3);color:var(--offwhite);padding:9px 16px;font-size:12px;font-family:'DM Sans',sans-serif;letter-spacing:0.5px;cursor:pointer;border-radius:2px;outline:none;transition:border-color 0.2s;}
+.sort-select:focus{border-color:var(--gold-dim);}
 
-/* CATEGORIES */
-.categories{background:var(--black);}
-.cat-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:50px;flex-wrap:wrap;gap:20px;}
-.cat-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-top:24px;}
-.cat-tab{background:transparent;border:1px solid var(--dark3);color:var(--gray);padding:9px 20px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border-radius:2px;transition:all 0.2s;}
+/* CATEGORY TABS */
+.cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:36px;}
+.cat-tab{background:transparent;border:1px solid var(--dark3);color:var(--gray);padding:10px 22px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border-radius:2px;transition:all 0.2s;}
 .cat-tab.active,.cat-tab:hover{background:var(--gold);border-color:var(--gold);color:var(--black);}
-.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+
+/* PRODUCTS GRID */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;}
 .product-card{background:var(--dark);border:1px solid var(--dark3);border-radius:2px;overflow:hidden;position:relative;cursor:pointer;transition:all 0.3s;}
-.product-card:hover{border-color:rgba(212,152,72,0.4);transform:translateY(-4px);}
+.product-card:hover{border-color:rgba(212,152,72,0.4);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.4);}
 .product-img{width:100%;aspect-ratio:1;background:var(--dark2);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
 .product-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;}
 .product-card:hover .product-img img{transform:scale(1.06);}
 .product-img-placeholder{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--dark3);letter-spacing:2px;}
 .product-badge{position:absolute;top:12px;left:12px;background:var(--gold);color:var(--black);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;}
-.product-info{padding:16px;}
-.product-name{font-weight:500;font-size:14px;color:var(--offwhite);margin-bottom:6px;}
-.product-brand{font-size:12px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;}
-.product-action{display:flex;justify-content:space-between;align-items:center;margin-top:14px;}
+.product-info{padding:18px;}
+.product-name{font-weight:500;font-size:14px;color:var(--offwhite);margin-bottom:5px;line-height:1.4;}
+.product-brand{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
+.product-action{display:flex;justify-content:space-between;align-items:center;}
 .add-btn{background:var(--gold);color:var(--black);border:none;padding:9px 18px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:1px;transition:background 0.2s;}
 .add-btn:hover{background:var(--gold-light);}
-.view-all-link{color:var(--gold);font-size:13px;font-weight:500;text-decoration:none;letter-spacing:1px;display:flex;align-items:center;gap:6px;transition:gap 0.2s;}
-.view-all-link:hover{gap:10px;}
+.product-price{font-size:15px;color:var(--gold);font-weight:600;}
 
-/* CANVAS */
-.canvas-section{background:var(--dark);position:relative;overflow:hidden;}
-.canvas-section::before{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent,rgba(212,152,72,0.03),transparent);}
-.canvas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:60px;}
-.canvas-card{position:relative;overflow:hidden;aspect-ratio:3/4;background:var(--dark2);cursor:pointer;}
-.canvas-card img{width:100%;height:100%;object-fit:cover;filter:grayscale(30%) brightness(0.7);transition:all 0.5s;}
-.canvas-card:hover img{filter:grayscale(0%) brightness(0.9);transform:scale(1.04);}
-.canvas-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,transparent 50%);}
-.canvas-label{position:absolute;bottom:0;left:0;right:0;padding:28px 24px;}
-.canvas-label h3{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--white);}
-.canvas-label span{font-size:12px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;}
-.canvas-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--dark2);}
-.canvas-placeholder-text{font-family:'Bebas Neue',sans-serif;font-size:60px;color:rgba(212,152,72,0.08);letter-spacing:4px;}
+/* EMPTY STATE */
+.empty-state{padding:80px 20px;text-align:center;color:var(--gray);}
+.empty-state p{font-size:15px;margin-top:12px;}
 
-/* HOW IT WORKS */
-.how-it-works{background:var(--black);}
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;margin-top:60px;position:relative;}
-.steps::before{content:'';position:absolute;top:30px;left:60px;right:60px;height:1px;background:linear-gradient(to right,transparent,rgba(212,152,72,0.2),rgba(212,152,72,0.2),transparent);}
-.step{text-align:center;position:relative;}
-.step-num{font-family:'Bebas Neue',sans-serif;font-size:72px;color:rgba(212,152,72,0.1);line-height:1;margin-bottom:-20px;}
-.step-icon{width:60px;height:60px;border:1px solid rgba(212,152,72,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;background:var(--dark);}
-.step-icon svg{width:26px;height:26px;stroke:var(--gold);fill:none;stroke-width:1.5;}
-.step-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--white);margin-bottom:10px;}
-.step-desc{font-size:13px;color:var(--gray);line-height:1.7;font-weight:300;}
-
-/* QUOTE BANNER */
-.quote-banner{background:var(--gold);padding:60px 5%;text-align:center;position:relative;overflow:hidden;}
-.quote-banner::before{content:'"';font-family:'Bebas Neue',sans-serif;font-size:300px;color:rgba(0,0,0,0.06);position:absolute;top:-40px;left:5%;line-height:1;}
-.quote-banner h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,6vw,64px);color:var(--black);letter-spacing:2px;position:relative;}
-.quote-banner p{font-size:15px;color:rgba(0,0,0,0.6);margin-top:12px;font-weight:400;}
-
-/* NEWSLETTER */
-.newsletter{background:var(--dark);border-top:1px solid var(--dark3);}
-.newsletter-inner{display:flex;justify-content:space-between;align-items:center;gap:40px;flex-wrap:wrap;}
-.newsletter-text h3{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;color:var(--white);}
-.newsletter-text p{color:var(--gray);font-size:14px;margin-top:6px;font-weight:300;}
-.newsletter-form{display:flex;gap:0;flex:1;max-width:440px;}
-.newsletter-form input{flex:1;background:var(--dark2);border:1px solid var(--dark3);border-right:none;color:var(--offwhite);padding:14px 20px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;border-radius:2px 0 0 2px;}
-.newsletter-form input::placeholder{color:var(--gray2);}
-.newsletter-form input:focus{border-color:rgba(212,152,72,0.4);}
-.newsletter-form button{background:var(--gold);color:var(--black);border:none;padding:14px 28px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:0 2px 2px 0;transition:background 0.2s;white-space:nowrap;}
-.newsletter-form button:hover{background:var(--gold-light);}
-
-/* FOOTER */
-footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5% 40px;}
-.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;margin-bottom:60px;}
-.footer-brand .logo{display:block;margin-bottom:16px;}
-.footer-brand p{font-size:13px;color:var(--gray);line-height:1.8;font-weight:300;max-width:260px;}
-.footer-brand .contact-info{margin-top:24px;display:flex;flex-direction:column;gap:8px;}
-.footer-brand .contact-info a{font-size:13px;color:var(--gray);text-decoration:none;transition:color 0.2s;}
-.footer-brand .contact-info a:hover{color:var(--gold);}
-.footer-col h4{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--white);margin-bottom:20px;}
-.footer-col ul{list-style:none;}
-.footer-col ul li{margin-bottom:10px;}
-.footer-col ul a{font-size:13px;color:var(--gray);text-decoration:none;transition:color 0.2s;}
-.footer-col ul a:hover{color:var(--gold);}
-.footer-bottom{border-top:1px solid var(--dark3);padding-top:30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
-.footer-bottom p{font-size:12px;color:var(--gray2);}
-.social-links{display:flex;gap:12px;}
-.social-link{width:36px;height:36px;border:1px solid var(--dark3);display:flex;align-items:center;justify-content:center;color:var(--gray);text-decoration:none;font-size:13px;transition:all 0.2s;border-radius:2px;}
-.social-link:hover{border-color:var(--gold);color:var(--gold);}
-.payment-icons{display:flex;gap:8px;flex-wrap:wrap;}
-.pay-icon{background:var(--dark2);border:1px solid var(--dark3);padding:4px 12px;font-size:11px;color:var(--gray);border-radius:2px;letter-spacing:1px;text-transform:uppercase;}
-
-/* ---- CART BUTTON ---- */
+/* CART BUTTON */
 .cart-btn{background:transparent;border:none;cursor:pointer;color:var(--offwhite);position:relative;padding:8px 10px;display:flex;align-items:center;transition:color 0.2s;margin-left:8px;}
 .cart-btn:hover{color:var(--gold);}
 .cart-badge{position:absolute;top:2px;right:4px;background:var(--gold);color:var(--black);font-size:9px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;opacity:0;transform:scale(0);transition:all 0.2s;}
 .cart-badge.show{opacity:1;transform:scale(1);}
 
-/* ---- CART DRAWER ---- */
+/* CART DRAWER */
 .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:300;opacity:0;pointer-events:none;transition:opacity 0.3s;}
 .cart-overlay.open{opacity:1;pointer-events:all;}
 .cart-drawer{position:fixed;top:0;right:0;bottom:0;width:420px;max-width:95vw;background:var(--dark2);z-index:301;transform:translateX(105%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;border-left:1px solid rgba(212,152,72,0.15);}
@@ -218,7 +143,7 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 .cart-continue{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--gray);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;width:100%;transition:color 0.2s;}
 .cart-continue:hover{color:var(--gold);}
 
-/* ---- SIZE MODAL ---- */
+/* SIZE MODAL */
 .sm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
 .sm-overlay.open{opacity:1;pointer-events:all;}
 .sm-box{background:var(--dark2);border:1px solid rgba(212,152,72,0.18);border-radius:4px;width:100%;max-width:480px;overflow:hidden;transform:scale(0.95);transition:transform 0.25s;}
@@ -250,7 +175,7 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 .sm-add-btn{width:100%;background:var(--gold);color:var(--black);border:none;padding:14px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:2px;transition:background 0.2s;}
 .sm-add-btn:hover{background:var(--gold-light);}
 
-/* ---- SIZE GUIDE MODAL ---- */
+/* SIZE GUIDE MODAL */
 .sg-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
 .sg-overlay.open{opacity:1;pointer-events:all;}
 .sg-box{background:var(--dark2);border:1px solid rgba(212,152,72,0.18);border-radius:4px;width:100%;max-width:580px;max-height:88vh;overflow-y:auto;transform:translateY(20px);transition:transform 0.25s;}
@@ -277,14 +202,36 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 .sg-m-item strong{display:block;font-size:11px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
 .sg-m-item span{font-size:12px;color:var(--gray);line-height:1.6;}
 
+/* FOOTER */
+footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5% 40px;}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;margin-bottom:60px;}
+.footer-brand .logo{display:block;margin-bottom:16px;}
+.footer-brand p{font-size:13px;color:var(--gray);line-height:1.8;font-weight:300;max-width:260px;}
+.footer-brand .contact-info{margin-top:24px;display:flex;flex-direction:column;gap:8px;}
+.footer-brand .contact-info a{font-size:13px;color:var(--gray);text-decoration:none;transition:color 0.2s;}
+.footer-brand .contact-info a:hover{color:var(--gold);}
+.footer-col h4{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--white);margin-bottom:20px;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:10px;}
+.footer-col ul a{font-size:13px;color:var(--gray);text-decoration:none;transition:color 0.2s;}
+.footer-col ul a:hover{color:var(--gold);}
+.footer-bottom{border-top:1px solid var(--dark3);padding-top:30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+.footer-bottom p{font-size:12px;color:var(--gray2);}
+.social-links{display:flex;gap:12px;}
+.social-link{width:36px;height:36px;border:1px solid var(--dark3);display:flex;align-items:center;justify-content:center;color:var(--gray);text-decoration:none;font-size:13px;transition:all 0.2s;border-radius:2px;}
+.social-link:hover{border-color:var(--gold);color:var(--gold);}
+.payment-icons{display:flex;gap:8px;flex-wrap:wrap;}
+.pay-icon{background:var(--dark2);border:1px solid var(--dark3);padding:4px 12px;font-size:11px;color:var(--gray);border-radius:2px;letter-spacing:1px;text-transform:uppercase;}
+
 /* RESPONSIVE */
 @media(max-width:768px){
   .nav-links{display:none;}.hamburger{display:flex;}
-  .hero-stats{position:static;margin-top:50px;flex-wrap:wrap;gap:30px;}
   .footer-top{grid-template-columns:1fr 1fr;}
-  .canvas-grid{grid-template-columns:1fr;}
-  .steps::before{display:none;}
-  .newsletter-inner{flex-direction:column;}
+  .page-hero-stats{gap:24px;}
+  .products-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+}
+@media(max-width:480px){
+  .products-grid{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
@@ -293,23 +240,21 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="#" class="logo"><img src="logo.png" alt="Vistec GraphX"/></a>
+    <a href="index.html" class="logo"><img src="logo.png" alt="Vistec GraphX"/></a>
     <ul class="nav-links">
-      <li><a href="products.html">Shop</a></li>
-      <li><a href="#canvas">Products</a></li>
+      <li><a href="products.html" class="active">Shop</a></li>
+      <li><a href="index.html#canvas">Products</a></li>
       <li><a href="designer.html">Designer</a></li>
-      <li><a href="#how">How It Works</a></li>
-      <li><a href="#about">About</a></li>
+      <li><a href="index.html#how">How It Works</a></li>
+      <li><a href="index.html#about">About</a></li>
       <li><a href="tel:+17043776626" class="nav-phone">+1 704-377-6626</a></li>
     </ul>
     <button class="cart-btn" id="cartBtn" onclick="openCart()">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
       <span class="cart-badge" id="cartBadge"></span>
     </button>
-    <a href="#quote" class="nav-cta">Get a Quote</a>
-    <div class="hamburger">
-      <span></span><span></span><span></span>
-    </div>
+    <a href="index.html#quote" class="nav-cta">Get a Quote</a>
+    <div class="hamburger"><span></span><span></span><span></span></div>
   </div>
 </nav>
 
@@ -409,39 +354,26 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
   </div>
 </div>
 
-<!-- HERO -->
-<section class="hero" id="home">
-  <div class="hero-bg"></div>
-  <div class="hero-pattern"></div>
-  <div class="hero-glow"></div>
-  <div class="hero-content">
-    <div class="hero-badge">Charlotte, NC &middot; No Minimums &middot; DTF Printing</div>
-    <h1>WE'VE<br>GOT YOUR<br><span class="gold">BACK.</span></h1>
-    <p class="hero-sub">Premium custom apparel, DTF printing, and bold designs &mdash; built for individuals, teams, and businesses in Charlotte and beyond.</p>
-    <div class="hero-actions">
-      <a href="products.html" class="btn-primary">Shop Now</a>
-      <a href="#quote" class="btn-outline">Request a Quote</a>
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-pattern"></div>
+  <div class="page-hero-glow"></div>
+  <div class="page-hero-inner">
+    <div class="page-breadcrumb">
+      <a href="index.html">Home</a>
+      <span>/</span>
+      <span style="color:var(--gold);">Shop</span>
+    </div>
+    <h1 class="page-title">SHOP THE<br><span class="gold">COLLECTION</span></h1>
+    <p class="page-subtitle">Premium custom apparel with DTF printing. No minimums &mdash; order one piece or a hundred.</p>
+    <div class="page-hero-stats">
+      <div class="ph-stat"><span class="ph-stat-num" id="totalProducts">—</span><span class="ph-stat-label">Products</span></div>
+      <div class="ph-stat"><span class="ph-stat-num">5</span><span class="ph-stat-label">Categories</span></div>
+      <div class="ph-stat"><span class="ph-stat-num">$4.99</span><span class="ph-stat-label">Flat Shipping</span></div>
     </div>
   </div>
-  <div class="hero-stats">
-    <div class="stat-item">
-      <div class="stat-num">1K+</div>
-      <div class="stat-label">Designs</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">0</div>
-      <div class="stat-label">Minimums</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">48H</div>
-      <div class="stat-label">Turnaround</div>
-    </div>
-  </div>
-  <div class="hero-scroll">
-    <span>Scroll</span>
-    <div class="scroll-line"></div>
-  </div>
-</section>
+</div>
 
 <!-- MARQUEE -->
 <div class="marquee-section">
@@ -463,151 +395,36 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
   </div>
 </div>
 
-<!-- FEATURES -->
-<section class="features" id="about">
-  <span class="section-label">The Experience</span>
-  <h2 class="section-title">WHY CHOOSE<br>VISTEC</h2>
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-num">01</div>
-      <div class="feature-icon">
-        <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20"/><path d="M16 24l6 6 10-12"/></svg>
-      </div>
-      <div class="feature-title">Premium Quality</div>
-      <p class="feature-desc">From a one-off piece to bulk orders &mdash; we print on top-tier Gildan and premium brand garments with vivid, lasting DTF inks.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-num">02</div>
-      <div class="feature-icon">
-        <svg viewBox="0 0 48 48"><rect x="8" y="8" width="32" height="32" rx="4"/><path d="M16 24h16M24 16v16"/></svg>
-      </div>
-      <div class="feature-title">Easy Ordering</div>
-      <p class="feature-desc">Browse designs, customize online, approve proofs from your phone &mdash; we make the process dead simple from click to doorstep.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-num">03</div>
-      <div class="feature-icon">
-        <svg viewBox="0 0 48 48"><path d="M8 24l8-12h16l8 12-8 12H16L8 24z"/><circle cx="24" cy="24" r="5"/></svg>
-      </div>
-      <div class="feature-title">Fast Delivery</div>
-      <p class="feature-desc">Standard and rush options available. Charlotte locals can also pick up in-store at 701 Morris St.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-num">04</div>
-      <div class="feature-icon">
-        <svg viewBox="0 0 48 48"><path d="M24 8C15.2 8 8 15.2 8 24s7.2 16 16 16 16-7.2 16-16"/><path d="M30 14l10-6-2 10"/></svg>
-      </div>
-      <div class="feature-title">Expert Support</div>
-      <p class="feature-desc">Real humans, not bots. Our team walks you through every step &mdash; from design selection to delivery confirmation.</p>
-    </div>
-  </div>
-</section>
-
-<!-- PRODUCT CATEGORIES -->
-<section class="categories" id="products">
-  <div class="cat-header">
-    <div>
-      <span class="section-label">Decorated Products</span>
-      <h2 class="section-title">SHOP THE<br>COLLECTION</h2>
-    </div>
-    <a href="products.html" class="view-all-link">View All &rarr;</a>
-  </div>
+<!-- SHOP MAIN -->
+<div class="shop-section">
   <div class="cat-tabs" id="catTabs">
-    <button class="cat-tab active" data-cat="all">All</button>
+    <button class="cat-tab active" data-cat="all">All Products</button>
     <button class="cat-tab" data-cat="fun">Fun Print</button>
     <button class="cat-tab" data-cat="anime">Anime</button>
     <button class="cat-tab" data-cat="boots">Boots on the Ground</button>
     <button class="cat-tab" data-cat="no_kings">No Kings</button>
     <button class="cat-tab" data-cat="jesus">Jesus Christ</button>
   </div>
-  <div class="products-grid" id="productsGrid" style="margin-top:40px;"></div>
-</section>
 
-<!-- CANVAS -->
-<section class="canvas-section" id="canvas">
-  <span class="section-label">Products</span>
-  <h2 class="section-title">CHOOSE YOUR<br>CANVAS</h2>
-  <p class="section-desc">We print on the garments you love. Pick your style and we'll handle the rest.</p>
-  <div class="canvas-grid">
-    <div class="canvas-card" onclick="window.open('https://www.vistecprints.com/create/Mens','_blank')">
-      <div class="canvas-placeholder"><div class="canvas-placeholder-text">MEN'S</div></div>
-      <div class="canvas-overlay"></div>
-      <div class="canvas-label"><span>Explore Collection</span><h3>MENS</h3></div>
-    </div>
-    <div class="canvas-card" onclick="window.open('https://www.vistecprints.com/create/Womens','_blank')">
-      <div class="canvas-placeholder"><div class="canvas-placeholder-text">WOMEN</div></div>
-      <div class="canvas-overlay"></div>
-      <div class="canvas-label"><span>Explore Collection</span><h3>WOMENS</h3></div>
-    </div>
-    <div class="canvas-card" onclick="window.open('https://www.vistecprints.com/create/Kids','_blank')">
-      <div class="canvas-placeholder"><div class="canvas-placeholder-text">KIDS</div></div>
-      <div class="canvas-overlay"></div>
-      <div class="canvas-label"><span>Explore Collection</span><h3>KIDS</h3></div>
-    </div>
+  <div class="shop-toolbar">
+    <div class="results-count" id="resultsCount"><strong>—</strong> products</div>
+    <select class="sort-select" id="sortSelect" onchange="applySortAndRender()">
+      <option value="default">Sort: Default</option>
+      <option value="az">Name: A → Z</option>
+      <option value="za">Name: Z → A</option>
+      <option value="price-asc">Price: Low → High</option>
+      <option value="price-desc">Price: High → Low</option>
+    </select>
   </div>
-</section>
 
-<!-- HOW IT WORKS -->
-<section class="how-it-works" id="how">
-  <span class="section-label">The Process</span>
-  <h2 class="section-title">HOW IT<br>WORKS</h2>
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">01</div>
-      <div class="step-icon">
-        <svg viewBox="0 0 26 26"><circle cx="13" cy="13" r="10"/><path d="M9 13l3 3 5-6"/></svg>
-      </div>
-      <div class="step-title">SELECT</div>
-      <p class="step-desc">Browse our catalog of premium garments. T-shirts, hoodies, hats, and more &mdash; Gildan, Next Level, and beyond.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">02</div>
-      <div class="step-icon">
-        <svg viewBox="0 0 26 26"><rect x="3" y="3" width="20" height="20" rx="3"/><path d="M8 13h10M13 8v10"/></svg>
-      </div>
-      <div class="step-title">DESIGN</div>
-      <p class="step-desc">Choose from 1,000+ designs or upload your own artwork. Use our online designer to place and size it perfectly.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">03</div>
-      <div class="step-icon">
-        <svg viewBox="0 0 26 26"><path d="M4 13l5 5L22 6"/></svg>
-      </div>
-      <div class="step-title">ORDER</div>
-      <p class="step-desc">Approve your proof, choose your delivery speed, and we'll get it printed and shipped &mdash; or ready for pickup.</p>
-    </div>
-  </div>
-</section>
-
-<!-- QUOTE BANNER -->
-<div class="quote-banner" id="quote">
-  <h2>NO MINIMUMS. NO HASSLE. JUST GREAT PRINTS.</h2>
-  <p>Order one piece or a thousand &mdash; the quality never changes.</p>
-  <div style="margin-top:30px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
-    <a href="https://www.vistecprints.com/request_quote" style="background:var(--black);color:var(--gold);padding:15px 36px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-radius:2px;">Request a Quote</a>
-    <a href="https://www.vistecprints.com/quick_quote" style="background:transparent;border:2px solid rgba(0,0,0,0.3);color:var(--black);padding:15px 36px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-radius:2px;">Quick Quote</a>
-  </div>
+  <div class="products-grid" id="productsGrid"></div>
 </div>
-
-<!-- NEWSLETTER -->
-<section class="newsletter">
-  <div class="newsletter-inner">
-    <div class="newsletter-text">
-      <h3>JOIN THE VISTEC CREW</h3>
-      <p>Get notified on new drops, promos, and design launches.</p>
-    </div>
-    <form class="newsletter-form" onsubmit="handleSignup(event)">
-      <input type="email" placeholder="your@email.com" id="emailInput" required/>
-      <button type="submit">Sign Up</button>
-    </form>
-  </div>
-</section>
 
 <!-- FOOTER -->
 <footer>
   <div class="footer-top">
     <div class="footer-brand">
-      <a href="#" class="logo">VISTEC<span style="color:var(--white)">PRINTS</span></a>
+      <a href="index.html" class="logo"><img src="logo.png" alt="Vistec GraphX" style="height:70px;"/></a>
       <p>Custom apparel and DTF printing in Charlotte, NC. Bold designs, premium garments, no minimums.</p>
       <div class="contact-info">
         <a href="tel:+17043776626">+1 704-377-6626</a>
@@ -628,11 +445,11 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
     <div class="footer-col">
       <h4>Shop</h4>
       <ul>
-        <li><a href="https://www.vistecprints.com/shop">Decorated Products</a></li>
-        <li><a href="https://www.vistecprints.com/designs">Designs</a></li>
-        <li><a href="https://www.vistecprints.com/create/Mens">Mens</a></li>
-        <li><a href="https://www.vistecprints.com/create/Womens">Womens</a></li>
-        <li><a href="https://www.vistecprints.com/create/Kids">Kids</a></li>
+        <li><a href="products.html">All Products</a></li>
+        <li><a href="products.html?cat=fun">Fun Print</a></li>
+        <li><a href="products.html?cat=anime">Anime</a></li>
+        <li><a href="products.html?cat=boots">Boots on the Ground</a></li>
+        <li><a href="products.html?cat=no_kings">No Kings</a></li>
       </ul>
     </div>
     <div class="footer-col">
@@ -668,18 +485,44 @@ let products = [];
 let productMap = {};
 let activecat = 'all';
 
+// Check URL for category param (e.g. products.html?cat=anime)
+(function() {
+  const p = new URLSearchParams(location.search).get('cat');
+  if (p) activecat = p;
+})();
+
+function getPrice(p) {
+  return parseFloat((p.price || '0').replace(/[^0-9.]/g,'')) || 0;
+}
+
+function getSorted(arr) {
+  const val = document.getElementById('sortSelect').value;
+  const copy = [...arr];
+  if (val === 'az') copy.sort((a,b) => a.name.localeCompare(b.name));
+  else if (val === 'za') copy.sort((a,b) => b.name.localeCompare(a.name));
+  else if (val === 'price-asc') copy.sort((a,b) => getPrice(a) - getPrice(b));
+  else if (val === 'price-desc') copy.sort((a,b) => getPrice(b) - getPrice(a));
+  return copy;
+}
+
 function renderProducts(cat) {
   activecat = cat;
   const grid = document.getElementById('productsGrid');
-  const filtered = cat === 'all' ? products : products.filter(p => p.cat === cat);
-  if (!filtered.length) {
-    grid.innerHTML = '<p style="color:var(--gray);padding:40px 0;">No products in this category yet.</p>';
+  let filtered = cat === 'all' ? products : products.filter(p => p.cat === cat);
+  const sorted = getSorted(filtered);
+
+  document.getElementById('resultsCount').innerHTML =
+    `<strong>${sorted.length}</strong> product${sorted.length !== 1 ? 's' : ''}`;
+
+  if (!sorted.length) {
+    grid.innerHTML = '<div class="empty-state"><p>No products in this category yet. Check back soon!</p></div>';
     return;
   }
-  grid.innerHTML = filtered.map(p => `
+  grid.innerHTML = sorted.map(p => `
     <div class="product-card" onclick="openSizeModal('${p.id}')">
       <div class="product-img">
-        <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'>VP</div>'"/>
+        <img src="${p.img}" alt="${p.name}" loading="lazy"
+          onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'>VP</div>'"/>
         ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
       </div>
       <div class="product-info">
@@ -687,12 +530,14 @@ function renderProducts(cat) {
         <div class="product-brand">${p.garment ? p.garment + ' &middot; ' : ''}DTF Print</div>
         <div class="product-action">
           <button class="add-btn" onclick="event.stopPropagation();openSizeModal('${p.id}')">Add to Cart</button>
-          ${p.price ? `<span style="color:var(--gold);font-weight:600;font-size:14px;">${p.price}</span>` : ''}
+          ${p.price ? `<span class="product-price">${p.price}</span>` : ''}
         </div>
       </div>
     </div>
   `).join('');
 }
+
+function applySortAndRender() { renderProducts(activecat); }
 
 document.getElementById('catTabs').addEventListener('click', e => {
   const btn = e.target.closest('.cat-tab');
@@ -707,24 +552,28 @@ fetch('products.json')
   .then(data => {
     products = data;
     products.forEach(p => productMap[p.id] = p);
-    renderProducts('all');
+    document.getElementById('totalProducts').textContent = products.length;
+
+    // Activate the right tab if URL has a cat param
+    if (activecat !== 'all') {
+      document.querySelectorAll('.cat-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.cat === activecat);
+      });
+    }
+    renderProducts(activecat);
   })
   .catch(() => { products = []; renderProducts('all'); });
 
 // ── CART ──────────────────────────────────────────────
 let cart = JSON.parse(localStorage.getItem('vp_cart') || '[]');
 
-function saveCart() {
-  localStorage.setItem('vp_cart', JSON.stringify(cart));
-  updateCartUI();
-}
+function saveCart() { localStorage.setItem('vp_cart', JSON.stringify(cart)); updateCartUI(); }
 
 function addToCart(product, size, qty) {
   const key = product.id + '_' + size;
   const existing = cart.find(i => i._key === key);
-  if (existing) {
-    existing.qty += qty;
-  } else {
+  if (existing) { existing.qty += qty; }
+  else {
     const priceNum = parseFloat((product.price || '0').replace(/[^0-9.]/g,'')) || 0;
     cart.push({ _key: key, id: product.id, name: product.name, img: product.img,
       price: priceNum, priceStr: product.price || 'TBD', size, qty, garment: product.garment || '' });
@@ -732,10 +581,7 @@ function addToCart(product, size, qty) {
   saveCart();
 }
 
-function removeFromCart(key) {
-  cart = cart.filter(i => i._key !== key);
-  saveCart();
-}
+function removeFromCart(key) { cart = cart.filter(i => i._key !== key); saveCart(); }
 
 function updateQty(key, delta) {
   const item = cart.find(i => i._key === key);
@@ -813,9 +659,7 @@ function goCheckout() {
 }
 
 // ── SIZE MODAL ────────────────────────────────────────
-let smProduct = null;
-let smQty = 1;
-let smSize = null;
+let smProduct = null, smQty = 1, smSize = null;
 
 function openSizeModal(productId) {
   const p = productMap[productId];
@@ -889,27 +733,13 @@ function sgTab(btn, type) {
   btn.classList.add('active');
   buildSgTable(type);
 }
-function openSizeGuide() {
-  buildSgTable('tshirt');
-  document.getElementById('sgOverlay').classList.add('open');
-}
+function openSizeGuide() { buildSgTable('tshirt'); document.getElementById('sgOverlay').classList.add('open'); }
 function closeSizeGuide() { document.getElementById('sgOverlay').classList.remove('open'); }
 document.getElementById('sgOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeSizeGuide();
 });
 
-// Init cart badge on load
 updateCartUI();
-
-function handleSignup(e) {
-  e.preventDefault();
-  const input = document.getElementById('emailInput');
-  const btn = e.target.querySelector('button');
-  btn.textContent = 'Subscribed!';
-  btn.style.background = '#4CAF50';
-  input.value = '';
-  setTimeout(() => { btn.textContent = 'Sign Up'; btn.style.background = ''; }, 3000);
-}
 </script>
 </body>
 </html>
