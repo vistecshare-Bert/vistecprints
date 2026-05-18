@@ -99,6 +99,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $products  = loadProducts($jsonFile);
 $flashMsg  = $_GET['msg'] ?? '';
 $flashType = $_GET['type'] ?? 'success';
+
+// ── ORDERS ────────────────────────────────────────────
+$ordersFile = __DIR__ . '/../orders.json';
+function loadOrders($file) {
+    if (!file_exists($file)) return [];
+    $data = json_decode(file_get_contents($file), true);
+    return is_array($data) ? $data : [];
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'order_status') {
+    $orders   = loadOrders($ordersFile);
+    $orderId  = $_POST['order_id'] ?? '';
+    $newStatus = $_POST['status'] ?? 'pending';
+    foreach ($orders as &$o) {
+        if ($o['id'] === $orderId) { $o['status'] = $newStatus; break; }
+    }
+    unset($o);
+    file_put_contents($ordersFile, json_encode($orders, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    header('Location: dashboard.php?tab=orders&msg=' . urlencode("Order {$orderId} marked as {$newStatus}.") . '&type=success');
+    exit;
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'order_delete') {
+    $orders  = loadOrders($ordersFile);
+    $orderId = $_POST['order_id'] ?? '';
+    $orders  = array_values(array_filter($orders, fn($o) => $o['id'] !== $orderId));
+    file_put_contents($ordersFile, json_encode($orders, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    header('Location: dashboard.php?tab=orders&msg=Order+deleted.&type=warning');
+    exit;
+}
+$orders   = loadOrders($ordersFile);
+$activeTab = $_GET['tab'] ?? 'products';
+$pendingCount = count(array_filter($orders, fn($o) => ($o['status'] ?? '') === 'pending'));
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -210,6 +241,29 @@ tr:hover td{background:#fafafa;}
 
 .modal-foot{padding:16px 24px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:10px;}
 .empty-state{text-align:center;padding:60px 20px;color:#bbb;}
+
+/* ORDERS */
+.order-card{background:#fff;border:1px solid #e8e8e8;border-radius:3px;margin-bottom:16px;overflow:hidden;}
+.order-card-head{padding:14px 20px;background:#fafafa;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.order-id{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:#111;}
+.order-date{font-size:12px;color:#aaa;}
+.order-status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;}
+.status-pending{background:#fff3e0;color:#e65c00;border:1px solid #f5c88a;}
+.status-fulfilled{background:#f0faf4;color:#1e7e45;border:1px solid #a3d9b5;}
+.status-cancelled{background:#fff0f0;color:#c00;border:1px solid #f5a0a0;}
+.order-total{font-weight:700;color:var(--gold);margin-left:auto;font-size:15px;}
+.order-card-body{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+@media(max-width:700px){.order-card-body{grid-template-columns:1fr;}}
+.order-section{padding:16px 20px;border-right:1px solid #f0f0f0;}
+.order-section:last-child{border-right:none;}
+.order-section h4{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#aaa;margin-bottom:10px;}
+.order-section p{font-size:13px;color:#333;margin-bottom:4px;}
+.order-items-list{list-style:none;}
+.order-items-list li{font-size:13px;color:#333;padding:5px 0;border-bottom:1px solid #f5f5f5;display:flex;justify-content:space-between;}
+.order-items-list li:last-child{border-bottom:none;}
+.order-card-foot{padding:12px 20px;border-top:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.status-select{border:1px solid #ddd;padding:7px 10px;font-size:12px;font-family:'DM Sans',sans-serif;border-radius:2px;color:#555;background:#fff;cursor:pointer;}
+.sb-badge{background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;margin-left:auto;}
 </style>
 </head>
 <body>
@@ -219,9 +273,16 @@ tr:hover td{background:#fafafa;}
   <div class="sb-label">Manage</div>
   <ul class="sb-nav">
     <li>
-      <a href="dashboard.php" class="active">
+      <a href="dashboard.php?tab=products" <?= $activeTab==='products' ? 'class="active"' : '' ?>>
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        Decorated Products
+        Products
+      </a>
+    </li>
+    <li>
+      <a href="dashboard.php?tab=orders" <?= $activeTab==='orders' ? 'class="active"' : '' ?> style="justify-content:flex-start;">
+        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        Orders
+        <?php if ($pendingCount > 0): ?><span class="sb-badge"><?= $pendingCount ?></span><?php endif; ?>
       </a>
     </li>
     <li>
@@ -241,17 +302,88 @@ tr:hover td{background:#fafafa;}
 
 <div class="main">
   <div class="topbar">
-    <h1>Decorated Products</h1>
+    <h1><?= $activeTab === 'orders' ? 'Orders' : 'Decorated Products' ?></h1>
+    <?php if ($activeTab !== 'orders'): ?>
     <button class="btn btn-gold" onclick="openModal()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Add Product
     </button>
+    <?php endif; ?>
   </div>
 
   <div class="content">
     <?php if ($flashMsg): ?>
     <div class="flash flash-<?= htmlspecialchars($flashType) ?>"><?= htmlspecialchars($flashMsg) ?></div>
     <?php endif; ?>
+
+    <?php if ($activeTab === 'orders'): ?>
+    <!-- ===== ORDERS TAB ===== -->
+    <div class="stats">
+      <div class="stat-card"><div class="num"><?= count($orders) ?></div><div class="lbl">Total Orders</div></div>
+      <div class="stat-card"><div class="num"><?= $pendingCount ?></div><div class="lbl">Pending</div></div>
+      <div class="stat-card"><div class="num"><?= count(array_filter($orders, fn($o) => ($o['status']??'') === 'fulfilled')) ?></div><div class="lbl">Fulfilled</div></div>
+      <div class="stat-card"><div class="num">$<?= number_format(array_sum(array_map(fn($o) => $o['total']??0, $orders)), 2) ?></div><div class="lbl">Total Revenue</div></div>
+    </div>
+
+    <?php if (empty($orders)): ?>
+    <div class="empty-state"><p>No orders yet. Orders placed on the website will appear here.</p></div>
+    <?php else: ?>
+    <?php foreach ($orders as $o):
+      $status = $o['status'] ?? 'pending';
+      $cust   = $o['customer'] ?? [];
+      $addr   = $cust['address'] ?? [];
+    ?>
+    <div class="order-card">
+      <div class="order-card-head">
+        <span class="order-id"><?= htmlspecialchars($o['id']) ?></span>
+        <span class="order-date"><?= date('M j, Y g:i A', strtotime($o['date'] ?? 'now')) ?></span>
+        <span class="order-status status-<?= htmlspecialchars($status) ?>"><?= ucfirst($status) ?></span>
+        <span class="order-total">$<?= number_format($o['total'] ?? 0, 2) ?></span>
+      </div>
+      <div class="order-card-body">
+        <div class="order-section">
+          <h4>Customer</h4>
+          <p><strong><?= htmlspecialchars($cust['name'] ?? '—') ?></strong></p>
+          <p><?= htmlspecialchars($cust['email'] ?? '') ?></p>
+          <p><?= htmlspecialchars($cust['phone'] ?? '') ?></p>
+          <p style="margin-top:8px;color:#888;"><?= htmlspecialchars(($addr['line1']??'') . ', ' . ($addr['city']??'') . ', ' . ($addr['state']??'') . ' ' . ($addr['zip']??'')) ?></p>
+          <?php if (!empty($o['notes'])): ?><p style="margin-top:8px;font-style:italic;color:#888;font-size:12px;">"<?= htmlspecialchars($o['notes']) ?>"</p><?php endif; ?>
+        </div>
+        <div class="order-section">
+          <h4>Items · Subtotal $<?= number_format($o['subtotal']??0,2) ?> + $<?= number_format($o['shipping']??4.99,2) ?> shipping</h4>
+          <ul class="order-items-list">
+          <?php foreach (($o['items'] ?? []) as $item): ?>
+            <li>
+              <span><?= htmlspecialchars($item['name'] ?? '') ?> — Size <?= htmlspecialchars($item['size'] ?? '') ?></span>
+              <span><?= htmlspecialchars($item['priceStr'] ?? '') ?> ×<?= intval($item['qty'] ?? 1) ?></span>
+            </li>
+          <?php endforeach; ?>
+          </ul>
+        </div>
+      </div>
+      <div class="order-card-foot">
+        <form method="POST" style="display:flex;align-items:center;gap:8px;">
+          <input type="hidden" name="action" value="order_status"/>
+          <input type="hidden" name="order_id" value="<?= htmlspecialchars($o['id']) ?>"/>
+          <select name="status" class="status-select">
+            <option value="pending"   <?= $status==='pending'   ?'selected':'' ?>>Pending</option>
+            <option value="fulfilled" <?= $status==='fulfilled' ?'selected':'' ?>>Fulfilled</option>
+            <option value="cancelled" <?= $status==='cancelled' ?'selected':'' ?>>Cancelled</option>
+          </select>
+          <button type="submit" class="btn btn-outline btn-sm">Update Status</button>
+        </form>
+        <form method="POST" onsubmit="return confirm('Delete this order?')" style="margin-left:auto;">
+          <input type="hidden" name="action" value="order_delete"/>
+          <input type="hidden" name="order_id" value="<?= htmlspecialchars($o['id']) ?>"/>
+          <button type="submit" class="btn btn-red btn-sm">Delete</button>
+        </form>
+      </div>
+    </div>
+    <?php endforeach; ?>
+    <?php endif; ?>
+
+    <?php else: ?>
+    <!-- ===== PRODUCTS TAB ===== -->
 
     <div class="stats">
       <div class="stat-card"><div class="num"><?= count($products) ?></div><div class="lbl">Total Products</div></div>
@@ -324,6 +456,8 @@ tr:hover td{background:#fafafa;}
       </table>
       <?php endif; ?>
     </div>
+
+    <?php endif; // end products tab ?>
   </div>
 </div>
 

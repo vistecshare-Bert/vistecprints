@@ -25,7 +25,7 @@
   --panel-w-left:200px;
   --panel-w-right:280px;
   --toolbar-h:52px;
-  --nav-h:68px;
+  --nav-h:100px;
 }
 html,body{height:100%;overflow:hidden;}
 body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-serif;}
@@ -34,7 +34,7 @@ body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-se
 nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,152,72,0.2);padding:0 5%;height:var(--nav-h);}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;height:100%;}
 .logo{text-decoration:none;display:flex;align-items:center;}
-.logo img{height:44px;width:auto;display:block;}
+.logo img{height:90px;width:auto;display:block;}
 .nav-links{display:flex;align-items:center;gap:28px;list-style:none;}
 .nav-links a{color:var(--gray);text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500;transition:color 0.2s;}
 .nav-links a:hover,.nav-links a.active{color:var(--gold);}
@@ -320,7 +320,7 @@ input[type=range]{width:100%;accent-color:var(--gold);}
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="index.html" class="logo"><img src="Images/Logo.png" alt="Vistec GraphX"/></a>
+    <a href="index.html" class="logo"><img src="logo.png" alt="Vistec GraphX"/></a>
     <ul class="nav-links">
       <li><a href="index.html#products">Shop</a></li>
       <li><a href="index.html#canvas">Products</a></li>

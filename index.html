@@ -25,9 +25,9 @@ body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-se
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,10,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,152,72,0.15);padding:0 5%;}
-.nav-inner{display:flex;align-items:center;justify-content:space-between;height:68px;}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:100px;}
 .logo{text-decoration:none;display:flex;align-items:center;}
-.logo img{height:46px;width:auto;display:block;}
+.logo img{height:90px;width:auto;display:block;}
 .nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
 .nav-links a{color:var(--gray);text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500;transition:color 0.2s;}
 .nav-links a:hover{color:var(--gold);}
@@ -174,6 +174,109 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 .payment-icons{display:flex;gap:8px;flex-wrap:wrap;}
 .pay-icon{background:var(--dark2);border:1px solid var(--dark3);padding:4px 12px;font-size:11px;color:var(--gray);border-radius:2px;letter-spacing:1px;text-transform:uppercase;}
 
+/* ---- CART BUTTON ---- */
+.cart-btn{background:transparent;border:none;cursor:pointer;color:var(--offwhite);position:relative;padding:8px 10px;display:flex;align-items:center;transition:color 0.2s;margin-left:8px;}
+.cart-btn:hover{color:var(--gold);}
+.cart-badge{position:absolute;top:2px;right:4px;background:var(--gold);color:var(--black);font-size:9px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;opacity:0;transform:scale(0);transition:all 0.2s;}
+.cart-badge.show{opacity:1;transform:scale(1);}
+
+/* ---- CART DRAWER ---- */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:300;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.cart-overlay.open{opacity:1;pointer-events:all;}
+.cart-drawer{position:fixed;top:0;right:0;bottom:0;width:420px;max-width:95vw;background:var(--dark2);z-index:301;transform:translateX(105%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;border-left:1px solid rgba(212,152,72,0.15);}
+.cart-drawer.open{transform:translateX(0);}
+.cart-head{padding:22px 24px 18px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;flex-shrink:0;}
+.cart-head-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--white);flex:1;}
+.cart-head-count{font-size:12px;color:var(--gray);margin-left:8px;margin-top:6px;}
+.cart-x{background:transparent;border:none;cursor:pointer;color:var(--gray);padding:6px;display:flex;align-items:center;transition:color 0.2s;}
+.cart-x:hover{color:var(--offwhite);}
+.cart-body{flex:1;overflow-y:auto;padding:8px 24px;}
+.cart-empty-state{height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--gray);text-align:center;}
+.cart-empty-state p{font-size:14px;}
+.c-item{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+.c-item-img{width:80px;height:80px;background:var(--dark3);border-radius:2px;overflow:hidden;flex-shrink:0;}
+.c-item-img img{width:100%;height:100%;object-fit:cover;}
+.c-item-info{flex:1;min-width:0;}
+.c-item-name{font-size:13px;font-weight:500;color:var(--offwhite);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.c-item-meta{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
+.c-item-bottom{display:flex;align-items:center;justify-content:space-between;}
+.c-item-price{font-size:14px;color:var(--gold);font-weight:600;}
+.c-item-qty{display:flex;align-items:center;gap:8px;}
+.cq-btn{background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--offwhite);width:28px;height:28px;border-radius:2px;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.cq-btn:hover{background:rgba(212,152,72,0.15);border-color:var(--gold-dim);}
+.cq-num{font-size:14px;color:var(--offwhite);min-width:22px;text-align:center;}
+.c-item-del{background:transparent;border:none;cursor:pointer;color:var(--gray2);padding:4px;transition:color 0.2s;margin-left:6px;}
+.c-item-del:hover{color:#e05555;}
+.cart-foot{padding:20px 24px;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0;}
+.cart-lines{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+.cart-line{display:flex;justify-content:space-between;font-size:13px;color:var(--gray);}
+.cart-line.total{font-size:16px;color:var(--offwhite);font-weight:600;border-top:1px solid rgba(255,255,255,0.08);padding-top:12px;margin-top:4px;}
+.cart-line.total span:last-child{color:var(--gold);}
+.cart-checkout-btn{width:100%;background:var(--gold);color:var(--black);border:none;padding:15px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:2px;transition:background 0.2s;}
+.cart-checkout-btn:hover{background:var(--gold-light);}
+.cart-checkout-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.cart-continue{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--gray);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;width:100%;transition:color 0.2s;}
+.cart-continue:hover{color:var(--gold);}
+
+/* ---- SIZE MODAL ---- */
+.sm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.sm-overlay.open{opacity:1;pointer-events:all;}
+.sm-box{background:var(--dark2);border:1px solid rgba(212,152,72,0.18);border-radius:4px;width:100%;max-width:480px;overflow:hidden;transform:scale(0.95);transition:transform 0.25s;}
+.sm-overlay.open .sm-box{transform:scale(1);}
+.sm-top{display:flex;border-bottom:1px solid rgba(255,255,255,0.07);position:relative;}
+.sm-img{width:120px;height:120px;background:var(--dark3);flex-shrink:0;overflow:hidden;}
+.sm-img img{width:100%;height:100%;object-fit:cover;}
+.sm-meta{padding:18px 20px;flex:1;}
+.sm-pname{font-weight:600;font-size:15px;color:var(--offwhite);margin-bottom:4px;line-height:1.3;}
+.sm-garment{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.sm-price{font-size:22px;color:var(--gold);font-weight:700;}
+.sm-close-x{position:absolute;top:10px;right:12px;background:transparent;border:none;cursor:pointer;color:var(--gray);padding:4px;transition:color 0.2s;}
+.sm-close-x:hover{color:var(--offwhite);}
+.sm-body{padding:20px 24px;display:flex;flex-direction:column;gap:16px;}
+.sm-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.sm-lbl a{color:var(--gold);cursor:pointer;font-size:10px;letter-spacing:1px;text-transform:uppercase;}
+.sm-sizes{display:flex;gap:8px;flex-wrap:wrap;}
+.sm-size{min-width:52px;height:44px;padding:0 10px;background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--offwhite);font-size:12px;font-weight:500;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-family:'DM Sans',sans-serif;letter-spacing:0.5px;}
+.sm-size:hover{border-color:rgba(212,152,72,0.5);}
+.sm-size.sel{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:700;}
+.sm-size-err{font-size:12px;color:#e05555;display:none;margin-top:-8px;}
+.sm-size-err.show{display:block;}
+.sm-qty-row{display:flex;align-items:center;gap:16px;}
+.sm-qty-label{font-size:13px;color:var(--gray);}
+.sm-qctrl{display:flex;align-items:center;gap:10px;}
+.sm-qbtn{background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--offwhite);width:34px;height:34px;border-radius:2px;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-family:inherit;line-height:1;}
+.sm-qbtn:hover{background:rgba(212,152,72,0.15);border-color:var(--gold-dim);}
+.sm-qval{font-size:16px;color:var(--offwhite);min-width:28px;text-align:center;font-weight:500;}
+.sm-add-btn{width:100%;background:var(--gold);color:var(--black);border:none;padding:14px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:2px;transition:background 0.2s;}
+.sm-add-btn:hover{background:var(--gold-light);}
+
+/* ---- SIZE GUIDE MODAL ---- */
+.sg-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.sg-overlay.open{opacity:1;pointer-events:all;}
+.sg-box{background:var(--dark2);border:1px solid rgba(212,152,72,0.18);border-radius:4px;width:100%;max-width:580px;max-height:88vh;overflow-y:auto;transform:translateY(20px);transition:transform 0.25s;}
+.sg-overlay.open .sg-box{transform:translateY(0);}
+.sg-head{padding:22px 28px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--dark2);z-index:1;}
+.sg-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--gold);}
+.sg-x{background:transparent;border:none;cursor:pointer;color:var(--gray);padding:6px;display:flex;align-items:center;transition:color 0.2s;}
+.sg-x:hover{color:var(--offwhite);}
+.sg-body{padding:24px 28px;}
+.sg-tabs{display:flex;gap:6px;margin-bottom:22px;}
+.sg-tab{padding:8px 16px;background:var(--dark3);border:1px solid rgba(255,255,255,0.08);color:var(--gray);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+.sg-tab.active{background:rgba(212,152,72,0.12);border-color:var(--gold-dim);color:var(--gold);}
+.sg-note{font-size:13px;color:var(--gray);line-height:1.7;margin-bottom:20px;padding:12px 16px;background:rgba(212,152,72,0.05);border-left:2px solid var(--gold-dim);border-radius:0 2px 2px 0;}
+.sg-table{width:100%;border-collapse:collapse;font-size:13px;}
+.sg-table th{background:var(--dark3);color:var(--gold);font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:11px 14px;text-align:left;border-bottom:1px solid rgba(212,152,72,0.15);}
+.sg-table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.05);color:var(--offwhite);}
+.sg-table td:first-child{font-weight:600;color:var(--gold);}
+.sg-table tr:last-child td{border-bottom:none;}
+.sg-table tr:hover td{background:rgba(212,152,72,0.04);}
+.sg-measure{margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08);}
+.sg-measure h4{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--white);margin-bottom:16px;}
+.sg-measure-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;}
+.sg-m-item{background:var(--dark3);padding:14px;border-radius:2px;border:1px solid rgba(255,255,255,0.06);}
+.sg-m-item strong{display:block;font-size:11px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
+.sg-m-item span{font-size:12px;color:var(--gray);line-height:1.6;}
+
 /* RESPONSIVE */
 @media(max-width:768px){
   .nav-links{display:none;}.hamburger{display:flex;}
@@ -190,7 +293,7 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="#" class="logo"><img src="Images/Logo.png" alt="Vistec GraphX"/></a>
+    <a href="#" class="logo"><img src="logo.png" alt="Vistec GraphX"/></a>
     <ul class="nav-links">
       <li><a href="#products">Shop</a></li>
       <li><a href="#canvas">Products</a></li>
@@ -199,12 +302,112 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
       <li><a href="#about">About</a></li>
       <li><a href="tel:+17043776626" class="nav-phone">+1 704-377-6626</a></li>
     </ul>
+    <button class="cart-btn" id="cartBtn" onclick="openCart()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="cart-badge" id="cartBadge"></span>
+    </button>
     <a href="#quote" class="nav-cta">Get a Quote</a>
     <div class="hamburger">
       <span></span><span></span><span></span>
     </div>
   </div>
 </nav>
+
+<!-- CART OVERLAY + DRAWER -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-head">
+    <span class="cart-head-title">Your Cart</span>
+    <span class="cart-head-count" id="cartHeadCount"></span>
+    <button class="cart-x" onclick="closeCart()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="cart-body" id="cartBody"></div>
+  <div class="cart-foot">
+    <div class="cart-lines">
+      <div class="cart-line"><span>Subtotal</span><span id="cartSubtotal">$0.00</span></div>
+      <div class="cart-line"><span>Shipping</span><span>$4.99</span></div>
+      <div class="cart-line total"><span>Total</span><span id="cartTotal">$0.00</span></div>
+    </div>
+    <button class="cart-checkout-btn" id="cartCheckoutBtn" onclick="goCheckout()" disabled>Proceed to Checkout</button>
+    <button class="cart-continue" onclick="closeCart()">Continue Shopping</button>
+  </div>
+</div>
+
+<!-- SIZE SELECTION MODAL -->
+<div class="sm-overlay" id="smOverlay">
+  <div class="sm-box">
+    <div class="sm-top">
+      <div class="sm-img"><img id="smImg" src="" alt=""/></div>
+      <div class="sm-meta">
+        <div class="sm-pname" id="smName"></div>
+        <div class="sm-garment" id="smGarment"></div>
+        <div class="sm-price" id="smPrice"></div>
+      </div>
+      <button class="sm-close-x" onclick="closeSizeModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sm-body">
+      <div>
+        <div class="sm-lbl">Select Size <a onclick="openSizeGuide()">Size Guide</a></div>
+        <div class="sm-sizes">
+          <button class="sm-size" data-size="XS">XS</button>
+          <button class="sm-size" data-size="S">S</button>
+          <button class="sm-size" data-size="M">M</button>
+          <button class="sm-size" data-size="L">L</button>
+          <button class="sm-size" data-size="XL">XL</button>
+          <button class="sm-size" data-size="XXL">XXL</button>
+          <button class="sm-size" data-size="3XL">3XL</button>
+        </div>
+        <div class="sm-size-err" id="smSizeErr">Please select a size.</div>
+      </div>
+      <div>
+        <div class="sm-lbl">Quantity</div>
+        <div class="sm-qty-row">
+          <div class="sm-qctrl">
+            <button class="sm-qbtn" onclick="changeSmQty(-1)">−</button>
+            <span class="sm-qval" id="smQtyVal">1</span>
+            <button class="sm-qbtn" onclick="changeSmQty(1)">+</button>
+          </div>
+        </div>
+      </div>
+      <button class="sm-add-btn" id="smAddBtn" onclick="confirmAddToCart()">Add to Cart</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIZE GUIDE MODAL -->
+<div class="sg-overlay" id="sgOverlay">
+  <div class="sg-box">
+    <div class="sg-head">
+      <span class="sg-title">Size Guide</span>
+      <button class="sg-x" onclick="closeSizeGuide()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sg-body">
+      <div class="sg-tabs">
+        <button class="sg-tab active" onclick="sgTab(this,'tshirt')">T-Shirt</button>
+        <button class="sg-tab" onclick="sgTab(this,'hoodie')">Hoodie / Sweatshirt</button>
+      </div>
+      <div class="sg-note">All measurements are in <strong>inches</strong>. Sizes are US/American standard. If between sizes, size up for a relaxed fit.</div>
+      <div id="sgTableWrap">
+        <table class="sg-table" id="sgTable"></table>
+      </div>
+      <div class="sg-measure">
+        <h4>How to Measure</h4>
+        <div class="sg-measure-grid">
+          <div class="sg-m-item"><strong>Chest</strong><span>Measure around the fullest part of your chest, keeping the tape level and horizontal.</span></div>
+          <div class="sg-m-item"><strong>Waist</strong><span>Measure around your natural waistline, the narrowest part of your torso.</span></div>
+          <div class="sg-m-item"><strong>Hip</strong><span>Measure around the fullest part of your hips, about 8" below your waist.</span></div>
+          <div class="sg-m-item"><strong>Length</strong><span>Measure from the highest point of the shoulder straight down to the bottom hem.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- HERO -->
 <section class="hero" id="home">
@@ -314,6 +517,7 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
     <button class="cat-tab" data-cat="fun">Fun Print</button>
     <button class="cat-tab" data-cat="anime">Anime</button>
     <button class="cat-tab" data-cat="boots">Boots on the Ground</button>
+    <button class="cat-tab" data-cat="no_kings">No Kings</button>
     <button class="cat-tab" data-cat="jesus">Jesus Christ</button>
   </div>
   <div class="products-grid" id="productsGrid" style="margin-top:40px;"></div>
@@ -459,7 +663,9 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 </footer>
 
 <script>
+// ── PRODUCTS ──────────────────────────────────────────
 let products = [];
+let productMap = {};
 let activecat = 'all';
 
 function renderProducts(cat) {
@@ -471,7 +677,7 @@ function renderProducts(cat) {
     return;
   }
   grid.innerHTML = filtered.map(p => `
-    <div class="product-card" onclick="window.open('https://www.vistecprints.com/shop/view_product/${p.id}','_blank')">
+    <div class="product-card" onclick="openSizeModal('${p.id}')">
       <div class="product-img">
         <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'>VP</div>'"/>
         ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
@@ -480,7 +686,7 @@ function renderProducts(cat) {
         <div class="product-name">${p.name}</div>
         <div class="product-brand">${p.garment ? p.garment + ' &middot; ' : ''}DTF Print</div>
         <div class="product-action">
-          <button class="add-btn" onclick="event.stopPropagation();window.open('https://www.vistecprints.com/shop/view_product/${p.id}','_blank')">Add to Cart</button>
+          <button class="add-btn" onclick="event.stopPropagation();openSizeModal('${p.id}')">Add to Cart</button>
           ${p.price ? `<span style="color:var(--gold);font-weight:600;font-size:14px;">${p.price}</span>` : ''}
         </div>
       </div>
@@ -498,8 +704,202 @@ document.getElementById('catTabs').addEventListener('click', e => {
 
 fetch('products.json')
   .then(r => r.json())
-  .then(data => { products = data; renderProducts('all'); })
+  .then(data => {
+    products = data;
+    products.forEach(p => productMap[p.id] = p);
+    renderProducts('all');
+  })
   .catch(() => { products = []; renderProducts('all'); });
+
+// ── CART ──────────────────────────────────────────────
+let cart = JSON.parse(localStorage.getItem('vp_cart') || '[]');
+
+function saveCart() {
+  localStorage.setItem('vp_cart', JSON.stringify(cart));
+  updateCartUI();
+}
+
+function addToCart(product, size, qty) {
+  const key = product.id + '_' + size;
+  const existing = cart.find(i => i._key === key);
+  if (existing) {
+    existing.qty += qty;
+  } else {
+    const priceNum = parseFloat((product.price || '0').replace(/[^0-9.]/g,'')) || 0;
+    cart.push({ _key: key, id: product.id, name: product.name, img: product.img,
+      price: priceNum, priceStr: product.price || 'TBD', size, qty, garment: product.garment || '' });
+  }
+  saveCart();
+}
+
+function removeFromCart(key) {
+  cart = cart.filter(i => i._key !== key);
+  saveCart();
+}
+
+function updateQty(key, delta) {
+  const item = cart.find(i => i._key === key);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) cart = cart.filter(i => i._key !== key);
+  saveCart();
+}
+
+function getSubtotal() { return cart.reduce((s, i) => s + i.price * i.qty, 0); }
+function getCartCount() { return cart.reduce((s, i) => s + i.qty, 0); }
+
+function updateCartUI() {
+  const count = getCartCount();
+  const badge = document.getElementById('cartBadge');
+  badge.textContent = count || '';
+  badge.classList.toggle('show', count > 0);
+  const headCount = document.getElementById('cartHeadCount');
+  if (headCount) headCount.textContent = count ? `(${count} item${count > 1 ? 's' : ''})` : '';
+  renderCartBody();
+  const sub = getSubtotal();
+  const el = document.getElementById('cartSubtotal');
+  const tot = document.getElementById('cartTotal');
+  const btn = document.getElementById('cartCheckoutBtn');
+  if (el) el.textContent = '$' + sub.toFixed(2);
+  if (tot) tot.textContent = '$' + (sub + 4.99).toFixed(2);
+  if (btn) btn.disabled = cart.length === 0;
+}
+
+function renderCartBody() {
+  const body = document.getElementById('cartBody');
+  if (!body) return;
+  if (!cart.length) {
+    body.innerHTML = `<div class="cart-empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.3"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <p>Your cart is empty.<br/>Add something from the shop!</p></div>`;
+    return;
+  }
+  body.innerHTML = cart.map(item => `
+    <div class="c-item">
+      <div class="c-item-img"><img src="${item.img}" alt="${item.name}" onerror="this.src='';this.style.display='none'"/></div>
+      <div class="c-item-info">
+        <div class="c-item-name">${item.name}</div>
+        <div class="c-item-meta">Size: ${item.size} &nbsp;·&nbsp; ${item.garment}</div>
+        <div class="c-item-bottom">
+          <span class="c-item-price">${item.priceStr}</span>
+          <div class="c-item-qty">
+            <button class="cq-btn" onclick="updateQty('${item._key}',-1)">−</button>
+            <span class="cq-num">${item.qty}</span>
+            <button class="cq-btn" onclick="updateQty('${item._key}',1)">+</button>
+          </div>
+          <button class="c-item-del" onclick="removeFromCart('${item._key}')" title="Remove">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function openCart() {
+  document.getElementById('cartDrawer').classList.add('open');
+  document.getElementById('cartOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  updateCartUI();
+}
+function closeCart() {
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function goCheckout() {
+  if (!cart.length) return;
+  localStorage.setItem('vp_cart', JSON.stringify(cart));
+  window.location.href = 'checkout.html';
+}
+
+// ── SIZE MODAL ────────────────────────────────────────
+let smProduct = null;
+let smQty = 1;
+let smSize = null;
+
+function openSizeModal(productId) {
+  const p = productMap[productId];
+  if (!p) return;
+  smProduct = p; smQty = 1; smSize = null;
+  document.getElementById('smImg').src = p.img || '';
+  document.getElementById('smName').textContent = p.name;
+  document.getElementById('smGarment').textContent = (p.garment || '') + ' · DTF Print';
+  document.getElementById('smPrice').textContent = p.price || 'Contact for price';
+  document.getElementById('smQtyVal').textContent = 1;
+  document.getElementById('smSizeErr').classList.remove('show');
+  document.querySelectorAll('.sm-size').forEach(b => b.classList.remove('sel'));
+  document.getElementById('smOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSizeModal() {
+  document.getElementById('smOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('smOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeSizeModal();
+});
+document.querySelectorAll('.sm-size').forEach(btn => {
+  btn.addEventListener('click', function() {
+    smSize = this.dataset.size;
+    document.querySelectorAll('.sm-size').forEach(b => b.classList.remove('sel'));
+    this.classList.add('sel');
+    document.getElementById('smSizeErr').classList.remove('show');
+  });
+});
+function changeSmQty(delta) {
+  smQty = Math.max(1, Math.min(20, smQty + delta));
+  document.getElementById('smQtyVal').textContent = smQty;
+}
+function confirmAddToCart() {
+  if (!smSize) { document.getElementById('smSizeErr').classList.add('show'); return; }
+  addToCart(smProduct, smSize, smQty);
+  closeSizeModal();
+  openCart();
+}
+
+// ── SIZE GUIDE ────────────────────────────────────────
+const SG_DATA = {
+  tshirt: [
+    { size:'XS', chest:'32–34"', waist:'26–28"', hip:'34–36"', length:'26"' },
+    { size:'S',  chest:'35–37"', waist:'29–31"', hip:'37–39"', length:'27"' },
+    { size:'M',  chest:'38–40"', waist:'32–34"', hip:'40–42"', length:'28"' },
+    { size:'L',  chest:'41–43"', waist:'35–37"', hip:'43–45"', length:'29"' },
+    { size:'XL', chest:'44–46"', waist:'38–40"', hip:'46–48"', length:'30"' },
+    { size:'XXL',chest:'47–50"', waist:'41–44"', hip:'49–52"', length:'31"' },
+    { size:'3XL',chest:'51–54"', waist:'45–48"', hip:'53–56"', length:'32"' },
+  ],
+  hoodie: [
+    { size:'XS', chest:'33–35"', waist:'27–29"', hip:'35–37"', length:'25"' },
+    { size:'S',  chest:'36–38"', waist:'30–32"', hip:'38–40"', length:'26"' },
+    { size:'M',  chest:'39–41"', waist:'33–35"', hip:'41–43"', length:'27"' },
+    { size:'L',  chest:'42–44"', waist:'36–38"', hip:'44–46"', length:'28"' },
+    { size:'XL', chest:'45–47"', waist:'39–41"', hip:'47–49"', length:'29"' },
+    { size:'XXL',chest:'48–51"', waist:'42–45"', hip:'50–53"', length:'30"' },
+    { size:'3XL',chest:'52–55"', waist:'46–49"', hip:'54–57"', length:'31"' },
+  ]
+};
+function buildSgTable(type) {
+  const rows = SG_DATA[type];
+  const t = document.getElementById('sgTable');
+  t.innerHTML = `<thead><tr><th>Size</th><th>Chest</th><th>Waist</th><th>Hip</th><th>Length</th></tr></thead>
+    <tbody>${rows.map(r=>`<tr><td>${r.size}</td><td>${r.chest}</td><td>${r.waist}</td><td>${r.hip}</td><td>${r.length}</td></tr>`).join('')}</tbody>`;
+}
+function sgTab(btn, type) {
+  document.querySelectorAll('.sg-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildSgTable(type);
+}
+function openSizeGuide() {
+  buildSgTable('tshirt');
+  document.getElementById('sgOverlay').classList.add('open');
+}
+function closeSizeGuide() { document.getElementById('sgOverlay').classList.remove('open'); }
+document.getElementById('sgOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeSizeGuide();
+});
+
+// Init cart badge on load
+updateCartUI();
 
 function handleSignup(e) {
   e.preventDefault();
