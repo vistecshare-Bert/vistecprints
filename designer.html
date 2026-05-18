@@ -322,7 +322,7 @@ input[type=range]{width:100%;accent-color:var(--gold);}
   <div class="nav-inner">
     <a href="index.html" class="logo"><img src="logo.png" alt="Vistec GraphX"/></a>
     <ul class="nav-links">
-      <li><a href="index.html#products">Shop</a></li>
+      <li><a href="products.html">Shop</a></li>
       <li><a href="index.html#canvas">Products</a></li>
       <li><a href="designer.html" class="active">Designer</a></li>
       <li><a href="index.html#how">How It Works</a></li>
@@ -469,7 +469,7 @@ input[type=range]{width:100%;accent-color:var(--gold);}
 
     <div class="right-tabs">
       <button class="right-tab active" data-tab="add">Add</button>
-      <button class="right-tab" data-tab="text">Text</button>
+      <button class="right-tab" data-tab="text">Edit</button>
       <button class="right-tab" data-tab="layers">Layers</button>
     </div>
 
@@ -523,7 +523,7 @@ input[type=range]{width:100%;accent-color:var(--gold);}
     <!-- TEXT TAB -->
     <div class="tab-pane" id="tab-text">
       <div id="textPropsWrap">
-        <div class="no-selection" id="noSelectionMsg">Select a text element<br/>to edit its properties</div>
+        <div class="no-selection" id="noSelectionMsg">Click any element on the canvas<br/>to select &amp; edit it.<br/><br/><span style="font-size:11px;color:var(--gray2);">Drag to move &nbsp;·&nbsp; Corner handles to resize<br/>Double-click text to type</span></div>
         <div id="textProps" style="display:none;flex-direction:column;gap:14px;">
 
           <div class="prop-group">
@@ -604,6 +604,64 @@ input[type=range]{width:100%;accent-color:var(--gold);}
           </div>
 
         </div>
+      </div>
+
+      <!-- IMAGE / SHAPE PROPERTIES (shown when non-text element selected) -->
+      <div id="imgProps" style="display:none;flex-direction:column;gap:14px;padding:0 0 8px;">
+
+        <div class="prop-group">
+          <div class="prop-label">Size (px) &nbsp;<span id="ipAspectTag" style="font-size:9px;color:var(--gold-dim);letter-spacing:0;">locked</span></div>
+          <div class="prop-row">
+            <div class="prop-group">
+              <div class="prop-label" style="font-size:9px;margin-bottom:3px;">Width</div>
+              <input type="number" class="prop-input" id="ipW" min="1" max="3000"/>
+            </div>
+            <div class="prop-group">
+              <div class="prop-label" style="font-size:9px;margin-bottom:3px;">Height</div>
+              <input type="number" class="prop-input" id="ipH" min="1" max="3000"/>
+            </div>
+          </div>
+          <div class="toggle-wrap" style="margin-top:10px;">
+            <span class="toggle-label">Lock Aspect Ratio</span>
+            <input type="checkbox" class="tgl" id="ipLock" checked/>
+            <label class="tgl-btn" for="ipLock"></label>
+          </div>
+        </div>
+
+        <div class="prop-group">
+          <div class="prop-label">Position (px)</div>
+          <div class="prop-row">
+            <div class="prop-group">
+              <div class="prop-label" style="font-size:9px;margin-bottom:3px;">X (left)</div>
+              <input type="number" class="prop-input" id="ipX"/>
+            </div>
+            <div class="prop-group">
+              <div class="prop-label" style="font-size:9px;margin-bottom:3px;">Y (top)</div>
+              <input type="number" class="prop-input" id="ipY"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="prop-group">
+          <div class="prop-label">Rotation</div>
+          <input type="range" id="ipRotation" min="0" max="360" value="0"/>
+          <span style="font-size:11px;color:var(--gray);margin-top:2px;" id="ipRotVal">0°</span>
+        </div>
+
+        <div class="prop-group">
+          <div class="prop-label">Flip</div>
+          <div class="style-btns">
+            <button class="style-btn" id="ipFlipH">↔ Horizontal</button>
+            <button class="style-btn" id="ipFlipV">↕ Vertical</button>
+          </div>
+        </div>
+
+        <div class="prop-group">
+          <div class="prop-label">Opacity</div>
+          <input type="range" id="ipOpacity" min="0" max="100" value="100"/>
+          <span style="font-size:11px;color:var(--gray);margin-top:2px;" id="ipOpVal">100%</span>
+        </div>
+
       </div>
     </div>
 
@@ -729,6 +787,19 @@ const canvas = new fabric.Canvas('designer-canvas', {
   stopContextMenu: true,
 });
 canvas.setDimensions({ width: 520, height: 520 });
+
+// Gold, visible control handles on every object
+fabric.Object.prototype.set({
+  cornerColor: '#D49848',
+  cornerStrokeColor: '#9A6B2E',
+  cornerStyle: 'circle',
+  cornerSize: 12,
+  transparentCorners: false,
+  borderColor: '#D49848',
+  borderDashArray: [5, 3],
+  padding: 8,
+  rotatingPointOffset: 32,
+});
 
 // =========================================================
 //  PRINT ZONE
@@ -952,11 +1023,13 @@ document.getElementById('artworkInput').addEventListener('change', function() {
         const max = z.width * sz;
         const scale = img.width > max ? max / img.width : 1;
         img.scale(scale);
+        img.set({ selectable: true, hasControls: true, hasBorders: true });
         img.id = 'img_' + Date.now();
         centerInZone(img);
         canvas.add(img);
         canvas.setActiveObject(img);
         canvas.renderAll();
+        switchTab('text');
       });
     };
     reader.readAsDataURL(file);
@@ -1056,34 +1129,52 @@ document.addEventListener('keydown', e => {
 // =========================================================
 function onSelectObject() {
   updateLayersPanel();
-  const obj = selectedObject;
-  const isText = obj && (obj.type === 'i-text' || obj.type === 'text');
+  const obj     = selectedObject;
+  const isText  = obj && (obj.type === 'i-text' || obj.type === 'text');
+  const isOther = obj && !isText;
 
-  document.getElementById('noSelectionMsg').style.display = isText ? 'none' : 'block';
-  document.getElementById('textProps').style.display      = isText ? 'flex' : 'none';
+  document.getElementById('noSelectionMsg').style.display = obj ? 'none' : 'block';
+  document.getElementById('textProps').style.display      = isText  ? 'flex' : 'none';
+  document.getElementById('imgProps').style.display       = isOther ? 'flex' : 'none';
 
-  if (!isText) return;
+  if (isText) {
+    suppressProps = true;
+    document.getElementById('propFontFamily').value    = obj.fontFamily || 'DM Sans';
+    document.getElementById('propFontSize').value      = Math.round(obj.fontSize) || 36;
+    document.getElementById('propLineHeight').value    = obj.lineHeight || 1.2;
+    document.getElementById('propTextContent').value   = obj.text || '';
+    document.getElementById('propOpacity').value       = Math.round((obj.opacity || 1) * 100);
+    document.getElementById('propOpacityVal').textContent = Math.round((obj.opacity || 1) * 100) + '%';
+    const ls = obj.charSpacing || 0;
+    document.getElementById('propLetterSpacing').value = ls;
+    document.getElementById('propLetterSpacingVal').textContent = ls;
+    const fill = obj.fill || '#ffffff';
+    document.getElementById('propTextColor').value   = fill.startsWith('#') ? fill : '#ffffff';
+    document.getElementById('propTextColorHex').textContent = fill;
+    document.getElementById('btnBold').classList.toggle('active',      obj.fontWeight === 'bold');
+    document.getElementById('btnItalic').classList.toggle('active',    obj.fontStyle  === 'italic');
+    document.getElementById('btnUnderline').classList.toggle('active', !!obj.underline);
+    suppressProps = false;
+  }
+
+  if (isOther) {
+    syncImgProps(obj);
+    switchTab('text');
+  }
+}
+
+function syncImgProps(obj) {
+  if (!obj || suppressProps) return;
   suppressProps = true;
-
-  document.getElementById('propFontFamily').value    = obj.fontFamily || 'DM Sans';
-  document.getElementById('propFontSize').value      = Math.round(obj.fontSize) || 36;
-  document.getElementById('propLineHeight').value    = obj.lineHeight || 1.2;
-  document.getElementById('propTextContent').value   = obj.text || '';
-  document.getElementById('propOpacity').value       = Math.round((obj.opacity || 1) * 100);
-  document.getElementById('propOpacityVal').textContent = Math.round((obj.opacity || 1) * 100) + '%';
-
-  const ls = obj.charSpacing || 0;
-  document.getElementById('propLetterSpacing').value   = ls;
-  document.getElementById('propLetterSpacingVal').textContent = ls;
-
-  const fill = obj.fill || '#ffffff';
-  document.getElementById('propTextColor').value   = fill.startsWith('#') ? fill : '#ffffff';
-  document.getElementById('propTextColorHex').textContent = fill;
-
-  document.getElementById('btnBold').classList.toggle('active',      obj.fontWeight === 'bold');
-  document.getElementById('btnItalic').classList.toggle('active',    obj.fontStyle  === 'italic');
-  document.getElementById('btnUnderline').classList.toggle('active', !!obj.underline);
-
+  document.getElementById('ipW').value = Math.round(obj.getScaledWidth());
+  document.getElementById('ipH').value = Math.round(obj.getScaledHeight());
+  document.getElementById('ipX').value = Math.round(obj.left);
+  document.getElementById('ipY').value = Math.round(obj.top);
+  const angle = Math.round(((obj.angle || 0) % 360 + 360) % 360);
+  document.getElementById('ipRotation').value = angle;
+  document.getElementById('ipRotVal').textContent = angle + '°';
+  document.getElementById('ipOpacity').value = Math.round((obj.opacity || 1) * 100);
+  document.getElementById('ipOpVal').textContent = Math.round((obj.opacity || 1) * 100) + '%';
   suppressProps = false;
 }
 
@@ -1159,6 +1250,90 @@ document.getElementById('btnUnderline').addEventListener('click', function() {
   canvas.renderAll();
   saveState();
 });
+
+// =========================================================
+//  IMAGE / SHAPE PROPERTIES
+// =========================================================
+document.getElementById('ipW').addEventListener('input', function() {
+  if (suppressProps) return;
+  const obj = canvas.getActiveObject(); if (!obj) return;
+  const newW = parseInt(this.value); if (!newW || newW < 1) return;
+  if (document.getElementById('ipLock').checked) {
+    obj.scaleToWidth(newW);
+    suppressProps = true;
+    document.getElementById('ipH').value = Math.round(obj.getScaledHeight());
+    suppressProps = false;
+  } else {
+    obj.set('scaleX', newW / obj.width);
+  }
+  canvas.renderAll();
+});
+document.getElementById('ipW').addEventListener('change', saveState);
+
+document.getElementById('ipH').addEventListener('input', function() {
+  if (suppressProps) return;
+  const obj = canvas.getActiveObject(); if (!obj) return;
+  const newH = parseInt(this.value); if (!newH || newH < 1) return;
+  if (document.getElementById('ipLock').checked) {
+    obj.scaleToHeight(newH);
+    suppressProps = true;
+    document.getElementById('ipW').value = Math.round(obj.getScaledWidth());
+    suppressProps = false;
+  } else {
+    obj.set('scaleY', newH / obj.height);
+  }
+  canvas.renderAll();
+});
+document.getElementById('ipH').addEventListener('change', saveState);
+
+document.getElementById('ipX').addEventListener('input', function() {
+  if (suppressProps) return;
+  const obj = canvas.getActiveObject(); if (!obj) return;
+  obj.set('left', parseInt(this.value) || 0); canvas.renderAll();
+});
+document.getElementById('ipX').addEventListener('change', saveState);
+
+document.getElementById('ipY').addEventListener('input', function() {
+  if (suppressProps) return;
+  const obj = canvas.getActiveObject(); if (!obj) return;
+  obj.set('top', parseInt(this.value) || 0); canvas.renderAll();
+});
+document.getElementById('ipY').addEventListener('change', saveState);
+
+document.getElementById('ipRotation').addEventListener('input', function() {
+  if (suppressProps) return;
+  const obj = canvas.getActiveObject(); if (!obj) return;
+  obj.set('angle', parseInt(this.value));
+  document.getElementById('ipRotVal').textContent = this.value + '°';
+  canvas.renderAll();
+});
+document.getElementById('ipRotation').addEventListener('change', saveState);
+
+document.getElementById('ipOpacity').addEventListener('input', function() {
+  if (suppressProps) return;
+  const obj = canvas.getActiveObject(); if (!obj) return;
+  obj.set('opacity', this.value / 100);
+  document.getElementById('ipOpVal').textContent = this.value + '%';
+  canvas.renderAll();
+});
+document.getElementById('ipOpacity').addEventListener('change', saveState);
+
+document.getElementById('ipFlipH').addEventListener('click', function() {
+  const obj = canvas.getActiveObject(); if (!obj) return;
+  obj.set('flipX', !obj.flipX); canvas.renderAll(); saveState();
+});
+document.getElementById('ipFlipV').addEventListener('click', function() {
+  const obj = canvas.getActiveObject(); if (!obj) return;
+  obj.set('flipY', !obj.flipY); canvas.renderAll(); saveState();
+});
+document.getElementById('ipLock').addEventListener('change', function() {
+  document.getElementById('ipAspectTag').textContent = this.checked ? 'locked' : 'free';
+});
+
+// Sync panel in real-time while dragging/scaling/rotating
+canvas.on('object:scaling',  e => { if (document.getElementById('imgProps').style.display !== 'none') syncImgProps(e.target); });
+canvas.on('object:moving',   e => { if (document.getElementById('imgProps').style.display !== 'none') syncImgProps(e.target); });
+canvas.on('object:rotating', e => { if (document.getElementById('imgProps').style.display !== 'none') syncImgProps(e.target); });
 
 // Align
 document.querySelectorAll('.align-btn').forEach(btn => {
@@ -1247,12 +1422,9 @@ document.querySelectorAll('.right-tab').forEach(t => {
   t.addEventListener('click', () => switchTab(t.dataset.tab));
 });
 
-// Auto-switch to text tab when text selected
-canvas.on('selection:created', e => {
-  if (e.selected[0] && (e.selected[0].type === 'i-text' || e.selected[0].type === 'text')) {
-    switchTab('text');
-  }
-});
+// Auto-switch to Edit tab on any selection
+canvas.on('selection:created', e => { if (e.selected[0]) switchTab('text'); });
+canvas.on('selection:updated', e => { if (e.selected[0]) switchTab('text'); });
 
 // =========================================================
 //  QUOTE MODAL
