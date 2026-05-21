@@ -3,8 +3,18 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Shop &mdash; VistecPrints Custom Apparel Charlotte NC</title>
+<title>Shop Custom Apparel — T-Shirts, Hoodies &amp; More | VistecPrints Charlotte NC</title>
+<meta name="description" content="Shop custom printed t-shirts, hoodies, tanks, and more. Charlotte NC's go-to for DTF and screen printing. No minimums — order 1 or 1,000."/>
+<meta name="keywords" content="custom t-shirts charlotte nc, buy custom hoodies, dtf printed apparel, vistecprints shop"/>
+<link rel="canonical" href="https://rebuild.vistecprints.com/products.html"/>
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="Shop Custom Apparel | VistecPrints Charlotte NC"/>
+<meta property="og:description" content="Custom printed t-shirts, hoodies, tanks and more. No minimums. Fast turnaround."/>
+<meta property="og:url" content="https://rebuild.vistecprints.com/products.html"/>
+<meta property="og:image" content="https://rebuild.vistecprints.com/vistecprints-images/Logo.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
@@ -272,21 +282,21 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="index.html" class="logo"><img src="logo.png" alt="Vistec GraphX"/></a>
-    <ul class="nav-links">
-      <li><a href="products.html" class="active">Shop</a></li>
-      <li><a href="index.html#canvas">Products</a></li>
+    <a href="index.html" class="logo"><img src="images/Logo.png" alt="VistecPrints"/></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="create.html" class="active">Products</a></li>
+      <li><a href="designs.html">Designs</a></li>
       <li><a href="designer.html">Designer</a></li>
-      <li><a href="index.html#how">How It Works</a></li>
-      <li><a href="index.html#about">About</a></li>
-      <li><a href="tel:+17043776626" class="nav-phone">+1 704-377-6626</a></li>
     </ul>
     <button class="cart-btn" id="cartBtn" onclick="openCart()">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
       <span class="cart-badge" id="cartBadge"></span>
     </button>
-    <a href="index.html#quote" class="nav-cta">Get a Quote</a>
-    <div class="hamburger"><span></span><span></span><span></span></div>
+    <a href="index.html#contact" class="nav-cta">Get a Quote</a>
+    <div class="hamburger" id="hamburger" onclick="this.classList.toggle('open');document.getElementById('navLinks').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </div>
   </div>
 </nav>
 
@@ -485,7 +495,7 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 <footer>
   <div class="footer-top">
     <div class="footer-brand">
-      <a href="index.html" class="logo"><img src="logo.png" alt="Vistec GraphX" style="height:70px;"/></a>
+      <a href="index.html" class="logo"><img src="images/Logo.png" alt="Vistec GraphX" style="height:70px;"/></a>
       <p>Custom apparel and DTF printing in Charlotte, NC. Bold designs, premium garments, no minimums.</p>
       <div class="contact-info">
         <a href="tel:+17043776626">+1 704-377-6626</a>
@@ -496,11 +506,9 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
     <div class="footer-col">
       <h4>Company</h4>
       <ul>
-        <li><a href="https://www.vistecprints.com/about">About</a></li>
-        <li><a href="https://www.vistecprints.com/returns">Returns Policy</a></li>
-        <li><a href="https://www.vistecprints.com/guarantee">Guarantee</a></li>
-        <li><a href="https://www.vistecprints.com/privacy">Privacy Policy</a></li>
-        <li><a href="https://www.vistecprints.com/useragree">Terms</a></li>
+        <li><a href="index.html">About Us</a></li>
+        <li><a href="mailto:vistecfx@gmail.com">Returns &amp; Policy</a></li>
+        <li><a href="tel:+17043776626">Contact Us</a></li>
       </ul>
     </div>
     <div class="footer-col">
@@ -517,10 +525,10 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
       <h4>Quick Links</h4>
       <ul>
         <li><a href="designer.html">Designer Tool</a></li>
-        <li><a href="https://www.vistecprints.com/request_quote">Request a Quote</a></li>
-        <li><a href="https://www.vistecprints.com/quick_quote">Quick Quote</a></li>
-        <li><a href="https://www.vistecprints.com/contact">Contact</a></li>
-        <li><a href="https://www.vistecprints.com/user/login">Login</a></li>
+        <li><a href="#" onclick="openQuoteModal(event)">Request a Quote</a></li>
+        <li><a href="checkout.html">Checkout</a></li>
+        <li><a href="mailto:vistecfx@gmail.com">Email Us</a></li>
+        <li><a href="tel:+17043776626">+1 704-377-6626</a></li>
       </ul>
     </div>
   </div>
@@ -932,5 +940,183 @@ document.getElementById('zlOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeZoom();
 });
 </script>
+
+<!-- QUOTE MODAL -->
+<style>
+.qm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:700;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s;padding:20px;}
+.qm-overlay.open{opacity:1;pointer-events:all;}
+.qm-box{background:#1a1a1a;border:1px solid rgba(212,152,72,0.25);border-radius:6px;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;position:relative;padding:36px 32px;}
+@media(max-width:500px){.qm-box{padding:28px 20px;}}
+.qm-close{position:absolute;top:12px;right:14px;background:none;border:none;color:#888;font-size:26px;cursor:pointer;line-height:1;padding:4px 8px;transition:color 0.2s;}
+.qm-close:hover{color:#F0EDE8;}
+.qm-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;color:#fff;margin-bottom:6px;}
+.qm-sub{font-size:13px;color:#888;line-height:1.6;margin-bottom:22px;}
+.qm-err{background:rgba(224,85,85,0.12);border:1px solid rgba(224,85,85,0.4);border-radius:3px;padding:10px 14px;font-size:13px;color:#e05555;margin-bottom:14px;display:none;}
+.qm-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:480px){.qm-row{grid-template-columns:1fr;}}
+.qm-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.qm-row>.qm-field{margin-bottom:0;}
+.qm-field label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#888;}
+.qm-field input,.qm-field select,.qm-field textarea{background:#222;border:1px solid rgba(255,255,255,0.1);color:#F0EDE8;padding:11px 13px;border-radius:3px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;width:100%;}
+.qm-field input:focus,.qm-field select:focus,.qm-field textarea:focus{border-color:#9A6B2E;}
+.qm-field input::placeholder,.qm-field textarea::placeholder{color:#555;}
+.qm-field select option{background:#222;}
+.qm-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:6px;}
+.qm-btn-cancel{background:none;border:1px solid rgba(255,255,255,0.1);color:#888;padding:10px 20px;border-radius:3px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.qm-btn-cancel:hover{border-color:rgba(255,255,255,0.3);color:#F0EDE8;}
+.qm-btn-send{background:#D49848;color:#0a0a0a;border:none;padding:11px 26px;border-radius:3px;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.2s;}
+.qm-btn-send:hover{background:#E8B96A;}
+.qm-btn-send:disabled{opacity:0.45;cursor:not-allowed;}
+.qm-success{text-align:center;padding:20px 0;}
+.qm-success svg{color:#D49848;margin-bottom:16px;}
+.qm-success h3{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;color:#D49848;margin-bottom:10px;}
+.qm-success p{font-size:14px;color:#888;line-height:1.65;margin-bottom:20px;}
+</style>
+
+<div class="qm-overlay" id="quoteModal" onclick="if(event.target===this)closeQuoteModal()">
+  <div class="qm-box">
+    <button class="qm-close" onclick="closeQuoteModal()">&#215;</button>
+
+    <div id="qmForm">
+      <div class="qm-title">Request a Quote</div>
+      <div class="qm-sub">Tell us what you need and we'll get back to you within 1 business day.</div>
+      <div class="qm-err" id="qmErr"></div>
+
+      <div class="qm-row">
+        <div class="qm-field">
+          <label>Your Name *</label>
+          <input type="text" id="qmName" placeholder="Full name"/>
+        </div>
+        <div class="qm-field">
+          <label>Email *</label>
+          <input type="email" id="qmEmail" placeholder="you@email.com"/>
+        </div>
+      </div>
+      <div class="qm-row">
+        <div class="qm-field">
+          <label>Phone</label>
+          <input type="tel" id="qmPhone" placeholder="704-000-0000"/>
+        </div>
+        <div class="qm-field">
+          <label>Item Type</label>
+          <select id="qmProduct">
+            <option value="">Select...</option>
+            <option>T-Shirts</option>
+            <option>Hoodies / Sweatshirts</option>
+            <option>Hats / Caps</option>
+            <option>Polos</option>
+            <option>Tank Tops</option>
+            <option>Bags / Totes</option>
+            <option>Custom Item</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="qm-row">
+        <div class="qm-field">
+          <label>Estimated Quantity</label>
+          <select id="qmQty">
+            <option value="">Select...</option>
+            <option>1 – 11</option>
+            <option>12 – 24</option>
+            <option>25 – 49</option>
+            <option>50 – 99</option>
+            <option>100 – 249</option>
+            <option>250+</option>
+          </select>
+        </div>
+        <div class="qm-field">
+          <label>Budget (optional)</label>
+          <input type="text" id="qmBudget" placeholder="e.g. $300"/>
+        </div>
+      </div>
+      <div class="qm-field">
+        <label>Details / Notes</label>
+        <textarea id="qmNotes" rows="3" placeholder="Design ideas, colors, sizes needed, deadline, etc."></textarea>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div class="g-recaptcha" data-sitekey="6Le5nfAsAAAAAJ8BYbZVXMRt1FxeobXJTnLMs6eN" data-theme="dark"></div>
+      </div>
+      <div class="qm-actions">
+        <button class="qm-btn-cancel" onclick="closeQuoteModal()">Cancel</button>
+        <button class="qm-btn-send" id="qmSubmit" onclick="submitQuote()">Send Quote Request</button>
+      </div>
+    </div>
+
+    <div id="qmSuccess" style="display:none;" class="qm-success">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></svg>
+      <h3>Quote Request Sent!</h3>
+      <p>Thanks, we'll review your request and email you back within 1 business day.<br/>Questions? Call us at <a href="tel:+17043776626" style="color:#D49848;">+1 704-377-6626</a>.</p>
+      <button class="qm-btn-send" onclick="closeQuoteModal()">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openQuoteModal(e) {
+  if (e) e.preventDefault();
+  document.getElementById('quoteModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeQuoteModal() {
+  document.getElementById('quoteModal').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('qmForm').style.display = 'block';
+  document.getElementById('qmSuccess').style.display = 'none';
+  document.getElementById('qmErr').style.display = 'none';
+  document.getElementById('qmSubmit').disabled = false;
+  document.getElementById('qmSubmit').textContent = 'Send Quote Request';
+}
+async function submitQuote() {
+  const name  = document.getElementById('qmName').value.trim();
+  const email = document.getElementById('qmEmail').value.trim();
+  const errEl = document.getElementById('qmErr');
+  errEl.style.display = 'none';
+  if (!name || !email) {
+    errEl.textContent = 'Please fill in your name and email.';
+    errEl.style.display = 'block';
+    return;
+  }
+  const recaptchaToken = (typeof grecaptcha !== 'undefined') ? grecaptcha.getResponse() : '';
+  if (!recaptchaToken) {
+    errEl.textContent = 'Please complete the reCAPTCHA verification below.';
+    errEl.style.display = 'block';
+    return;
+  }
+  const btn = document.getElementById('qmSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  try {
+    const res  = await fetch('quote-request.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, email,
+        phone:          document.getElementById('qmPhone').value.trim(),
+        product:        document.getElementById('qmProduct').value,
+        qty:            document.getElementById('qmQty').value,
+        budget:         document.getElementById('qmBudget').value.trim(),
+        notes:          document.getElementById('qmNotes').value.trim(),
+        recaptchaToken,
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('qmForm').style.display = 'none';
+      document.getElementById('qmSuccess').style.display = 'block';
+      if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+    } else {
+      throw new Error(data.error || 'Failed to send. Please try again.');
+    }
+  } catch(err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Send Quote Request';
+    if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+  }
+}
+</script>
+<script>fetch('track.php?page=products&ref='+encodeURIComponent(document.referrer),{keepalive:true}).catch(()=>{});</script>
 </body>
 </html>

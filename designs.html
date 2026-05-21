@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Design Library — Browse 200+ Custom Designs | VistecPrints</title>
+<meta name="description" content="Browse our library of 200+ professionally crafted designs. Anime, patriotic, seasonal, government, and more. Pick a design, customize it, and we print it."/>
+<meta name="keywords" content="custom design t-shirt charlotte nc, anime shirt designs, patriotic shirt designs, custom apparel designs"/>
+<link rel="canonical" href="https://rebuild.vistecprints.com/designs.html"/>
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="Design Library — 200+ Custom Designs | VistecPrints"/>
+<meta property="og:description" content="Browse hundreds of designs across multiple categories. Choose, customize, and order."/>
+<meta property="og:url" content="https://rebuild.vistecprints.com/designs.html"/>
+<meta property="og:image" content="https://rebuild.vistecprints.com/images/Logo.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --black:#0a0a0a;
+  --dark:#111111;
+  --dark2:#1a1a1a;
+  --dark3:#222222;
+  --dark4:#2a2a2a;
+  --gold:#D49848;
+  --gold-light:#E8B96A;
+  --gold-dim:#9A6B2E;
+  --white:#FFFFFF;
+  --offwhite:#F0EDE8;
+  --gray:#888888;
+  --gray2:#555555;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,152,72,0.2);padding:0 5%;}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:100px;}
+.logo{text-decoration:none;display:flex;align-items:center;}
+.logo img{height:90px;width:auto;display:block;}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
+.nav-links a{color:var(--gray);text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500;transition:color 0.2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);}
+.nav-cta{background:var(--gold);color:var(--black);padding:10px 22px;border-radius:2px;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:background 0.2s;}
+.nav-cta:hover{background:var(--gold-light);}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.hamburger span{display:block;width:24px;height:2px;background:var(--gold);}
+@media(max-width:768px){
+  .nav-links{display:none;position:fixed;top:100px;left:0;right:0;background:rgba(10,10,10,0.98);flex-direction:column;padding:24px 5%;gap:0;border-bottom:1px solid rgba(212,152,72,0.2);}
+  .nav-links.open{display:flex;}
+  .nav-links li{border-bottom:1px solid rgba(255,255,255,0.05);}
+  .nav-links a{padding:14px 0;display:block;}
+  .hamburger{display:flex;}
+  .nav-cta{display:none;}
+}
+
+/* PAGE HEADER */
+.page-header{padding:140px 5% 60px;background:linear-gradient(180deg,#0d0d0d 0%,var(--black) 100%);border-bottom:1px solid rgba(212,152,72,0.1);position:relative;overflow:hidden;}
+.page-header::before{content:'';position:absolute;top:-100px;right:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(212,152,72,0.06) 0%,transparent 70%);pointer-events:none;}
+.ph-badge{display:inline-block;border:1px solid var(--gold-dim);color:var(--gold);font-size:10px;letter-spacing:3px;text-transform:uppercase;padding:5px 14px;margin-bottom:20px;}
+.ph-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,90px);line-height:0.95;color:var(--white);letter-spacing:2px;}
+.ph-title span{color:var(--gold);}
+.ph-sub{font-size:15px;color:var(--gray);margin-top:16px;max-width:520px;line-height:1.7;font-weight:300;}
+
+/* CONTROLS BAR */
+.controls-bar{background:var(--dark);border-bottom:1px solid rgba(255,255,255,0.06);padding:0 5%;position:sticky;top:100px;z-index:100;}
+.controls-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:16px 0;}
+.cat-tabs{display:flex;gap:4px;flex-wrap:wrap;}
+.cat-tab{background:transparent;border:1px solid rgba(255,255,255,0.08);color:var(--gray);padding:7px 16px;border-radius:2px;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.cat-tab:hover{border-color:var(--gold-dim);color:var(--offwhite);}
+.cat-tab.active{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:600;}
+.search-wrap{display:flex;align-items:center;gap:10px;}
+.search-box{background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--offwhite);padding:8px 14px;border-radius:2px;font-size:13px;font-family:'DM Sans',sans-serif;width:220px;outline:none;transition:border-color 0.2s;}
+.search-box::placeholder{color:var(--gray2);}
+.search-box:focus{border-color:var(--gold-dim);}
+.result-count{font-size:12px;color:var(--gray);white-space:nowrap;letter-spacing:0.5px;}
+@media(max-width:768px){
+  .controls-bar{top:100px;}
+  .controls-inner{flex-direction:column;align-items:flex-start;}
+  .search-wrap{width:100%;}
+  .search-box{flex:1;}
+}
+
+/* DESIGN GRID */
+.grid-section{padding:40px 5% 80px;}
+.design-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+@media(max-width:500px){.design-grid{grid-template-columns:repeat(2,1fr);gap:10px;}}
+
+.design-card{background:var(--dark2);border:1px solid rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;cursor:pointer;transition:all 0.25s;position:relative;}
+.design-card:hover{border-color:rgba(212,152,72,0.4);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.5);}
+.design-img-wrap{width:100%;aspect-ratio:1;background:var(--dark3);overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;}
+.design-img{width:100%;height:100%;object-fit:contain;transition:transform 0.3s;}
+.design-card:hover .design-img{transform:scale(1.05);}
+.design-img-wrap .img-placeholder{width:60px;height:60px;border:1px solid rgba(255,255,255,0.08);border-radius:2px;display:flex;align-items:center;justify-content:center;color:var(--gray2);font-size:10px;}
+.design-info{padding:12px 14px 14px;}
+.design-name{font-size:12px;color:var(--offwhite);font-weight:500;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.design-cat-badge{font-size:10px;color:var(--gold-dim);letter-spacing:0.5px;margin-top:4px;text-transform:uppercase;}
+
+/* Hover overlay */
+.design-hover-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;}
+.design-card:hover .design-hover-overlay{opacity:1;}
+.design-use-btn{background:var(--gold);color:var(--black);border:none;padding:10px 22px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:'DM Sans',sans-serif;cursor:pointer;border-radius:2px;transition:background 0.2s;}
+.design-use-btn:hover{background:var(--gold-light);}
+
+/* Empty state */
+.empty-state{grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--gray);}
+.empty-state svg{opacity:0.2;margin-bottom:16px;}
+.empty-state p{font-size:15px;}
+
+/* Loading skeleton */
+.skeleton{background:linear-gradient(90deg,var(--dark3) 25%,var(--dark4) 50%,var(--dark3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+/* QUOTE MODAL */
+.qm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.qm-overlay.open{display:flex;}
+.qm-box{background:var(--dark);border:1px solid rgba(212,152,72,0.2);border-radius:4px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;position:relative;}
+.qm-header{padding:28px 32px 0;border-bottom:1px solid rgba(255,255,255,0.07);padding-bottom:20px;}
+.qm-close{position:absolute;top:16px;right:20px;background:none;border:none;color:var(--gray);font-size:22px;cursor:pointer;line-height:1;transition:color 0.2s;}
+.qm-close:hover{color:var(--offwhite);}
+.qm-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;color:var(--white);}
+.qm-sub{font-size:13px;color:var(--gray);margin-top:4px;}
+.qm-body{padding:24px 32px 32px;}
+.qm-form-row{margin-bottom:16px;}
+.qm-form-row label{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:6px;}
+.qm-form-row input,.qm-form-row select,.qm-form-row textarea{width:100%;background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--offwhite);padding:10px 14px;border-radius:2px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;}
+.qm-form-row input:focus,.qm-form-row select:focus,.qm-form-row textarea:focus{border-color:var(--gold-dim);}
+.qm-form-row select option{background:var(--dark3);}
+.qm-form-row textarea{resize:vertical;min-height:90px;}
+.qm-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.qm-captcha{margin:16px 0;}
+.qm-submit{width:100%;background:var(--gold);color:var(--black);border:none;padding:14px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:'DM Sans',sans-serif;cursor:pointer;border-radius:2px;transition:background 0.2s;margin-top:8px;}
+.qm-submit:hover{background:var(--gold-light);}
+.qm-msg{padding:10px 14px;border-radius:2px;font-size:13px;margin-bottom:16px;display:none;}
+.qm-msg.success{background:rgba(40,160,80,0.15);border:1px solid rgba(40,160,80,0.3);color:#6fcf97;}
+.qm-msg.error{background:rgba(220,80,80,0.15);border:1px solid rgba(220,80,80,0.3);color:#eb5757;}
+.qm-design-preview{display:flex;align-items:center;gap:12px;background:var(--dark3);border:1px solid rgba(212,152,72,0.2);border-radius:2px;padding:10px 14px;margin-bottom:20px;}
+.qm-design-thumb{width:52px;height:52px;object-fit:contain;border-radius:2px;background:var(--dark4);}
+.qm-design-info{flex:1;}
+.qm-design-info strong{font-size:13px;color:var(--offwhite);display:block;}
+.qm-design-info span{font-size:11px;color:var(--gold-dim);letter-spacing:0.5px;text-transform:uppercase;}
+
+/* FOOTER */
+footer{background:var(--dark);border-top:1px solid rgba(212,152,72,0.15);padding:60px 5% 30px;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px;}
+.footer-brand p{font-size:13px;color:var(--gray);line-height:1.8;margin-top:16px;max-width:280px;}
+.footer-col h4{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:10px;}
+.footer-col ul li a{color:var(--gray);text-decoration:none;font-size:13px;transition:color 0.2s;}
+.footer-col ul li a:hover{color:var(--gold);}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.06);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.footer-bottom p{font-size:12px;color:var(--gray2);}
+@media(max-width:768px){
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px;}
+  .footer-brand{grid-column:1/-1;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo"><img src="images/Logo.png" alt="VistecPrints"/></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="create.html">Products</a></li>
+      <li><a href="designs.html" class="active">Designs</a></li>
+      <li><a href="designer.html">Designer</a></li>
+    </ul>
+    <button class="cart-btn" id="cartBtn" onclick="openCart()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+      <span class="cart-badge" id="cartBadge"></span>
+    </button>
+    <a href="index.html#contact" class="nav-cta">Get a Quote</a>
+    <div class="hamburger" id="hamburger" onclick="this.classList.toggle('open');document.getElementById('navLinks').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="ph-badge">Design Library</div>
+  <h1 class="ph-title">Browse Our <span>Designs</span></h1>
+  <p class="ph-sub">Choose from hundreds of professionally crafted designs across multiple categories. Pick one, customize it, and we'll print it for you.</p>
+</div>
+
+<!-- CONTROLS -->
+<div class="controls-bar">
+  <div class="controls-inner">
+    <div class="cat-tabs" id="catTabs"></div>
+    <div class="search-wrap">
+      <input type="text" class="search-box" id="searchBox" placeholder="Search designs..." oninput="onSearch(this.value)"/>
+      <span class="result-count" id="resultCount"></span>
+    </div>
+  </div>
+</div>
+
+<!-- GRID -->
+<div class="grid-section">
+  <div class="design-grid" id="designGrid"></div>
+</div>
+
+<!-- QUOTE MODAL -->
+<div class="qm-overlay" id="quoteModal" onclick="if(event.target===this)closeQuoteModal()">
+  <div class="qm-box">
+    <div class="qm-header">
+      <button class="qm-close" onclick="closeQuoteModal()">&#215;</button>
+      <div class="qm-title">Request a Quote</div>
+      <div class="qm-sub">Tell us about your order and we'll get back to you within 24 hours.</div>
+    </div>
+    <div class="qm-body">
+      <div class="qm-design-preview" id="qmDesignPreview" style="display:none">
+        <img class="qm-design-thumb" id="qmDesignThumb" src="" alt=""/>
+        <div class="qm-design-info">
+          <strong id="qmDesignName"></strong>
+          <span id="qmDesignCat"></span>
+        </div>
+      </div>
+      <div class="qm-msg" id="qmMsg"></div>
+      <form id="quoteForm" onsubmit="submitQuote(event)">
+        <div class="qm-row2">
+          <div class="qm-form-row">
+            <label>First Name *</label>
+            <input type="text" name="first_name" required placeholder="John"/>
+          </div>
+          <div class="qm-form-row">
+            <label>Last Name *</label>
+            <input type="text" name="last_name" required placeholder="Smith"/>
+          </div>
+        </div>
+        <div class="qm-form-row">
+          <label>Email Address *</label>
+          <input type="email" name="email" required placeholder="you@example.com"/>
+        </div>
+        <div class="qm-form-row">
+          <label>Phone Number</label>
+          <input type="tel" name="phone" placeholder="(704) 555-0100"/>
+        </div>
+        <div class="qm-form-row">
+          <label>Product / Garment Type</label>
+          <select name="product">
+            <option value="">— Select —</option>
+            <option>T-Shirt</option>
+            <option>Hoodie</option>
+            <option>Tank Top</option>
+            <option>Long Sleeve</option>
+            <option>Polo</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="qm-row2">
+          <div class="qm-form-row">
+            <label>Quantity</label>
+            <input type="number" name="qty" min="1" placeholder="e.g. 24"/>
+          </div>
+          <div class="qm-form-row">
+            <label>Budget</label>
+            <input type="text" name="budget" placeholder="e.g. $300"/>
+          </div>
+        </div>
+        <div class="qm-form-row">
+          <label>Additional Notes</label>
+          <textarea name="notes" placeholder="Colors, sizes, special requests…"></textarea>
+        </div>
+        <input type="hidden" name="design_id" id="qmDesignId"/>
+        <input type="hidden" name="design_name" id="qmDesignNameField"/>
+        <div class="qm-captcha">
+          <div class="g-recaptcha" data-sitekey="6Le5nfAsAAAAAJ8BYbZVXMRt1FxeobXJTnLMs6eN" data-theme="dark"></div>
+        </div>
+        <button type="submit" class="qm-submit">Send Quote Request</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <img src="images/Logo.png" alt="VistecPrints" style="height:60px;"/>
+      <p>Charlotte NC's custom apparel specialists. Quality printing, fast turnaround, unmatched service.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="index.html#about">About Us</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+        <li><a href="admin.php">Admin</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="products.html">All Products</a></li>
+        <li><a href="designs.html">Design Library</a></li>
+        <li><a href="designer.html">Designer Tool</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#" onclick="openQuoteModal(event)">Request a Quote</a></li>
+        <li><a href="tel:+17043776626">Call Us</a></li>
+        <li><a href="mailto:vistecfx@gmail.com">Email Us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025 VistecPrints. All rights reserved.</p>
+    <p style="font-size:12px;color:var(--gray2);">Charlotte, NC &mdash; (704) 377-6626</p>
+  </div>
+</footer>
+
+<script src="design-library.js"></script>
+<script>
+// designs.html uses DESIGN_LIBRARY, DESIGN_CATS, ALL_LIBRARY_DESIGNS from design-library.js
+// Local aliases so the rest of the page code needs minimal changes
+const DESIGNS     = DESIGN_LIBRARY;
+const CATS        = DESIGN_CATS.map(c => ({...c, label: c.key === 'all' ? 'All Designs' : c.label}));
+const ALL_DESIGNS = ALL_LIBRARY_DESIGNS;
+
+/* ── DESIGN DATA BLOCK REMOVED — now in design-library.js ── */
+const _REMOVED = {
+  boots: [
+    {id:604939926,name:"Boots on the Ground"},
+    {id:604945586,name:"Boots 2"},
+    {id:604949531,name:"Boots 11"},
+    {id:604949786,name:"Boots 5"},
+    {id:604949971,name:"Boots 9"},
+    {id:604950201,name:"Boots 10"},
+    {id:604950361,name:"Boots 4"},
+    {id:604950496,name:"Boots 3"},
+    {id:604950736,name:"Boots 6"},
+    {id:604951006,name:"Boots 8"},
+    {id:604954816,name:"Boots 1"},
+    {id:604957611,name:"Boots 15"},
+    {id:604957746,name:"Boots 14"},
+    {id:604957966,name:"Boots 13"},
+    {id:604958081,name:"Boots 12"},
+    {id:608304386,name:"Boots Series 1"},
+    {id:608307586,name:"Boots Series 2"},
+    {id:608307846,name:"Boots Series 3"},
+    {id:608307951,name:"Boots Series 4"},
+    {id:608315661,name:"No Kings In America"},
+    {id:608316616,name:"No Kings In America — We The People"},
+    {id:608316681,name:"No Kings In America — Political"},
+    {id:608316811,name:"No Kings In America — Anti Trump"},
+    {id:608317016,name:"No Kings In America — VTN"},
+    {id:608317136,name:"No Kings In America — Patriot"},
+    {id:608317226,name:"We The People — LGBT"},
+    {id:608317341,name:"No Kings In America — NHUY"},
+    {id:608317481,name:"No Kings In America — VTN 2"},
+    {id:608317621,name:"We Have No Kings In America"},
+    {id:608317711,name:"Floral Boho No Kings"},
+    {id:608317761,name:"Floral Boho Since 1776"},
+    {id:608317826,name:"No Kings In America — Classic"},
+    {id:608317961,name:"No Kings In America — Bold"},
+    {id:608318096,name:"No Kings In America Since 1776"},
+    {id:608318266,name:"Please Take Them — No Kings"},
+    {id:608318356,name:"No Kings In America — VTN 3"},
+    {id:608318446,name:"We Have No Kings — VTN 2"},
+    {id:608318531,name:"No Kings In America — NHUY 2"},
+    {id:615015311,name:"Heritage — I Don't Recognize My Party"},
+    {id:615015546,name:"Heritage — Look What They Did"},
+    {id:615015666,name:"Heritage — Hijacked"},
+    {id:615015746,name:"Heritage — Party"},
+    {id:624741461,name:"Woman of My Dreams — Pink & Green"},
+    {id:624741551,name:"Woman of My Dreams — Variant"},
+    {id:625485816,name:"Black Front"},
+    {id:625486171,name:"Black Front 2"},
+    {id:625487091,name:"White Front"},
+    {id:625487166,name:"White Back"},
+    {id:625489876,name:"Black Front 3"},
+    {id:625489956,name:"Black Back"},
+    {id:626103671,name:"Fishers of Men"},
+  ],
+  funprint: [
+    {id:605883461,name:"Thick-Fil-A"},
+    {id:605883466,name:"Tired"},
+    {id:605883471,name:"Culture Champion"},
+    {id:605883476,name:"Hustle Hard"},
+    {id:605883481,name:"Thicker Than a Snicker"},
+    {id:605883486,name:"Lips"},
+    {id:605883491,name:"God Is Good"},
+  ],
+  women: [
+    {id:605883696,name:"Denim Boss Lady 1"},
+    {id:605883701,name:"Denim Boss Lady 10"},
+    {id:605883706,name:"Denim Boss Lady 11"},
+    {id:605883711,name:"Denim Boss Lady 12"},
+    {id:605883716,name:"Denim Boss Lady 13"},
+    {id:605883721,name:"Denim Boss Lady 14"},
+    {id:605883726,name:"Denim Boss Lady 15"},
+    {id:605883731,name:"Denim Boss Lady 16"},
+    {id:605883736,name:"Denim Boss Lady 17"},
+    {id:605883741,name:"Denim Boss Lady 18"},
+    {id:605883746,name:"Denim Boss Lady 19"},
+    {id:605883751,name:"Denim Boss Lady 2"},
+    {id:605883756,name:"Denim Boss Lady 20"},
+    {id:605883761,name:"Denim Boss Lady 21"},
+    {id:605883766,name:"Denim Boss Lady 22"},
+    {id:605883771,name:"Denim Boss Lady 23"},
+    {id:605883776,name:"Denim Boss Lady 24"},
+    {id:605883781,name:"Denim Boss Lady 25"},
+    {id:605883786,name:"Denim Boss Lady 26"},
+    {id:605883791,name:"Denim Boss Lady 27"},
+    {id:605883986,name:"Denim Boss Lady 48"},
+    {id:605883991,name:"Denim Boss Lady 49"},
+    {id:605883996,name:"Denim Boss Lady 50"},
+    {id:605884001,name:"Denim Boss Lady 51"},
+    {id:605884006,name:"Denim Boss Lady 52"},
+    {id:605884011,name:"Denim Boss Lady 53"},
+    {id:605884016,name:"Denim Boss Lady 54"},
+    {id:605884021,name:"Denim Boss Lady 55"},
+    {id:605884026,name:"Denim Boss Lady 56"},
+    {id:605884031,name:"Denim Boss Lady 57"},
+    {id:605884036,name:"Denim Boss Lady 58"},
+    {id:605884041,name:"Denim Boss Lady 59"},
+    {id:605884046,name:"Denim Boss Lady 60"},
+    {id:605884051,name:"Denim Boss Lady 61"},
+    {id:605884056,name:"Denim Boss Lady 62"},
+    {id:605884061,name:"Denim Boss Lady 63"},
+    {id:605884066,name:"Denim Boss Lady 64"},
+    {id:605884221,name:"Denim Boss Lady A1"},
+    {id:605884226,name:"Denim Boss Lady A10"},
+    {id:605884231,name:"Denim Boss Lady A11"},
+  ],
+  anime: [
+    {id:605883526,name:"Anime 1"},
+    {id:605883531,name:"Anime V3-38"},
+    {id:605883536,name:"Anime V3 33"},
+    {id:605883541,name:"Anime V3 35"},
+    {id:605883546,name:"Anime V3 21"},
+    {id:605883551,name:"Anime V3 29"},
+    {id:605883556,name:"Anime V3 42"},
+    {id:605883561,name:"Anime V3 02"},
+    {id:605883566,name:"Anime V3 03"},
+    {id:605883571,name:"Anime V3 04"},
+    {id:605883576,name:"Anime V3 05"},
+    {id:605883581,name:"Anime V3 06"},
+    {id:605883586,name:"Anime V3 07"},
+    {id:605883591,name:"Anime V3 08"},
+    {id:605883596,name:"Anime V3 09"},
+    {id:605883601,name:"Anime V3 10"},
+    {id:605883606,name:"Anime V3 11"},
+    {id:605883611,name:"Anime V3 12"},
+    {id:605883616,name:"Anime V3 13"},
+    {id:605883621,name:"Anime V3 14"},
+    {id:605883626,name:"Anime V3 15"},
+    {id:605883631,name:"Anime V3 16"},
+    {id:605883636,name:"Anime V3 17"},
+    {id:605883641,name:"Anime V3 41"},
+    {id:605883646,name:"Anime V3 37"},
+    {id:605883651,name:"Anime V3 18"},
+  ],
+  celebrations: [
+    {id:592188816,name:"Fall Season 18"},
+    {id:592188391,name:"Fall Season 01"},
+    {id:592188411,name:"Fall Season 02"},
+    {id:592188441,name:"Fall Season 03"},
+    {id:592188466,name:"Fall Season 04"},
+    {id:592188511,name:"Fall Season 05"},
+    {id:592188526,name:"Fall Season 06"},
+    {id:592188556,name:"Fall Season 07"},
+    {id:592188581,name:"Fall Season 08"},
+    {id:592188601,name:"Fall Season 09"},
+    {id:592188621,name:"Fall Season 10"},
+    {id:592188641,name:"Fall Season 11"},
+    {id:592188666,name:"Fall Season 12"},
+    {id:592188691,name:"Fall Season 13"},
+    {id:592188711,name:"Fall Season 14"},
+    {id:592188741,name:"Fall Season 15"},
+    {id:592188756,name:"Fall Season 16"},
+    {id:592188771,name:"Fall Season 17"},
+    {id:592189036,name:"Fall Season 29"},
+    {id:592189106,name:"Fall Season 31"},
+    {id:591742066,name:"Halloween 14"},
+    {id:591742011,name:"Halloween 12"},
+    {id:591742031,name:"Halloween 13"},
+    {id:591741981,name:"Halloween 11"},
+  ],
+  elements: [
+    {id:488399763,name:"Elements Skulls 132"},
+    {id:488399633,name:"Elements Skulls 120"},
+    {id:488399648,name:"Elements Skulls 121"},
+    {id:488399658,name:"Elements Skulls 122"},
+    {id:488399668,name:"Elements Skulls 123"},
+    {id:488399678,name:"Elements Skulls 124"},
+    {id:488399698,name:"Elements Skulls 126"},
+    {id:488399708,name:"Elements Skulls 127"},
+    {id:488399718,name:"Elements Skulls 128"},
+    {id:488399733,name:"Elements Skulls 129"},
+    {id:488399743,name:"Elements Skulls 130"},
+    {id:488399753,name:"Elements Skulls 131"},
+    {id:488399828,name:"Elements Skulls 138"},
+    {id:488593353,name:"Elements Skulls 143"},
+    {id:488593343,name:"Elements Skulls 142"},
+    {id:488593333,name:"Elements Skulls 141"},
+    {id:488399848,name:"Elements Skulls 140"},
+    {id:488399838,name:"Elements Skulls 139"},
+    {id:488399798,name:"Elements Skulls 135"},
+    {id:488399778,name:"Elements Skulls 133"},
+    {id:488399508,name:"Elements Skulls 107"},
+    {id:488399383,name:"Elements Skulls 96"},
+    {id:488399403,name:"Elements Skulls 97"},
+    {id:488399418,name:"Elements Skulls 98"},
+    {id:488399428,name:"Elements Skulls 99"},
+    {id:488399438,name:"Elements Skulls 100"},
+    {id:488399448,name:"Elements Skulls 101"},
+    {id:488399458,name:"Elements Skulls 102"},
+    {id:488399468,name:"Elements Skulls 103"},
+    {id:488399478,name:"Elements Skulls 104"},
+    {id:488399488,name:"Elements Skulls 105"},
+    {id:488399498,name:"Elements Skulls 106"},
+    {id:488399593,name:"Elements Skulls 115"},
+    {id:488399573,name:"Elements Skulls 113"},
+    {id:488399583,name:"Elements Skulls 114"},
+    {id:488399558,name:"Elements Skulls 112"},
+  ],
+  fantasy: [
+    {id:488398298,name:"Fantasy Skulls Classic"},
+    {id:488399048,name:"Fantasy Skulls 66"},
+  ],
+  government: [
+    {id:619429616,name:"Coast Guard 07"},
+    {id:592756116,name:"Air Force 03"},
+    {id:592756081,name:"Air Force 01"},
+    {id:619429881,name:"Veterans Day 09"},
+    {id:619429861,name:"Veterans Day 08"},
+    {id:619429831,name:"Veterans Day 07"},
+    {id:619429801,name:"Veterans Day 06"},
+    {id:619429776,name:"Coast Guard 10"},
+    {id:619429691,name:"Coast Guard 09"},
+    {id:619429666,name:"Coast Guard 08"},
+    {id:619429906,name:"Veterans Day 10"},
+    {id:619429586,name:"Coast Guard 06"},
+    {id:619429556,name:"Fire Department 10"},
+    {id:619429536,name:"Fire Department 09"},
+    {id:619429511,name:"Fire Department 08"},
+    {id:619429451,name:"Fire Department 07"},
+    {id:619429426,name:"Fire Department 06"},
+    {id:619429411,name:"EMS 10"},
+    {id:619429371,name:"EMS 09"},
+    {id:619429351,name:"EMS 08"},
+    {id:592756286,name:"Fire Department 01"},
+    {id:592756151,name:"Air Force 05"},
+    {id:592756136,name:"Air Force 04"},
+    {id:592756096,name:"Air Force 02"},
+    {id:592756056,name:"Police 05"},
+    {id:619429336,name:"EMS 07"},
+    {id:592755961,name:"Police 02"},
+    {id:592755936,name:"Police 01"},
+    {id:592755906,name:"Army 05"},
+    {id:592755866,name:"Army 04"},
+    {id:592755836,name:"Army 03"},
+    {id:592755806,name:"Army 02"},
+    {id:592755771,name:"Army 01"},
+    {id:592756391,name:"Fire Department 05"},
+    {id:592756621,name:"Veterans Day 04"},
+    {id:592756586,name:"Veterans Day 03"},
+    {id:592756566,name:"Veterans Day 02"},
+    {id:592756521,name:"Coast Guard 05"},
+  ],
+}; /* end _REMOVED stub */
+
+function imgUrl(id)      { return designImgUrl(id); }
+function imgFallback(id) { return designImgFallback(id); }
+function catLabel(key)   { return designCatLabel(key); }
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let activeFilter = 'all';
+let searchQuery  = '';
+const PAGE_SIZE  = 48;
+let visibleCount = PAGE_SIZE;
+
+function getFiltered() {
+  let list = ALL_DESIGNS;
+  if (activeFilter !== 'all') list = list.filter(d => d.cat === activeFilter);
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(d => d.name.toLowerCase().includes(q) || d.cat.toLowerCase().includes(q));
+  }
+  return list;
+}
+
+function catLabel(key) {
+  return CATS.find(c => c.key === key)?.label || key;
+}
+
+// ─── RENDER ─────────────────────────────────────────────────────────────────
+function render() {
+  const filtered = getFiltered();
+  const shown    = filtered.slice(0, visibleCount);
+  document.getElementById('resultCount').textContent = `${filtered.length} designs`;
+
+  const grid = document.getElementById('designGrid');
+  grid.innerHTML = shown.length ? shown.map(d => `
+    <div class="design-card" onclick="useDesign(${d.id},'${d.name.replace(/'/g,"\\'")}','${d.cat}')">
+      <div class="design-img-wrap">
+        <img class="design-img" src="${imgUrl(d.id)}" alt="${d.name}" loading="lazy"
+          onerror="this.src='${imgFallback(d.id)}';this.onerror=function(){this.style.display='none';this.nextElementSibling.style.display='flex';}"/>
+        <div class="img-placeholder" style="display:none">No Preview</div>
+      </div>
+      <div class="design-info">
+        <div class="design-name">${d.name}</div>
+        <div class="design-cat-badge">${catLabel(d.cat)}</div>
+      </div>
+      <div class="design-hover-overlay">
+        <button class="design-use-btn">Customize &amp; Order</button>
+      </div>
+    </div>
+  `).join('') : `<div class="empty-state">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <p>No designs found for "<strong>${searchQuery}</strong>"</p>
+  </div>`;
+
+  // Load more button
+  const existing = document.getElementById('loadMoreWrap');
+  if (existing) existing.remove();
+  if (filtered.length > visibleCount) {
+    const wrap = document.createElement('div');
+    wrap.id = 'loadMoreWrap';
+    wrap.style.cssText = 'text-align:center;padding:40px 0 20px;';
+    wrap.innerHTML = `<button onclick="loadMore()" style="background:transparent;border:1px solid rgba(212,152,72,0.4);color:var(--gold);padding:12px 36px;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;font-family:'DM Sans',sans-serif;cursor:pointer;border-radius:2px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(212,152,72,0.4)'">Load More (${Math.min(PAGE_SIZE, filtered.length - visibleCount)} more)</button>`;
+    document.querySelector('.grid-section').appendChild(wrap);
+  }
+}
+
+function loadMore() {
+  visibleCount += PAGE_SIZE;
+  render();
+  document.getElementById('loadMoreWrap')?.scrollIntoView({behavior:'smooth', block:'end'});
+}
+
+// ─── CATEGORY TABS ──────────────────────────────────────────────────────────
+function buildTabs() {
+  const wrap = document.getElementById('catTabs');
+  wrap.innerHTML = CATS.map(c => {
+    const count = c.key === 'all' ? ALL_DESIGNS.length : (DESIGN_LIBRARY[c.key]?.length || 0);
+    return `<button class="cat-tab${c.key === activeFilter ? ' active' : ''}" onclick="setFilter('${c.key}')">${c.label} <span style="opacity:0.6;font-size:10px">${count}</span></button>`;
+  }).join('');
+}
+
+function setFilter(key) {
+  activeFilter = key;
+  visibleCount = PAGE_SIZE;
+  buildTabs();
+  render();
+  window.scrollTo({top: document.querySelector('.controls-bar').offsetTop - 110, behavior:'smooth'});
+}
+
+function onSearch(val) {
+  searchQuery = val.trim();
+  visibleCount = PAGE_SIZE;
+  render();
+}
+
+// ─── USE DESIGN → OPEN IN DESIGNER ─────────────────────────────────────────
+function useDesign(id, name, cat) {
+  const params = new URLSearchParams({
+    design_id:   id,
+    design_name: name,
+    design_cat:  cat,
+    price:       20,
+  });
+  window.location.href = 'designer.html?' + params.toString();
+}
+
+function openQuoteModal(e) {
+  if (e) e.preventDefault();
+  document.getElementById('qmDesignPreview').style.display = 'none';
+  document.getElementById('quoteModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeQuoteModal() {
+  document.getElementById('quoteModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeQuoteModal(); });
+
+// ─── SUBMIT QUOTE ───────────────────────────────────────────────────────────
+function submitQuote(e) {
+  e.preventDefault();
+  const msg = document.getElementById('qmMsg');
+  const token = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
+  if (!token) {
+    msg.className = 'qm-msg error'; msg.style.display = 'block';
+    msg.textContent = 'Please complete the reCAPTCHA verification.';
+    return;
+  }
+  const btn = e.target.querySelector('.qm-submit');
+  btn.textContent = 'Sending…'; btn.disabled = true;
+  const data = new FormData(e.target);
+  data.append('g-recaptcha-response', token);
+  fetch('quote-request.php', {method:'POST', body: data})
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        msg.className = 'qm-msg success'; msg.style.display = 'block';
+        msg.textContent = 'Quote request sent! We\'ll get back to you within 24 hours.';
+        e.target.reset();
+        if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+        document.getElementById('qmDesignPreview').style.display = 'none';
+        btn.textContent = 'Send Quote Request'; btn.disabled = false;
+      } else {
+        throw new Error(res.message || 'Server error');
+      }
+    })
+    .catch(err => {
+      msg.className = 'qm-msg error'; msg.style.display = 'block';
+      msg.textContent = err.message || 'Something went wrong. Please try again.';
+      btn.textContent = 'Send Quote Request'; btn.disabled = false;
+      if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+    });
+}
+
+// ─── INIT ───────────────────────────────────────────────────────────────────
+buildTabs();
+render();
+
+// URL param: ?cat=anime
+const urlCat = new URLSearchParams(location.search).get('cat');
+if (urlCat && DESIGNS[urlCat]) setFilter(urlCat);
+</script>
+<script>fetch('track.php?page=designs&ref='+encodeURIComponent(document.referrer),{keepalive:true}).catch(()=>{});</script>
+</body>
+</html>

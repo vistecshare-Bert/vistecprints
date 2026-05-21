@@ -16,17 +16,29 @@
 }
 html{scroll-behavior:smooth;}
 body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden;}
+.nav-spacer{height:70px;}
 
 /* ── NAV ── */
-.nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.06);padding:0 24px;}
-.nav-inner{display:flex;align-items:center;justify-content:space-between;height:60px;max-width:1200px;margin:0 auto;}
-.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--gold);text-decoration:none;}
-.nav-logo span{color:var(--offwhite);}
-.nav-links{display:flex;align-items:center;gap:24px;}
-.nav-links a{color:var(--gray);text-decoration:none;font-size:13px;letter-spacing:.5px;transition:color .2s;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,10,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,152,72,0.15);padding:0 5%;}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:70px;}
+.logo img{height:50px;display:block;}
+.nav-links{display:flex;align-items:center;gap:28px;list-style:none;}
+.nav-links a{color:var(--gray);text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500;transition:color .2s;}
 .nav-links a:hover,.nav-links a.active{color:var(--gold);}
-.nav-cart{display:flex;align-items:center;gap:6px;background:var(--gold);color:#000;border:none;padding:8px 16px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:2px;text-decoration:none;}
-.nav-cart:hover{background:var(--gold-light);}
+.nav-cta{background:var(--gold);color:#000;padding:9px 20px;border-radius:2px;font-size:12px;font-weight:600;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:background .2s;white-space:nowrap;}
+.nav-cta:hover{background:var(--gold-light);}
+.cart-btn{position:relative;background:none;border:none;cursor:pointer;color:var(--offwhite);padding:6px;}
+.cart-badge{position:absolute;top:2px;right:2px;background:var(--gold);color:#000;font-size:9px;font-weight:700;border-radius:50%;width:16px;height:16px;display:none;align-items:center;justify-content:center;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;}
+.hamburger span{display:block;width:22px;height:2px;background:var(--offwhite);transition:all .2s;}
+@media(max-width:768px){
+  .nav-links{display:none;position:fixed;top:70px;left:0;right:0;background:rgba(10,10,10,0.98);flex-direction:column;padding:20px;gap:0;}
+  .nav-links.open{display:flex;}
+  .nav-links li{width:100%;border-bottom:1px solid rgba(255,255,255,0.06);}
+  .nav-links a{display:block;padding:14px 0;font-size:14px;}
+  .nav-cta{display:none;}
+  .hamburger{display:flex;}
+}
 
 /* ── HERO ── */
 .hero{padding:64px 24px 48px;text-align:center;max-width:700px;margin:0 auto;}
@@ -96,27 +108,70 @@ body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-se
   .card-body{padding:12px;}
   .card-name{font-size:13px;}
 }
+
+/* ── PRODUCT MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--dark2);border:1px solid rgba(255,255,255,0.1);border-radius:8px;max-width:860px;width:100%;max-height:90vh;overflow-y:auto;position:relative;}
+.modal-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.07);border:none;color:var(--offwhite);font-size:18px;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:10;transition:background .2s;}
+.modal-close:hover{background:rgba(255,255,255,0.15);}
+.modal-grid{display:grid;grid-template-columns:280px 1fr;min-height:400px;}
+.modal-left{background:var(--dark3);padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px;border-radius:8px 0 0 8px;}
+.modal-mockup{width:220px;height:220px;object-fit:contain;}
+.modal-colors{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+.modal-right{padding:28px;}
+.modal-brand{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dim);font-weight:600;margin-bottom:4px;}
+.modal-name{font-size:20px;font-weight:700;color:var(--offwhite);margin-bottom:4px;line-height:1.3;}
+.modal-sku{font-size:12px;color:var(--gray2);margin-bottom:16px;}
+.modal-desc{font-size:13px;color:var(--gray);line-height:1.7;margin-bottom:20px;}
+.modal-tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:20px;}
+.modal-tab{padding:8px 16px;font-size:12px;letter-spacing:.5px;text-transform:uppercase;font-weight:600;color:var(--gray2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;font-family:"DM Sans",sans-serif;}
+.modal-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.modal-panel{display:none;}
+.modal-panel.active{display:block;}
+.spec-row{display:flex;gap:8px;font-size:12px;margin-bottom:8px;align-items:baseline;}
+.spec-label{color:var(--gray2);min-width:120px;font-weight:500;}
+.spec-val{color:var(--offwhite);}
+.features-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.features-list li{font-size:12px;color:var(--offwhite);display:flex;align-items:baseline;gap:8px;}
+.features-list li::before{content:"✓";color:var(--gold);font-size:11px;flex-shrink:0;}
+.size-table{width:100%;border-collapse:collapse;font-size:12px;}
+.size-table th{text-align:left;color:var(--gray2);font-weight:600;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.08);text-transform:uppercase;letter-spacing:.5px;font-size:11px;}
+.size-table td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,0.05);color:var(--offwhite);}
+.size-table tr:last-child td{border-bottom:none;}
+.modal-cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:var(--gold);color:#000;border:none;border-radius:3px;font-size:13px;font-weight:700;font-family:"DM Sans",sans-serif;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-top:24px;text-decoration:none;transition:background .2s;}
+.modal-cta:hover{background:var(--gold-light);}
+@media(max-width:700px){
+  .modal-grid{grid-template-columns:1fr;}
+  .modal-left{border-radius:8px 8px 0 0;padding:20px;}
+  .modal-mockup{width:160px;height:160px;}
+}
+
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav class="nav">
+<nav>
   <div class="nav-inner">
-    <a class="nav-logo" href="index.html">VISTEC<span>PRINTS</span></a>
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="products.html">Products</a>
-      <a href="create.html" class="active">Create</a>
-      <a href="designer.html">Designer</a>
-      <a href="index.html#contact">Contact</a>
+    <a href="index.html" class="logo"><img src="images/Logo.png" alt="VistecPrints"/></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="create.html" class="active">Products</a></li>
+      <li><a href="designs.html">Designs</a></li>
+      <li><a href="designer.html">Designer</a></li>
+    </ul>
+    <button class="cart-btn" id="cartBtn" onclick="openCart()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+      <span class="cart-badge" id="cartBadge"></span>
+    </button>
+    <a href="index.html#contact" class="nav-cta">Get a Quote</a>
+    <div class="hamburger" id="hamburger" onclick="this.classList.toggle('open');document.getElementById('navLinks').classList.toggle('open')">
+      <span></span><span></span><span></span>
     </div>
-    <a class="nav-cart" href="checkout.html">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.61L23 6H6"/></svg>
-      Cart
-    </a>
   </div>
 </nav>
+<div class="nav-spacer"></div>
 
 <!-- HERO -->
 <section class="hero">
@@ -139,7 +194,7 @@ body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-se
   <div class="product-grid" id="productGrid">
 
     <!-- 1: Gildan 5000 Unisex -->
-    <div class="card" data-category="mens">
+    <div class="card" data-category="mens" data-product="gildan-5000" onclick="openProductModal('gildan-5000')">
       <div class="card-img">
         <img src="mockups/tshirt-white-front.png" alt="Gildan 5000" onerror="this.style.opacity='0.2'"/>
         <span class="card-badge">Best Seller</span>
@@ -165,7 +220,7 @@ body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-se
     </div>
 
     <!-- 2: Bella+Canvas BC3001 -->
-    <div class="card" data-category="mens">
+    <div class="card" data-category="mens" data-product="bc3001" onclick="openProductModal('bc3001')">
       <div class="card-img">
         <img src="mockups/tshirt-white-front.png" alt="Bella Canvas BC3001" onerror="this.style.opacity='0.2'"/>
         <span class="card-badge" style="background:#7c5cbf;">Premium</span>
@@ -191,7 +246,7 @@ body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-se
     </div>
 
     <!-- 3: Gildan 5000L Women's -->
-    <div class="card" data-category="womens">
+    <div class="card" data-category="womens" data-product="gildan-5000l" onclick="openProductModal('gildan-5000l')">
       <div class="card-img">
         <img src="mockups/tshirt-female-white-front.png" alt="Gildan 5000L Women's" onerror="this.src='mockups/tshirt-white-front.png'"/>
         <span class="card-badge women">Women's</span>
@@ -217,7 +272,7 @@ body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-se
     </div>
 
     <!-- 4: Gildan 64000 Softstyle -->
-    <div class="card" data-category="mens">
+    <div class="card" data-category="mens" data-product="gildan-64000" onclick="openProductModal('gildan-64000')">
       <div class="card-img">
         <img src="mockups/tshirt-white-front.png" alt="Gildan Softstyle 64000" onerror="this.style.opacity='0.2'"/>
       </div>
@@ -242,7 +297,7 @@ body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-se
     </div>
 
     <!-- 5: Next Level NL6211 Long Sleeve -->
-    <div class="card" data-category="longsleeve">
+    <div class="card" data-category="longsleeve" data-product="nl6211" onclick="openProductModal('nl6211')">
       <div class="card-img">
         <img src="mockups/tshirt-white-front.png" alt="Next Level Long Sleeve" onerror="this.style.opacity='0.2'"/>
         <span class="card-badge long">Long Sleeve</span>
@@ -268,7 +323,7 @@ body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-se
     </div>
 
     <!-- 6: Gildan Youth 5000B -->
-    <div class="card" data-category="youth">
+    <div class="card" data-category="youth" data-product="gildan-5000b" onclick="openProductModal('gildan-5000b')">
       <div class="card-img">
         <img src="mockups/tshirt-white-front.png" alt="Gildan Youth 5000B" onerror="this.style.opacity='0.2'"/>
         <span class="card-badge youth">Youth</span>
@@ -294,7 +349,7 @@ body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-se
     </div>
 
     <!-- 7: Next Level Youth NL3310 -->
-    <div class="card" data-category="youth">
+    <div class="card" data-category="youth" data-product="nl3310" onclick="openProductModal('nl3310')">
       <div class="card-img">
         <img src="mockups/tshirt-white-front.png" alt="Next Level Youth NL3310" onerror="this.style.opacity='0.2'"/>
         <span class="card-badge youth">Youth</span>
@@ -320,7 +375,7 @@ body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-se
     </div>
 
     <!-- 8: Gildan Youth Softstyle 64000B -->
-    <div class="card" data-category="youth">
+    <div class="card" data-category="youth" data-product="gildan-64000b" onclick="openProductModal('gildan-64000b')">
       <div class="card-img">
         <img src="mockups/tshirt-white-front.png" alt="Gildan Youth Softstyle 64000B" onerror="this.style.opacity='0.2'"/>
         <span class="card-badge youth">Youth</span>
@@ -409,5 +464,198 @@ document.querySelectorAll('.card').forEach(card => {
 // if (params.get('garment')) { currentGarment = params.get('garment'); }
 // (This is handled in designer.html if the ?garment= param support is wired up)
 </script>
+
+<!-- ── PRODUCT MODAL ── -->
+<div class="modal-overlay" id="productModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    <div class="modal-grid">
+      <div class="modal-left">
+        <img class="modal-mockup" id="modalMockup" src="mockups/tshirt-white-front.png" alt=""/>
+        <div class="modal-colors" id="modalColors"></div>
+        <a class="modal-cta" id="modalCta" href="designer.html">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Start Designing
+        </a>
+      </div>
+      <div class="modal-right">
+        <div class="modal-brand" id="modalBrand"></div>
+        <div class="modal-name"  id="modalName"></div>
+        <div class="modal-sku"   id="modalSku"></div>
+        <div class="modal-desc"  id="modalDesc"></div>
+        <div class="modal-tabs">
+          <button class="modal-tab active" data-tab="details" onclick="switchTab(this)">Details</button>
+          <button class="modal-tab"        data-tab="sizes"   onclick="switchTab(this)">Size Chart</button>
+          <button class="modal-tab"        data-tab="care"    onclick="switchTab(this)">Care &amp; Fabric</button>
+        </div>
+        <div class="modal-panel active" id="tabDetails">
+          <ul class="features-list" id="modalFeatures"></ul>
+        </div>
+        <div class="modal-panel" id="tabSizes">
+          <table class="size-table">
+            <thead><tr><th>Size</th><th>Chest</th></tr></thead>
+            <tbody id="modalSizeRows"></tbody>
+          </table>
+        </div>
+        <div class="modal-panel" id="tabCare">
+          <div class="spec-row"><span class="spec-label">Weight</span><span class="spec-val" id="modalWeight"></span></div>
+          <div class="spec-row"><span class="spec-label">Material</span><span class="spec-val" id="modalMaterial"></span></div>
+          <div class="spec-row"><span class="spec-label">Care</span><span class="spec-val" id="modalCare"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS = [
+  {key:'gray',   hex:'#8c8c8c', label:'Gray'},
+  {key:'white',  hex:'#f0f0f0', label:'White',  border:'#aaa'},
+  {key:'black',  hex:'#1a1a1a', label:'Black',  border:'#555'},
+  {key:'navy',   hex:'#1a2744', label:'Navy'},
+  {key:'red',    hex:'#c0392b', label:'Red'},
+  {key:'royal',  hex:'#2850a0', label:'Royal Blue'},
+  {key:'forest', hex:'#1e5e38', label:'Forest Green'},
+  {key:'maroon', hex:'#6b1a1a', label:'Maroon'},
+];
+
+const PRODUCT_DATA = {
+  'gildan-5000': {
+    brand:'Gildan', name:'Heavy Cotton 100% Cotton T-Shirt', sku:'SKU: 5000',
+    desc:'A classic undecorated tee. Pre-shrunk, 5.3 oz., 100% cotton construction with quality stitching throughout.',
+    weight:'5.3 oz.', material:'100% Cotton (most colors) · 90/10 Cotton/Poly (heather variants) · 99/1 Cotton/Poly (Ash)',
+    care:'Machine wash cold · Tumble dry low · Do not bleach',
+    features:['Seamless double-needle collar','Double-needle sleeves and hem','Taped neck and shoulders','Pre-shrunk fabric'],
+    sizes:[['S','34–36"'],['M','38–40"'],['L','42–44"'],['XL','46–48"'],['2XL','50–52"'],['3XL','54–56"'],['4XL','58–60"'],['5XL','62–64"']],
+    mockup:'mockups/tshirt-white-front.png', garment:'tshirt',
+  },
+  'bc3001': {
+    brand:'Bella + Canvas', name:'Unisex Jersey Short Sleeve Tee', sku:'SKU: BC3001',
+    desc:'The softest, smoothest tee you'll ever wear. Ring-spun cotton for a premium feel with a modern retail fit.',
+    weight:'4.2 oz.', material:'100% Airlume combed and ring-spun cotton · 90/10 Cotton/Poly (heather colors)',
+    care:'Machine wash cold · Tumble dry low · Inside out recommended',
+    features:['Side-seamed construction','Retail fit','Tear-away label','Airlume combed ring-spun cotton','Shoulder-to-shoulder tape'],
+    sizes:[['XS','32–34"'],['S','34–36"'],['M','38–40"'],['L','42–44"'],['XL','46–48"'],['2XL','50–52"'],['3XL','54–56"'],['4XL','58–60"'],['5XL','62–64"']],
+    mockup:'mockups/tshirt-white-front.png', garment:'tshirt',
+  },
+  'gildan-5000l': {
+    brand:'Gildan', name:"Women's Heavy Cotton T-Shirt", sku:'SKU: 5000L',
+    desc:"A classic women's cut tee. Pre-shrunk, 5.3 oz., 100% cotton with a feminine silhouette and quality stitching throughout.",
+    weight:'5.3 oz.', material:"100% Cotton · Contoured women's fit",
+    care:'Machine wash cold · Tumble dry low · Do not bleach',
+    features:["Contoured women's fit",'Seamless double-needle collar','Double-needle sleeves and hem','Taped neck and shoulders','Pre-shrunk'],
+    sizes:[['S','32–34"'],['M','35–37"'],['L','38–40"'],['XL','42–44"'],['2XL','46–48"'],['3XL','50–52"']],
+    mockup:'mockups/tshirt-female-white-front.png', garment:'tshirt-female',
+  },
+  'gildan-64000': {
+    brand:'Gildan', name:'Softstyle T-Shirt', sku:'SKU: 64000',
+    desc:'Ultra-soft ring-spun cotton for everyday comfort. A modern fit with a smooth finish, ideal for vibrant prints.',
+    weight:'4.5 oz.', material:'100% Ring-spun Cotton · 65/35 Polyester/Cotton (heather)',
+    care:'Machine wash cold · Tumble dry low',
+    features:['Ring-spun cotton for superior softness','Taped neck and shoulders','Tear-away label for comfort','Double-needle sleeves and hem'],
+    sizes:[['XS','32–34"'],['S','34–36"'],['M','38–40"'],['L','42–44"'],['XL','46–48"'],['2XL','50–52"'],['3XL','54–56"'],['4XL','58–60"']],
+    mockup:'mockups/tshirt-white-front.png', garment:'tshirt',
+  },
+  'nl6211': {
+    brand:'Next Level Apparel', name:'Adult CVC Long Sleeve Tee', sku:'SKU: NL6211',
+    desc:'A premium long sleeve tee with a CVC (Chief Value Cotton) fabric blend — soft, comfortable, and great for year-round wear.',
+    weight:'4.3 oz.', material:'60% Combed Ring-spun Cotton / 40% Polyester',
+    care:'Machine wash cold · Tumble dry low · Inside out for best results',
+    features:['CVC blend for softness and durability','Set-in sleeves','Side-seamed','Tear-away label','Great for full-chest prints'],
+    sizes:[['XS','32–34"'],['S','34–36"'],['M','38–40"'],['L','42–44"'],['XL','46–48"'],['2XL','50–52"'],['3XL','54–56"']],
+    mockup:'mockups/tshirt-white-front.png', garment:'tshirt',
+  },
+  'gildan-5000b': {
+    brand:'Gildan', name:'Youth Heavy Cotton T-Shirt', sku:'SKU: 5000B',
+    desc:'The same trusted Heavy Cotton construction, sized for kids. Pre-shrunk, durable, and built to last through every adventure.',
+    weight:'5.3 oz.', material:'100% Cotton',
+    care:'Machine wash cold · Tumble dry low',
+    features:['Pre-shrunk fabric','Seamless double-needle collar','Double-needle sleeves and hem','Taped neck and shoulders'],
+    sizes:[['XS','26–28"'],['S','28–30"'],['M','30–32"'],['L','32–34"'],['XL','34–36"']],
+    mockup:'mockups/tshirt-white-front.png', garment:'tshirt',
+  },
+  'nl3310': {
+    brand:'Next Level Apparel', name:'Youth Cotton Tee', sku:'SKU: NL3310',
+    desc:'Soft, lightweight youth tee made from combed ring-spun cotton. A comfortable everyday tee kids will love.',
+    weight:'4.3 oz.', material:'100% Combed Ring-spun Cotton',
+    care:'Machine wash cold · Tumble dry low',
+    features:['Combed ring-spun cotton','Side-seamed for a clean fit','Tear-away label','Durable ribbed collar'],
+    sizes:[['XS','24–26"'],['S','26–28"'],['M','28–30"'],['L','30–32"'],['XL','32–34"']],
+    mockup:'mockups/tshirt-white-front.png', garment:'tshirt',
+  },
+  'gildan-64000b': {
+    brand:'Gildan', name:'Youth Softstyle T-Shirt', sku:'SKU: 64000B',
+    desc:'Ultra-soft ring-spun cotton in a youth cut. Lightweight and comfortable — perfect for everyday kids' apparel.',
+    weight:'4.5 oz.', material:'100% Ring-spun Cotton',
+    care:'Machine wash cold · Tumble dry low',
+    features:['Ring-spun cotton for softness','Tear-away label','Double-needle sleeves and hem','Taped neck and shoulders'],
+    sizes:[['XS','24–26"'],['S','26–28"'],['M','28–30"'],['L','30–32"'],['XL','32–34"']],
+    mockup:'mockups/tshirt-white-front.png', garment:'tshirt',
+  },
+};
+
+function openProductModal(id) {
+  const p = PRODUCT_DATA[id];
+  if (!p) return;
+  // Populate
+  document.getElementById('modalBrand').textContent    = p.brand;
+  document.getElementById('modalName').textContent     = p.name;
+  document.getElementById('modalSku').textContent      = p.sku;
+  document.getElementById('modalDesc').textContent     = p.desc;
+  document.getElementById('modalWeight').textContent   = p.weight;
+  document.getElementById('modalMaterial').textContent = p.material;
+  document.getElementById('modalCare').textContent     = p.care;
+  // Mockup
+  const mImg = document.getElementById('modalMockup');
+  mImg.src = p.mockup;
+  mImg.onerror = () => { mImg.onerror=null; mImg.src='mockups/tshirt-white-front.png'; };
+  // CTA
+  document.getElementById('modalCta').href = 'designer.html?garment=' + p.garment;
+  // Features
+  const fl = document.getElementById('modalFeatures');
+  fl.innerHTML = p.features.map(f => `<li>${f}</li>`).join('');
+  // Size chart
+  const tbody = document.getElementById('modalSizeRows');
+  tbody.innerHTML = p.sizes.map(([s,c]) => `<tr><td>${s}</td><td>${c}</td></tr>`).join('');
+  // Colors
+  const cc = document.getElementById('modalColors');
+  cc.innerHTML = COLORS.map(c =>
+    `<div class="cc ${c.key}" title="${c.label}" onclick="previewColor('${c.key}','${c.hex}','${p.mockup}')" style="width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid ${c.border||'transparent'};background:${c.hex};transition:transform .15s;" onmouseover="this.style.transform='scale(1.25)'" onmouseout="this.style.transform='scale(1)'"></div>`
+  ).join('');
+  // Reset tabs
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.modal-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector('.modal-tab[data-tab="details"]').classList.add('active');
+  document.getElementById('tabDetails').classList.add('active');
+  // Show
+  document.getElementById('productModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('productModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function switchTab(btn) {
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.modal-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab' + btn.dataset.tab.charAt(0).toUpperCase() + btn.dataset.tab.slice(1)).classList.add('active');
+}
+
+function previewColor(colorKey, hex, baseMockup) {
+  // Tint the mockup image by changing the canvas overlay (simple visual hint)
+  const img = document.getElementById('modalMockup');
+  // Just highlight the swatch for now — full canvas tinting needs fabric.js
+  document.querySelectorAll('#modalColors > div').forEach(el => el.style.boxShadow = '');
+  event.target.style.boxShadow = '0 0 0 2px #fff, 0 0 0 4px #D49848';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+
 </body>
 </html>
