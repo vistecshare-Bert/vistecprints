@@ -15,7 +15,7 @@ function loadProducts($file) {
 
 function saveProducts($file, $products) {
     if (!is_writable($file) && !is_writable(dirname($file))) {
-        die('Error: products.json is not writable. Go to File Manager, right-click products.json → Permissions → set to 666.');
+        die('Error: products.json is not writable. Go to File Manager, right-click products.json â†’ Permissions â†’ set to 666.');
     }
     file_put_contents($file, json_encode(array_values($products), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 }
@@ -51,6 +51,57 @@ $categories = [
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action   = $_POST['action'] ?? '';
     $products = loadProducts($jsonFile);
+
+    // â”€â”€ CREATE DECORATED PRODUCT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    if ($action === 'add_decorated') {
+        $cat     = trim($_POST['cat']     ?? 'fun');
+        $name    = trim($_POST['name']    ?? '');
+        $price   = trim($_POST['price']   ?? '');
+        $badge   = trim($_POST['badge']   ?? '');
+        $garment = trim($_POST['garment'] ?? '');
+        $sizes   = array_values($_POST['sizes']  ?? []);
+        $colors  = array_values($_POST['colors'] ?? []);
+        $preview = $_POST['preview_data'] ?? '';
+        $id      = uniqid('dec_');
+        $imgPath = '';
+
+        // Save canvas capture as product image
+        if ($preview) {
+            $raw = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $preview));
+            $decDir = __DIR__ . '/../images/decorated/';
+            if (!is_dir($decDir)) mkdir($decDir, 0755, true);
+            file_put_contents($decDir . $id . '.png', $raw);
+            $imgPath = 'images/decorated/' . $id . '.png';
+        }
+
+        // Save uploaded design file
+        $designPath = '';
+        if (!empty($_FILES['design_file']['name'])) {
+            $ext = strtolower(pathinfo($_FILES['design_file']['name'], PATHINFO_EXTENSION));
+            $dDir = __DIR__ . '/../images/designs/';
+            if (!is_dir($dDir)) mkdir($dDir, 0755, true);
+            $df = $id . '_design.' . $ext;
+            move_uploaded_file($_FILES['design_file']['tmp_name'], $dDir . $df);
+            $designPath = 'images/designs/' . $df;
+        }
+
+        $products[] = [
+            'id'         => $id,
+            'name'       => $name,
+            'cat'        => $cat,
+            'badge'      => $badge,
+            'img'        => $imgPath,
+            'price'      => $price,
+            'garment'    => $garment,
+            'decorated'  => true,
+            'sizes'      => $sizes,
+            'colors'     => $colors,
+            'design_img' => $designPath,
+        ];
+        saveProducts($jsonFile, $products);
+        header('Location: dashboard.php?tab=decorated&msg=' . urlencode($name . ' saved!') . '&type=success');
+        exit;
+    }
 
     if ($action === 'add' || $action === 'edit') {
         $cat      = trim($_POST['cat'] ?? 'fun');
@@ -100,7 +151,7 @@ $products  = loadProducts($jsonFile);
 $flashMsg  = $_GET['msg'] ?? '';
 $flashType = $_GET['type'] ?? 'success';
 
-// ── ORDERS ────────────────────────────────────────────
+// â”€â”€ ORDERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $ordersFile = __DIR__ . '/../orders.json';
 function loadOrders($file) {
     if (!file_exists($file)) return [];
@@ -137,6 +188,7 @@ $pendingCount = count(array_filter($orders, fn($o) => ($o['status'] ?? '') === '
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>VistecPrints &mdash; Product Manager</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{--gold:#D49848;--gold-l:#E8B96A;--black:#0a0a0a;--dark:#111;--white:#fff;--gray:#888;--red:#e05555;}
@@ -264,6 +316,65 @@ tr:hover td{background:#fafafa;}
 .order-card-foot{padding:12px 20px;border-top:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .status-select{border:1px solid #ddd;padding:7px 10px;font-size:12px;font-family:'DM Sans',sans-serif;border-radius:2px;color:#555;background:#fff;cursor:pointer;}
 .sb-badge{background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;margin-left:auto;}
+
+/* DECORATED CREATOR */
+.dec-creator{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start;margin-bottom:28px;}
+@media(max-width:1100px){.dec-creator{grid-template-columns:1fr;}}
+.dec-canvas-col{background:#1e1e1e;border:1px solid #333;border-radius:4px;padding:12px;}
+.dec-form-col{background:#fff;border:1px solid #e8e8e8;border-radius:3px;padding:20px;}
+.dec-section-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#888;font-weight:600;margin-bottom:10px;}
+.dec-toolbar{display:flex;align-items:center;gap:4px;padding:6px 0 10px;flex-wrap:wrap;}
+.dec-tb-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;background:#2a2a2a;border:1px solid #444;border-radius:3px;color:#ccc;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.dec-tb-btn:hover{background:#3a3a3a;border-color:#666;color:#fff;}
+.dec-tb-btn.icon-only{padding:5px 8px;}
+.dec-tb-sep{width:1px;height:24px;background:#444;margin:0 2px;}
+.dec-canvas-area{position:relative;width:520px;height:520px;background:#111;border-radius:3px;overflow:hidden;margin:0 auto;}
+.dec-mockup-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;z-index:0;}
+.dec-mockup-color{position:absolute;inset:0;z-index:1;mix-blend-mode:multiply;pointer-events:none;transition:background 0.2s;}
+.dec-print-zone{position:absolute;pointer-events:none;border:2px dashed rgba(212,152,72,0.55);border-radius:2px;z-index:4;box-sizing:border-box;}
+.dec-controls-row{display:flex;align-items:center;gap:16px;padding:10px 4px 6px;flex-wrap:wrap;}
+.dec-ctrl-group{display:flex;align-items:center;gap:4px;}
+.dec-ctrl-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#666;font-weight:600;margin-right:4px;}
+.mockup-btn{padding:4px 10px;border:1px solid #444;border-radius:2px;background:#2a2a2a;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.5px;transition:all 0.15s;color:#ccc;}
+.mockup-btn.active,.mockup-btn:hover{background:var(--gold);border-color:var(--gold);color:#000;}
+.dec-swatches{display:flex;flex-wrap:wrap;gap:6px;}
+.dec-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 0.2s;position:relative;}
+.dec-swatch.active{border-color:var(--gold);transform:scale(1.15);}
+.dec-swatch[data-color="gray"]{background:#8c8c8c;}
+.dec-swatch[data-color="white"]{background:#f0f0f0;box-shadow:0 0 0 1px #aaa inset;}
+.dec-swatch[data-color="black"]{background:#1a1a1a;box-shadow:0 0 0 1px #555 inset;}
+.dec-swatch[data-color="navy"]{background:#1a2744;}
+.dec-swatch[data-color="red"]{background:#c0392b;}
+.dec-swatch[data-color="royal"]{background:#2850a0;}
+.dec-swatch[data-color="forest"]{background:#1e5e38;}
+.dec-swatch[data-color="maroon"]{background:#6b1a1a;}
+.dec-props-panel{background:#242424;border:1px solid #333;border-radius:3px;padding:10px 12px;margin-top:8px;display:none;}
+.dec-props-panel.visible{display:block;}
+.dec-prop-group{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
+.dec-prop-group:last-child{margin-bottom:0;}
+.dec-prop-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#666;font-weight:600;min-width:46px;}
+.dec-prop-input{background:#1a1a1a;border:1px solid #444;border-radius:2px;color:#ddd;font-size:12px;padding:4px 7px;font-family:'DM Sans',sans-serif;}
+.dec-prop-input[type="color"]{width:32px;height:26px;padding:1px 2px;cursor:pointer;}
+.dec-prop-input[type="number"]{width:60px;}
+.dec-prop-input[type="range"]{width:80px;cursor:pointer;}
+.dec-style-btn{padding:4px 9px;background:#2a2a2a;border:1px solid #444;border-radius:2px;color:#ccc;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.15s;}
+.dec-style-btn.active,.dec-style-btn:hover{background:var(--gold);border-color:var(--gold);color:#000;}
+.form-color-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
+.fcswatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid #ddd;transition:all 0.15s;flex-shrink:0;}
+.fcswatch.on{border-color:var(--gold);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--gold);}
+.fcswatch[data-color="gray"]{background:#8c8c8c;}
+.fcswatch[data-color="white"]{background:#f0f0f0;border-color:#ccc;}
+.fcswatch[data-color="black"]{background:#1a1a1a;}
+.fcswatch[data-color="navy"]{background:#1a2744;}
+.fcswatch[data-color="red"]{background:#c0392b;}
+.fcswatch[data-color="royal"]{background:#2850a0;}
+.fcswatch[data-color="forest"]{background:#1e5e38;}
+.fcswatch[data-color="maroon"]{background:#6b1a1a;}
+.size-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:4px;}
+.size-check{display:none;}
+.size-check+.size-label{display:block;text-align:center;padding:7px 4px;border:1px solid #ddd;border-radius:2px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;}
+.size-check:checked+.size-label{background:var(--gold);border-color:var(--gold);color:#000;}
+.dec-form-foot{display:flex;gap:10px;margin-top:20px;}
 </style>
 </head>
 <body>
@@ -286,6 +397,12 @@ tr:hover td{background:#fafafa;}
       </a>
     </li>
     <li>
+      <a href="dashboard.php?tab=decorated" <?= $activeTab==='decorated' ? 'class="active"' : '' ?>>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12l2 2 4-4"/></svg>
+        Decorated
+      </a>
+    </li>
+    <li>
       <a href="../index.html" target="_blank">
         <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         View Website
@@ -302,8 +419,12 @@ tr:hover td{background:#fafafa;}
 
 <div class="main">
   <div class="topbar">
-    <h1><?= $activeTab === 'orders' ? 'Orders' : 'Decorated Products' ?></h1>
-    <?php if ($activeTab !== 'orders'): ?>
+    <h1><?php
+      if ($activeTab === 'orders') echo 'Orders';
+      elseif ($activeTab === 'decorated') echo 'Decorated Products';
+      else echo 'Products';
+    ?></h1>
+    <?php if ($activeTab === 'products'): ?>
     <button class="btn btn-gold" onclick="openModal()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Add Product
@@ -343,19 +464,19 @@ tr:hover td{background:#fafafa;}
       <div class="order-card-body">
         <div class="order-section">
           <h4>Customer</h4>
-          <p><strong><?= htmlspecialchars($cust['name'] ?? '—') ?></strong></p>
+          <p><strong><?= htmlspecialchars($cust['name'] ?? 'â€”') ?></strong></p>
           <p><?= htmlspecialchars($cust['email'] ?? '') ?></p>
           <p><?= htmlspecialchars($cust['phone'] ?? '') ?></p>
           <p style="margin-top:8px;color:#888;"><?= htmlspecialchars(($addr['line1']??'') . ', ' . ($addr['city']??'') . ', ' . ($addr['state']??'') . ' ' . ($addr['zip']??'')) ?></p>
           <?php if (!empty($o['notes'])): ?><p style="margin-top:8px;font-style:italic;color:#888;font-size:12px;">"<?= htmlspecialchars($o['notes']) ?>"</p><?php endif; ?>
         </div>
         <div class="order-section">
-          <h4>Items · Subtotal $<?= number_format($o['subtotal']??0,2) ?> + $<?= number_format($o['shipping']??4.99,2) ?> shipping</h4>
+          <h4>Items Â· Subtotal $<?= number_format($o['subtotal']??0,2) ?> + $<?= number_format($o['shipping']??4.99,2) ?> shipping</h4>
           <ul class="order-items-list">
           <?php foreach (($o['items'] ?? []) as $item): ?>
             <li>
-              <span><?= htmlspecialchars($item['name'] ?? '') ?> — Size <?= htmlspecialchars($item['size'] ?? '') ?></span>
-              <span><?= htmlspecialchars($item['priceStr'] ?? '') ?> ×<?= intval($item['qty'] ?? 1) ?></span>
+              <span><?= htmlspecialchars($item['name'] ?? '') ?> â€” Size <?= htmlspecialchars($item['size'] ?? '') ?></span>
+              <span><?= htmlspecialchars($item['priceStr'] ?? '') ?> Ã—<?= intval($item['qty'] ?? 1) ?></span>
             </li>
           <?php endforeach; ?>
           </ul>
@@ -382,14 +503,221 @@ tr:hover td{background:#fafafa;}
     <?php endforeach; ?>
     <?php endif; ?>
 
+    <?php elseif ($activeTab === 'decorated'): ?>
+    <!-- ===== DECORATED TAB ===== -->
+    <?php
+      $decProducts = array_values(array_filter($products, fn($p) => !empty($p['decorated'])));
+    ?>
+
+    <form method="POST" id="decForm" enctype="multipart/form-data" onsubmit="captureAndSubmit(event)">
+      <input type="hidden" name="action" value="add_decorated"/>
+      <input type="hidden" name="preview_data" id="decPreviewData"/>
+
+      <div class="dec-creator">
+        <!-- LEFT: Full Canvas Column -->
+        <div class="dec-canvas-col">
+
+          <div class="dec-toolbar">
+            <button type="button" class="dec-tb-btn icon-only" id="decBtnUndo" title="Undo">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+            </button>
+            <button type="button" class="dec-tb-btn icon-only" id="decBtnRedo" title="Redo">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.13-9.36L23 10"/></svg>
+            </button>
+            <div class="dec-tb-sep"></div>
+            <button type="button" class="dec-tb-btn" id="decBtnText">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+              Add Text
+            </button>
+            <label class="dec-tb-btn" style="cursor:pointer;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Upload Art
+              <input type="file" name="design_file" id="decDesignFile" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="loadDesignToCanvas(this)"/>
+            </label>
+            <div class="dec-tb-sep"></div>
+            <button type="button" class="dec-tb-btn icon-only" id="decBtnFwd" title="Bring Forward">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="14" height="14" rx="2"/><rect x="2" y="2" width="14" height="14" rx="2" fill="#2a2a2a"/></svg>
+            </button>
+            <button type="button" class="dec-tb-btn icon-only" id="decBtnBck" title="Send Backward">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="14" height="14" rx="2"/><rect x="8" y="8" width="14" height="14" rx="2" fill="#2a2a2a"/></svg>
+            </button>
+            <div class="dec-tb-sep"></div>
+            <button type="button" class="dec-tb-btn icon-only" id="decBtnDelete" title="Delete Selected">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            </button>
+            <button type="button" class="dec-tb-btn" id="decBtnClear" style="margin-left:auto;">Clear All</button>
+          </div>
+
+          <div class="dec-canvas-area" id="decMockupWrap">
+            <img class="dec-mockup-img" id="decMockupImg" src="../mockups/tshirt-white-front.png" alt="mockup" crossorigin="anonymous" onerror="this.style.opacity='0.2'"/>
+            <div class="dec-mockup-color" id="decMockupColor" style="background:#8c8c8c;"></div>
+            <canvas id="decCanvas" width="520" height="520"></canvas>
+            <div class="dec-print-zone" id="decPrintZone"></div>
+          </div>
+
+          <div class="dec-controls-row">
+            <div class="dec-ctrl-group">
+              <span class="dec-ctrl-label">Garment</span>
+              <button type="button" class="mockup-btn active" data-garment="tshirt" onclick="setDecGarment('tshirt',this)">T-Shirt</button>
+              <button type="button" class="mockup-btn" data-garment="hoodie" onclick="setDecGarment('hoodie',this)">Hoodie</button>
+            </div>
+            <div class="dec-ctrl-group">
+              <span class="dec-ctrl-label">View</span>
+              <button type="button" class="mockup-btn active" data-view="front" onclick="setDecView('front',this)">Front</button>
+              <button type="button" class="mockup-btn" data-view="back" onclick="setDecView('back',this)">Back</button>
+            </div>
+            <div class="dec-ctrl-group">
+              <div class="dec-swatches">
+                <div class="dec-swatch active" data-color="gray"   title="Gray"         onclick="setDecColor('gray',this)"></div>
+                <div class="dec-swatch"        data-color="white"  title="White"        onclick="setDecColor('white',this)"></div>
+                <div class="dec-swatch"        data-color="black"  title="Black"        onclick="setDecColor('black',this)"></div>
+                <div class="dec-swatch"        data-color="navy"   title="Navy"         onclick="setDecColor('navy',this)"></div>
+                <div class="dec-swatch"        data-color="red"    title="Red"          onclick="setDecColor('red',this)"></div>
+                <div class="dec-swatch"        data-color="royal"  title="Royal Blue"   onclick="setDecColor('royal',this)"></div>
+                <div class="dec-swatch"        data-color="forest" title="Forest Green" onclick="setDecColor('forest',this)"></div>
+                <div class="dec-swatch"        data-color="maroon" title="Maroon"       onclick="setDecColor('maroon',this)"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dec-props-panel" id="decPropsPanel">
+            <div id="decTextProps">
+              <div class="dec-prop-group">
+                <span class="dec-prop-label">Font</span>
+                <select class="dec-prop-input" id="decPropFont" style="width:120px;">
+                  <option value="Arial">Arial</option>
+                  <option value="Times New Roman">Times New Roman</option>
+                  <option value="Georgia">Georgia</option>
+                  <option value="Verdana">Verdana</option>
+                  <option value="Impact">Impact</option>
+                </select>
+                <input type="number" class="dec-prop-input" id="decPropSize" value="40" min="8" max="200" title="Font Size"/>
+                <input type="color" class="dec-prop-input" id="decPropColor" value="#ffffff" title="Text Color"/>
+                <button type="button" class="dec-style-btn" id="decBtnBold"><strong>B</strong></button>
+                <button type="button" class="dec-style-btn" id="decBtnItalic"><em>I</em></button>
+              </div>
+            </div>
+            <div id="decImageProps" style="display:none;">
+              <div class="dec-prop-group">
+                <span class="dec-prop-label">Opacity</span>
+                <input type="range" class="dec-prop-input" id="decPropOpacity" min="0" max="100" value="100"/>
+                <span id="decOpacityVal" style="color:#aaa;font-size:11px;min-width:30px;">100%</span>
+                <button type="button" class="dec-style-btn" id="decBtnFlipX">&#8596;</button>
+                <button type="button" class="dec-style-btn" id="decBtnFlipY">&#8597;</button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /.dec-canvas-col -->
+
+        <div class="dec-form-col">
+          <div class="dec-section-title">Product Details</div>
+
+          <div class="form-group">
+            <label>Product Name *</label>
+            <input type="text" name="name" required placeholder="e.g. Anime Galaxy Tee"/>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category *</label>
+              <select name="cat">
+                <?php foreach ($categories as $key => $label): ?>
+                <option value="<?= $key ?>"><?= $label ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Price</label>
+              <input type="text" name="price" placeholder="$25.00"/>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Badge <span style="font-weight:300;text-transform:none;">(optional)</span></label>
+              <input type="text" name="badge" placeholder="New, Hot, Sale..."/>
+            </div>
+            <div class="form-group">
+              <label>Garment</label>
+              <input type="text" name="garment" placeholder="Heavy Cotton T-Shirt"/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Available Sizes</label>
+            <div class="size-grid">
+              <?php foreach (['S','M','L','XL','2XL','3XL','4XL','5XL'] as $sz): ?>
+              <div>
+                <input type="checkbox" class="size-check" id="sz_<?= $sz ?>" name="sizes[]" value="<?= $sz ?>"/>
+                <label class="size-label" for="sz_<?= $sz ?>"><?= $sz ?></label>
+              </div>
+              <?php endforeach; ?>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Available Colors</label>
+            <div class="form-color-row">
+              <?php foreach (['gray'=>'Gray','white'=>'White','black'=>'Black','navy'=>'Navy','red'=>'Red','royal'=>'Royal Blue','forest'=>'Forest','maroon'=>'Maroon'] as $k=>$v): ?>
+              <div class="fcswatch" data-color="<?= $k ?>" data-name="<?= $v ?>" title="<?= $v ?>" onclick="toggleFormColor(this)"></div>
+              <?php endforeach; ?>
+            </div>
+            <div id="decColorsHidden"></div>
+          </div>
+
+          <div class="dec-form-foot">
+            <a href="dashboard.php?tab=products" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-gold">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save Product
+            </button>
+          </div>
+        </div><!-- /.dec-form-col -->
+      </div><!-- /.dec-creator -->
+    </form>
+
+    <!-- Existing decorated products -->
+    <?php if (!empty($decProducts)): ?>
+    <div class="table-wrap">
+      <div class="table-header"><h2>Existing Decorated Products</h2></div>
+      <table>
+        <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Sizes</th><th>Actions</th></tr></thead>
+        <tbody>
+          <?php foreach ($products as $i => $p):
+            if (empty($p['decorated'])) continue;
+            $imgSrc = $p['img'] ?? '';
+            $displaySrc = $imgSrc ? '../' . $imgSrc : '';
+          ?>
+          <tr>
+            <td><?php if ($displaySrc): ?><img src="<?= htmlspecialchars($displaySrc) ?>" class="prod-img" alt="" onerror="this.style.display='none'"/><?php else: ?><div class="prod-img-placeholder">NO IMG</div><?php endif; ?></td>
+            <td><div class="prod-name"><?= htmlspecialchars($p['name']) ?></div><div class="prod-id">ID: <?= htmlspecialchars($p['id']) ?></div></td>
+            <td><span class="cat-badge cat-<?= htmlspecialchars($p['cat']) ?>"><?= htmlspecialchars($categories[$p['cat']] ?? $p['cat']) ?></span></td>
+            <td><?= htmlspecialchars($p['price'] ?? 'â€”') ?></td>
+            <td style="font-size:12px;color:#666;"><?= htmlspecialchars(implode(', ', $p['sizes'] ?? [])) ?></td>
+            <td>
+              <form method="POST" onsubmit="return confirm('Delete this product?')" style="display:inline;">
+                <input type="hidden" name="action" value="delete"/>
+                <input type="hidden" name="index" value="<?= $i ?>"/>
+                <button type="submit" class="btn btn-red btn-sm">Delete</button>
+              </form>
+            </td>
+          </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+    <?php endif; ?>
+
     <?php else: ?>
     <!-- ===== PRODUCTS TAB ===== -->
+    <?php $regProducts = array_filter($products, fn($p) => empty($p['decorated'])); ?>
 
     <div class="stats">
-      <div class="stat-card"><div class="num"><?= count($products) ?></div><div class="lbl">Total Products</div></div>
-      <div class="stat-card"><div class="num"><?= count(array_filter($products, fn($p) => $p['cat'] === 'anime')) ?></div><div class="lbl">Anime</div></div>
-      <div class="stat-card"><div class="num"><?= count(array_filter($products, fn($p) => $p['cat'] === 'fun')) ?></div><div class="lbl">Fun Print</div></div>
-      <div class="stat-card"><div class="num"><?= count(array_filter($products, fn($p) => !empty($p['badge']))) ?></div><div class="lbl">Featured</div></div>
+      <div class="stat-card"><div class="num"><?= count($regProducts) ?></div><div class="lbl">Total Products</div></div>
+      <div class="stat-card"><div class="num"><?= count(array_filter($regProducts, fn($p) => $p['cat'] === 'anime')) ?></div><div class="lbl">Anime</div></div>
+      <div class="stat-card"><div class="num"><?= count(array_filter($regProducts, fn($p) => $p['cat'] === 'fun')) ?></div><div class="lbl">Fun Print</div></div>
+      <div class="stat-card"><div class="num"><?= count(array_filter($regProducts, fn($p) => !empty($p['badge']))) ?></div><div class="lbl">Featured</div></div>
     </div>
 
     <div class="table-wrap">
@@ -420,6 +748,7 @@ tr:hover td{background:#fafafa;}
         </thead>
         <tbody>
           <?php foreach ($products as $i => $p):
+            if (!empty($p['decorated'])) continue;
             $imgSrc = $p['img'] ?? '';
             $isLocal = $imgSrc && strpos($imgSrc, 'http') !== 0;
             $displaySrc = $isLocal ? '../' . $imgSrc : $imgSrc;
@@ -437,9 +766,9 @@ tr:hover td{background:#fafafa;}
               <div class="prod-id">ID: <?= htmlspecialchars($p['id']) ?></div>
             </td>
             <td><span class="cat-badge cat-<?= htmlspecialchars($p['cat']) ?>"><?= htmlspecialchars($categories[$p['cat']] ?? $p['cat']) ?></span></td>
-            <td><?php if (!empty($p['badge'])): ?><span class="badge-tag"><?= htmlspecialchars($p['badge']) ?></span><?php else: ?><span style="color:#ccc">—</span><?php endif; ?></td>
-            <td><?= htmlspecialchars($p['price'] ?? '—') ?></td>
-            <td style="color:#666;max-width:160px;"><?= htmlspecialchars($p['garment'] ?? '—') ?></td>
+            <td><?php if (!empty($p['badge'])): ?><span class="badge-tag"><?= htmlspecialchars($p['badge']) ?></span><?php else: ?><span style="color:#ccc">â€”</span><?php endif; ?></td>
+            <td><?= htmlspecialchars($p['price'] ?? 'â€”') ?></td>
+            <td style="color:#666;max-width:160px;"><?= htmlspecialchars($p['garment'] ?? 'â€”') ?></td>
             <td>
               <div class="actions">
                 <button class="btn btn-outline btn-sm" onclick="editProduct(<?= $i ?>, <?= htmlspecialchars(json_encode($p), ENT_QUOTES) ?>)">Edit</button>
@@ -519,10 +848,6 @@ tr:hover td{background:#fafafa;}
             <button type="button" class="remove-img" onclick="removeUpload()" title="Remove">&times;</button>
           </div>
 
-          <div class="divider" id="urlDivider">or use external URL</div>
-
-          <input type="url" id="fImgUrl" placeholder="https://www.vistecprints.com/ssc/i/..." style="width:100%;border:1px solid #ddd;padding:10px 12px;font-size:13px;font-family:inherit;border-radius:2px;outline:none;color:#111;" oninput="document.getElementById('fImgExisting').value=this.value"/>
-          <div class="hint" style="margin-top:4px;">Paste a URL only if not uploading a file above</div>
         </div>
 
         <div class="form-group">
@@ -566,7 +891,6 @@ function openModal(edit) {
     document.getElementById('submitBtn').textContent = 'Add Product';
     document.getElementById('productForm').reset();
     document.getElementById('fImgExisting').value = '';
-    document.getElementById('fImgUrl').value = '';
     document.getElementById('currentImgWrap').style.display = 'none';
     document.getElementById('uploadPreviewWrap').style.display = 'none';
     updateUploadHint();
@@ -597,7 +921,6 @@ function editProduct(idx, data) {
     document.getElementById('currentImgThumb').src = src;
     document.getElementById('currentImgPath').textContent = data.img;
     document.getElementById('currentImgWrap').style.display = 'flex';
-    document.getElementById('fImgUrl').value = data.img.startsWith('http') ? data.img : '';
   } else {
     document.getElementById('currentImgWrap').style.display = 'none';
   }
@@ -621,7 +944,6 @@ function previewUpload(input) {
     document.getElementById('uploadPreviewSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
     document.getElementById('uploadPreviewWrap').style.display = 'flex';
     document.getElementById('fImgExisting').value = '';
-    document.getElementById('fImgUrl').value = '';
   };
   reader.readAsDataURL(file);
 }
@@ -645,6 +967,301 @@ document.querySelectorAll('.ftab').forEach(btn => {
     });
   });
 });
+
+// â”€â”€ DECORATED CREATOR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+(function() {
+  if (!document.getElementById('decCanvas')) return;
+
+  const SIZE = 520;
+
+  const DEC_MOCKUPS = {
+    tshirt: {
+      gray:   { front:'../mockups/tshirt-gray-front.png',   back:'../mockups/tshirt-gray-back.png'   },
+      white:  { front:'../mockups/tshirt-white-front.png',  back:'../mockups/tshirt-white-back.png'  },
+      black:  { front:'../mockups/tshirt-black-front.png',  back:'../mockups/tshirt-black-back.png'  },
+      navy:   { front:'../mockups/tshirt-navy-front.png',   back:'../mockups/tshirt-navy-back.png'   },
+      red:    { front:'../mockups/tshirt-red-front.png',    back:'../mockups/tshirt-red-back.png'    },
+      royal:  { front:'../mockups/tshirt-royal-front.png',  back:'../mockups/tshirt-royal-back.png'  },
+      forest: { front:'../mockups/tshirt-forest-front.png', back:'../mockups/tshirt-forest-back.png' },
+      maroon: { front:'../mockups/tshirt-maroon-front.png', back:'../mockups/tshirt-maroon-back.png' },
+    },
+    hoodie: {
+      gray:   { front:'../mockups/hoodie-gray-front.png',   back:'../mockups/hoodie-gray-back.png'   },
+      white:  { front:'../mockups/hoodie-white-front.png',  back:'../mockups/hoodie-white-back.png'  },
+      black:  { front:'../mockups/hoodie-black-front.png',  back:'../mockups/hoodie-black-back.png'  },
+      navy:   { front:'../mockups/hoodie-navy-front.png',   back:'../mockups/hoodie-navy-back.png'   },
+      red:    { front:'../mockups/hoodie-red-front.png',    back:'../mockups/hoodie-red-back.png'    },
+      royal:  { front:'../mockups/hoodie-royal-front.png',  back:'../mockups/hoodie-royal-back.png'  },
+      forest: { front:'../mockups/hoodie-forest-front.png', back:'../mockups/hoodie-forest-back.png' },
+      maroon: { front:'../mockups/hoodie-maroon-front.png', back:'../mockups/hoodie-maroon-back.png' },
+    },
+  };
+
+  const DEC_COLOR_HEX = {
+    gray:'#8c8c8c', white:null, black:'#1e1e1e', navy:'#1a2744',
+    red:'#c0392b', royal:'#2850a0', forest:'#1e5e38', maroon:'#6b1a1a',
+  };
+
+  const PRINT_ZONES = {
+    front:{ left:0.33, top:0.28, width:0.34, height:0.32 },
+    back: { left:0.32, top:0.27, width:0.36, height:0.34 },
+  };
+
+  let fc = null;
+  let decGarment = 'tshirt', decColor = 'gray', decView = 'front';
+  let history = [], historyIndex = -1;
+
+  function pushHistory() {
+    const json = JSON.stringify(fc.toJSON());
+    history = history.slice(0, historyIndex + 1);
+    history.push(json);
+    if (history.length > 40) history.shift();
+    historyIndex = history.length - 1;
+  }
+
+  function undo() {
+    if (historyIndex <= 0) return;
+    historyIndex--;
+    fc.loadFromJSON(history[historyIndex], () => { fc.renderAll(); updatePropsPanel(); });
+  }
+
+  function redo() {
+    if (historyIndex >= history.length - 1) return;
+    historyIndex++;
+    fc.loadFromJSON(history[historyIndex], () => { fc.renderAll(); updatePropsPanel(); });
+  }
+
+  function updateDecPrintZone() {
+    const z = PRINT_ZONES[decView];
+    const el = document.getElementById('decPrintZone');
+    if (!el) return;
+    el.style.left   = (z.left   * SIZE) + 'px';
+    el.style.top    = (z.top    * SIZE) + 'px';
+    el.style.width  = (z.width  * SIZE) + 'px';
+    el.style.height = (z.height * SIZE) + 'px';
+  }
+
+  function updateDecMockup() {
+    const map  = DEC_MOCKUPS[decGarment] || DEC_MOCKUPS.tshirt;
+    const base = map.white || map.gray;
+    const src  = base[decView] || base.front;
+    document.getElementById('decMockupImg').src = src;
+    const hex = DEC_COLOR_HEX[decColor];
+    document.getElementById('decMockupColor').style.background = hex || 'transparent';
+    updateDecPrintZone();
+  }
+
+  function updatePropsPanel() {
+    const obj = fc.getActiveObject();
+    const panel = document.getElementById('decPropsPanel');
+    const textDiv = document.getElementById('decTextProps');
+    const imgDiv  = document.getElementById('decImageProps');
+    if (!obj) { panel.classList.remove('visible'); return; }
+    panel.classList.add('visible');
+    if (obj.type === 'i-text' || obj.type === 'text') {
+      textDiv.style.display = '';
+      imgDiv.style.display  = 'none';
+      document.getElementById('decPropFont').value  = obj.fontFamily || 'Arial';
+      document.getElementById('decPropSize').value  = Math.round(obj.fontSize || 40);
+      document.getElementById('decPropColor').value = obj.fill || '#ffffff';
+      document.getElementById('decBtnBold').classList.toggle('active', obj.fontWeight === 'bold');
+      document.getElementById('decBtnItalic').classList.toggle('active', obj.fontStyle === 'italic');
+    } else {
+      textDiv.style.display = 'none';
+      imgDiv.style.display  = '';
+      const opVal = Math.round((obj.opacity || 1) * 100);
+      document.getElementById('decPropOpacity').value = opVal;
+      document.getElementById('decOpacityVal').textContent = opVal + '%';
+    }
+  }
+
+  function initCanvas() {
+    fc = new fabric.Canvas('decCanvas', {width: SIZE, height: SIZE});
+    fc.wrapperEl.style.position = 'relative';
+    fc.wrapperEl.style.zIndex   = '2';
+
+    fabric.Object.prototype.set({
+      cornerColor: '#D49848',
+      cornerStrokeColor: '#9A6B2E',
+      cornerStyle: 'circle',
+      cornerSize: 10,
+      transparentCorners: false,
+      borderColor: '#D49848',
+      borderDashArray: [5, 3],
+      padding: 8,
+    });
+
+    updateDecMockup();
+    pushHistory();
+
+    fc.on('object:modified', pushHistory);
+    fc.on('object:added',    pushHistory);
+    fc.on('object:removed',  pushHistory);
+    fc.on('selection:created',  updatePropsPanel);
+    fc.on('selection:updated',  updatePropsPanel);
+    fc.on('selection:cleared',  updatePropsPanel);
+    fc.on('object:modified', updatePropsPanel);
+
+    document.getElementById('decBtnUndo').addEventListener('click', undo);
+    document.getElementById('decBtnRedo').addEventListener('click', redo);
+    document.getElementById('decBtnDelete').addEventListener('click', () => {
+      const obj = fc.getActiveObject();
+      if (obj) { fc.remove(obj); fc.discardActiveObject(); fc.renderAll(); }
+    });
+    document.getElementById('decBtnClear').addEventListener('click', () => {
+      if (!confirm('Clear all objects from canvas?')) return;
+      fc.getObjects().slice().forEach(o => fc.remove(o));
+      fc.renderAll(); pushHistory();
+    });
+    document.getElementById('decBtnFwd').addEventListener('click', () => {
+      const obj = fc.getActiveObject();
+      if (obj) { fc.bringForward(obj); fc.renderAll(); pushHistory(); }
+    });
+    document.getElementById('decBtnBck').addEventListener('click', () => {
+      const obj = fc.getActiveObject();
+      if (obj) { fc.sendBackwards(obj); fc.renderAll(); pushHistory(); }
+    });
+    document.getElementById('decBtnText').addEventListener('click', () => {
+      const z = PRINT_ZONES[decView];
+      const txt = new fabric.IText('Your Text', {
+        left: (z.left + z.width / 2) * SIZE,
+        top:  (z.top  + z.height/ 2) * SIZE,
+        originX: 'center', originY: 'center',
+        fontSize: 40, fill: '#ffffff', fontFamily: 'Arial',
+        selectable: true, hasControls: true,
+      });
+      fc.add(txt); fc.setActiveObject(txt); fc.renderAll(); updatePropsPanel();
+    });
+
+    document.getElementById('decPropFont').addEventListener('change', e => {
+      const obj = fc.getActiveObject();
+      if (obj && (obj.type==='i-text'||obj.type==='text')) { obj.set('fontFamily', e.target.value); fc.renderAll(); }
+    });
+    document.getElementById('decPropSize').addEventListener('input', e => {
+      const obj = fc.getActiveObject();
+      if (obj && (obj.type==='i-text'||obj.type==='text')) { obj.set('fontSize', parseInt(e.target.value)||40); fc.renderAll(); }
+    });
+    document.getElementById('decPropColor').addEventListener('input', e => {
+      const obj = fc.getActiveObject();
+      if (obj && (obj.type==='i-text'||obj.type==='text')) { obj.set('fill', e.target.value); fc.renderAll(); }
+    });
+    document.getElementById('decBtnBold').addEventListener('click', function() {
+      const obj = fc.getActiveObject(); if (!obj) return;
+      const isBold = obj.fontWeight === 'bold';
+      obj.set('fontWeight', isBold ? 'normal' : 'bold');
+      this.classList.toggle('active', !isBold); fc.renderAll();
+    });
+    document.getElementById('decBtnItalic').addEventListener('click', function() {
+      const obj = fc.getActiveObject(); if (!obj) return;
+      const isItalic = obj.fontStyle === 'italic';
+      obj.set('fontStyle', isItalic ? 'normal' : 'italic');
+      this.classList.toggle('active', !isItalic); fc.renderAll();
+    });
+    document.getElementById('decPropOpacity').addEventListener('input', function() {
+      const obj = fc.getActiveObject(); if (!obj) return;
+      obj.set('opacity', parseInt(this.value) / 100);
+      document.getElementById('decOpacityVal').textContent = this.value + '%';
+      fc.renderAll();
+    });
+    document.getElementById('decBtnFlipX').addEventListener('click', () => {
+      const obj = fc.getActiveObject();
+      if (obj) { obj.set('flipX', !obj.flipX); fc.renderAll(); pushHistory(); }
+    });
+    document.getElementById('decBtnFlipY').addEventListener('click', () => {
+      const obj = fc.getActiveObject();
+      if (obj) { obj.set('flipY', !obj.flipY); fc.renderAll(); pushHistory(); }
+    });
+
+    document.addEventListener('keydown', e => {
+      if (!document.getElementById('decCanvas')) return;
+      if (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
+      if ((e.ctrlKey||e.metaKey) && e.key==='z') { e.preventDefault(); undo(); }
+      if ((e.ctrlKey||e.metaKey) && e.key==='y') { e.preventDefault(); redo(); }
+      if ((e.key==='Delete'||e.key==='Backspace') && fc.getActiveObject()) {
+        const obj = fc.getActiveObject();
+        if (obj.type !== 'i-text') { fc.remove(obj); fc.renderAll(); }
+      }
+    });
+  }
+
+  window.setDecGarment = function(type, btn) {
+    decGarment = type;
+    document.querySelectorAll('[data-garment]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); updateDecMockup();
+  };
+
+  window.setDecView = function(view, btn) {
+    decView = view;
+    document.querySelectorAll('[data-view]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); updateDecMockup();
+  };
+
+  window.setDecColor = function(color, el) {
+    decColor = color;
+    document.querySelectorAll('.dec-swatch').forEach(s => s.classList.remove('active'));
+    el.classList.add('active'); updateDecMockup();
+  };
+
+  window.toggleFormColor = function(el) {
+    el.classList.toggle('on');
+    const name = el.dataset.name;
+    const hidden = document.getElementById('decColorsHidden');
+    const existing = hidden.querySelector(`input[value="${name}"]`);
+    if (el.classList.contains('on')) {
+      if (!existing) {
+        const inp = document.createElement('input');
+        inp.type = 'hidden'; inp.name = 'colors[]'; inp.value = name;
+        hidden.appendChild(inp);
+      }
+    } else { if (existing) existing.remove(); }
+  };
+
+  window.loadDesignToCanvas = function(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      fabric.Image.fromURL(e.target.result, img => {
+        const z = PRINT_ZONES[decView];
+        const zW = z.width * SIZE, zH = z.height * SIZE;
+        const scale = Math.min(zW / img.width, zH / img.height, 1);
+        img.set({
+          left: (z.left + z.width / 2) * SIZE,
+          top:  (z.top  + z.height/ 2) * SIZE,
+          originX:'center', originY:'center',
+          scaleX: scale, scaleY: scale,
+          selectable: true, hasControls: true,
+        });
+        fc.add(img); fc.setActiveObject(img); fc.renderAll(); updatePropsPanel();
+      });
+    };
+    reader.readAsDataURL(input.files[0]);
+  };
+
+  window.captureAndSubmit = function(e) {
+    e.preventDefault();
+    fc.discardActiveObject(); fc.renderAll();
+    const off = document.createElement('canvas');
+    off.width = off.height = SIZE;
+    const ctx = off.getContext('2d');
+    const mockImg = document.getElementById('decMockupImg');
+    try { ctx.drawImage(mockImg, 0, 0, SIZE, SIZE); } catch(_) {}
+    const hex = DEC_COLOR_HEX[decColor];
+    if (hex) {
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = hex; ctx.fillRect(0, 0, SIZE, SIZE);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    const fabricImg = new Image();
+    fabricImg.onload = () => {
+      ctx.drawImage(fabricImg, 0, 0, SIZE, SIZE);
+      document.getElementById('decPreviewData').value = off.toDataURL('image/png');
+      e.target.submit();
+    };
+    fabricImg.src = fc.toDataURL({format:'png'});
+  };
+
+  initCanvas();
+})();
 </script>
 </body>
 </html>
