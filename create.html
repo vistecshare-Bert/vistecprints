@@ -16,15 +16,17 @@
 }
 html{scroll-behavior:smooth;}
 body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden;}
-.nav-spacer{height:70px;}
+.nav-spacer{height:100px;}
 
 /* ── NAV ── */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,10,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,152,72,0.15);padding:0 5%;}
-.nav-inner{display:flex;align-items:center;justify-content:space-between;height:70px;}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:100px;}
 .logo img{height:50px;display:block;}
 .nav-links{display:flex;align-items:center;gap:28px;list-style:none;}
 .nav-links a{color:var(--gray);text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500;transition:color .2s;}
 .nav-links a:hover,.nav-links a.active{color:var(--gold);}
+.nav-phone{color:#D49848;font-size:13px;font-weight:500;text-decoration:none;white-space:nowrap;}
+.nav-right{display:flex;align-items:center;gap:24px;}
 .nav-cta{background:var(--gold);color:#000;padding:9px 20px;border-radius:2px;font-size:12px;font-weight:600;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:background .2s;white-space:nowrap;}
 .nav-cta:hover{background:var(--gold-light);}
 .cart-btn{position:relative;background:none;border:none;cursor:pointer;color:var(--offwhite);padding:6px;}
@@ -452,15 +454,6 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   });
 });
 
-// ── Pass garment param to designer when card is clicked ──────────────
-document.querySelectorAll('.card').forEach(card => {
-  card.addEventListener('click', function(e) {
-    // Only navigate if the click wasn't on the button (button handles its own link)
-    if (e.target.closest('.btn-design')) return;
-    const link = card.querySelector('.btn-design');
-    if (link) window.location.href = link.href;
-  });
-});
 
 // ── Pre-select garment in designer via URL param ─────────────────────
 // In designer.html, add this near the top of the <script>:
