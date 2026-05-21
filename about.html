@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>About Vistec GraphX — Custom Printing Charlotte NC</title>
+<meta name="description" content="Vistec GraphX is Charlotte's custom printing studio. DTF printing, screen printing, embroidery, signs and banners. Located at 701 Morris St, Charlotte NC."/>
+<link rel="canonical" href="https://rebuild.vistecprints.com/about"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --black:#0a0a0a;--dark:#111111;--dark2:#1a1a1a;--dark3:#222222;
+  --gold:#D49848;--gold-light:#E8B96A;--gold-dim:#9A6B2E;
+  --white:#FFFFFF;--offwhite:#F0EDE8;--gray:#888888;--gray2:#555555;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden;}
+.nav-spacer{height:100px;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,10,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,152,72,0.15);padding:0 5%;}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:100px;}
+.logo img{height:50px;display:block;}
+.nav-links{display:flex;align-items:center;gap:28px;list-style:none;}
+.nav-links a{color:var(--gray);text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500;transition:color .2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);}
+.nav-phone{color:#D49848;font-size:13px;font-weight:500;text-decoration:none;white-space:nowrap;}
+.nav-right{display:flex;align-items:center;gap:24px;}
+.nav-cta{background:var(--gold);color:#000;padding:9px 20px;border-radius:2px;font-size:12px;font-weight:600;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:background .2s;white-space:nowrap;}
+.nav-cta:hover{background:var(--gold-light);}
+.cart-btn{position:relative;background:none;border:none;cursor:pointer;color:var(--offwhite);padding:6px;}
+.cart-badge{position:absolute;top:2px;right:2px;background:var(--gold);color:#000;font-size:9px;font-weight:700;border-radius:50%;width:16px;height:16px;display:none;align-items:center;justify-content:center;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;}
+.hamburger span{display:block;width:22px;height:2px;background:var(--offwhite);transition:all .2s;}
+@media(max-width:768px){
+  .nav-links{display:none;position:fixed;top:100px;left:0;right:0;background:rgba(10,10,10,0.98);flex-direction:column;padding:20px;gap:0;}
+  .nav-links.open{display:flex;}
+  .nav-links li{width:100%;border-bottom:1px solid rgba(255,255,255,0.06);}
+  .nav-links a{display:block;padding:14px 0;font-size:14px;}
+  .nav-cta{display:none;}
+  .hamburger{display:flex;}
+  .nav-phone{display:none;}
+}
+
+/* ── HERO ── */
+.hero{position:relative;padding:100px 5% 80px;overflow:hidden;border-bottom:1px solid rgba(212,152,72,0.1);}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#000 0%,#0d0d0d 60%,#111 100%);}
+.hero-pattern{position:absolute;inset:0;opacity:0.04;background-image:repeating-linear-gradient(45deg,#D49848 0,#D49848 1px,transparent 0,transparent 50%);background-size:30px 30px;}
+.hero-glow{position:absolute;top:-20%;right:-5%;width:600px;height:600px;background:radial-gradient(circle,rgba(212,152,72,0.07) 0%,transparent 70%);pointer-events:none;}
+.hero-content{position:relative;z-index:1;max-width:800px;}
+.hero-eyebrow{display:inline-block;border:1px solid var(--gold-dim);color:var(--gold);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:6px 16px;margin-bottom:28px;}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,10vw,110px);line-height:0.95;letter-spacing:2px;color:var(--white);margin-bottom:28px;}
+.hero h1 .gold{color:var(--gold);}
+.hero-sub{font-size:17px;color:var(--gray);max-width:540px;line-height:1.7;}
+
+/* ── SECTION SHARED ── */
+.section{padding:80px 5%;}
+.section-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-weight:600;display:block;margin-bottom:12px;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,60px);letter-spacing:2px;color:var(--offwhite);line-height:1.05;margin-bottom:20px;}
+.section-body{font-size:15px;color:var(--gray);line-height:1.8;max-width:640px;}
+.divider{width:48px;height:2px;background:var(--gold);margin:24px 0;}
+
+/* ── STORY ── */
+.story{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;max-width:1200px;margin:0 auto;}
+.story-visual{position:relative;}
+.story-box{background:var(--dark2);border:1px solid rgba(212,152,72,0.15);border-radius:4px;padding:48px 40px;text-align:center;}
+.story-box-num{font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--gold);line-height:1;margin-bottom:4px;}
+.story-box-label{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);font-weight:500;}
+.story-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(212,152,72,0.1);border:1px solid rgba(212,152,72,0.1);border-radius:4px;margin-top:16px;overflow:hidden;}
+.story-stat{background:var(--dark2);padding:28px 20px;text-align:center;}
+.story-stat-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--gold);line-height:1;margin-bottom:4px;}
+.story-stat-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);}
+@media(max-width:900px){.story{grid-template-columns:1fr;gap:40px;}}
+
+/* ── SERVICES ── */
+.services-section{background:var(--dark);border-top:1px solid rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.05);}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:rgba(212,152,72,0.08);border:1px solid rgba(212,152,72,0.08);border-radius:4px;overflow:hidden;margin-top:48px;max-width:1200px;}
+.service-card{background:var(--dark);padding:40px 32px;transition:background .2s;}
+.service-card:hover{background:var(--dark2);}
+.service-icon{width:48px;height:48px;border:1px solid rgba(212,152,72,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+.service-icon svg{stroke:var(--gold);fill:none;stroke-width:1.5;}
+.service-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--offwhite);margin-bottom:10px;}
+.service-desc{font-size:13px;color:var(--gray);line-height:1.7;}
+
+/* ── VALUES ── */
+.values-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px;margin-top:48px;max-width:1200px;}
+.value-card{background:var(--dark2);border:1px solid rgba(255,255,255,0.06);border-radius:4px;padding:32px 28px;transition:border-color .2s;}
+.value-card:hover{border-color:rgba(212,152,72,0.3);}
+.value-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:rgba(212,152,72,0.2);line-height:1;margin-bottom:12px;}
+.value-name{font-size:14px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--offwhite);margin-bottom:8px;}
+.value-desc{font-size:13px;color:var(--gray);line-height:1.6;}
+
+/* ── LOCATION ── */
+.location-section{background:var(--dark);border-top:1px solid rgba(255,255,255,0.05);}
+.location-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;max-width:1200px;margin:0 auto;}
+.location-map{border-radius:4px;overflow:hidden;border:1px solid rgba(212,152,72,0.15);}
+.location-map iframe{width:100%;height:360px;display:block;filter:grayscale(40%) contrast(1.1) brightness(0.85);}
+.contact-item{display:flex;align-items:flex-start;gap:16px;margin-bottom:28px;}
+.contact-icon{width:40px;height:40px;border:1px solid rgba(212,152,72,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.contact-icon svg{stroke:var(--gold);fill:none;stroke-width:1.5;}
+.contact-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dim);font-weight:600;margin-bottom:4px;}
+.contact-val{font-size:15px;color:var(--offwhite);}
+.contact-val a{color:var(--offwhite);text-decoration:none;transition:color .2s;}
+.contact-val a:hover{color:var(--gold);}
+@media(max-width:900px){.location-grid{grid-template-columns:1fr;gap:40px;}}
+
+/* ── CTA ── */
+.cta-section{text-align:center;padding:100px 5%;}
+.cta-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,80px);letter-spacing:2px;color:var(--offwhite);margin-bottom:16px;}
+.cta-title span{color:var(--gold);}
+.cta-sub{font-size:16px;color:var(--gray);margin-bottom:40px;}
+.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+.btn-gold{background:var(--gold);color:#000;padding:14px 32px;border-radius:2px;font-size:13px;font-weight:700;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:background .2s;}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-outline{border:1px solid rgba(212,152,72,0.4);color:var(--gold);padding:14px 32px;border-radius:2px;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:all .2s;}
+.btn-outline:hover{background:rgba(212,152,72,0.08);border-color:var(--gold);}
+
+/* ── FOOTER ── */
+footer{background:var(--dark2);border-top:1px solid rgba(255,255,255,0.06);padding:48px 5% 32px;}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;margin-bottom:40px;}
+.footer-brand img{height:60px;margin-bottom:16px;}
+.footer-brand p{font-size:13px;color:var(--gray2);line-height:1.7;max-width:280px;}
+.footer-col h4{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--offwhite);margin-bottom:16px;}
+.footer-col ul{list-style:none;}
+.footer-col li{margin-bottom:10px;}
+.footer-col a{font-size:13px;color:var(--gray2);text-decoration:none;transition:color .2s;}
+.footer-col a:hover{color:var(--gold);}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.06);padding-top:24px;text-align:center;font-size:12px;color:var(--gray2);max-width:1200px;margin:0 auto;}
+@media(max-width:768px){.footer-inner{grid-template-columns:1fr;gap:32px;}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo"><img src="images/Logo.png" alt="VistecPrints"/></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html">Shop</a></li>
+      <li><a href="create.html">Products</a></li>
+      <li><a href="designs.html">Designs</a></li>
+      <li><a href="designer.html">Designer</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="tel:+17043776626" class="nav-phone">+1 704-377-6626</a>
+      <a href="index.html#contact" class="nav-cta">Get a Quote</a>
+      <button class="cart-btn" id="cartBtn" onclick="openCart()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.2"/><circle cx="20" cy="21" r="1.2"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="cart-badge" id="cartBadge"></span>
+      </button>
+    </div>
+    <div class="hamburger" id="hamburger" onclick="this.classList.toggle('open');document.getElementById('navLinks').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+<div class="nav-spacer"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-pattern"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">Charlotte, NC · Est. Vistec GraphX</span>
+    <h1>Built In <span class="gold">Charlotte.</span><br>Printed For<br><span class="gold">Everyone.</span></h1>
+    <p class="hero-sub">We are a full-service custom print shop committed to quality, speed, and craftsmanship. From a single shirt to a full production run — we deliver work that represents you.</p>
+  </div>
+</section>
+
+<!-- STORY -->
+<section class="section">
+  <div class="story">
+    <div class="story-text">
+      <span class="section-label">Our Story</span>
+      <h2 class="section-title">More Than<br>A Print Shop</h2>
+      <div class="divider"></div>
+      <p class="section-body">Vistec GraphX was born from a simple belief — that great printing should be accessible to everyone. Whether you're a business building your brand, an organization outfitting your team, or an individual with a vision you want to wear, we bring it to life with precision and care.</p>
+      <br/>
+      <p class="section-body">Based in the heart of Charlotte, NC, we've grown into a trusted partner for custom apparel, signage, and branded merchandise. Every order — big or small — gets the same attention to detail and the same commitment to quality.</p>
+    </div>
+    <div class="story-visual">
+      <div class="story-box">
+        <div class="story-box-num">100%</div>
+        <div class="story-box-label">Charlotte Made · Customer Focused</div>
+      </div>
+      <div class="story-stats">
+        <div class="story-stat">
+          <div class="story-stat-num">48hr</div>
+          <div class="story-stat-label">Turnaround</div>
+        </div>
+        <div class="story-stat">
+          <div class="story-stat-num">0</div>
+          <div class="story-stat-label">Minimums</div>
+        </div>
+        <div class="story-stat">
+          <div class="story-stat-num">4</div>
+          <div class="story-stat-label">Print Methods</div>
+        </div>
+        <div class="story-stat">
+          <div class="story-stat-num">1</div>
+          <div class="story-stat-label">Goal: Your Vision</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="section services-section">
+  <div style="max-width:1200px;margin:0 auto;">
+    <span class="section-label">What We Do</span>
+    <h2 class="section-title">Our Services</h2>
+    <div class="services-grid">
+
+      <div class="service-card">
+        <div class="service-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="service-name">DTF Printing</div>
+        <p class="service-desc">Direct To Film printing delivers vibrant, full-color designs on virtually any fabric. No minimums, no setup fees — perfect for one-offs, small runs, and complex artwork.</p>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+        </div>
+        <div class="service-name">Screen Printing</div>
+        <p class="service-desc">The gold standard for bulk apparel. Screen printing delivers bold, long-lasting color with premium ink adhesion — ideal for team uniforms, events, and large orders.</p>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h12"/></svg>
+        </div>
+        <div class="service-name">Embroidery</div>
+        <p class="service-desc">Elevate your brand with precision embroidery. Hats, polos, jackets, bags — threaded logos and text that look sharp and last through every wash.</p>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+        </div>
+        <div class="service-name">Signs &amp; Banners</div>
+        <p class="service-desc">From storefront banners to event signage, we produce large-format prints that demand attention. Full color, weather-resistant, and built to represent your brand everywhere.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section class="section">
+  <div style="max-width:1200px;margin:0 auto;">
+    <span class="section-label">Why Choose Us</span>
+    <h2 class="section-title">What Sets Us Apart</h2>
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="value-num">01</div>
+        <div class="value-name">No Minimums</div>
+        <p class="value-desc">Order one piece or one thousand. We don't believe in forcing bulk on customers who don't need it. Your project, your quantity.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-num">02</div>
+        <div class="value-name">Fast Turnaround</div>
+        <p class="value-desc">Most orders ship within 48 hours. When you need it fast without sacrificing quality, we deliver — every time.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-num">03</div>
+        <div class="value-name">Print Quality</div>
+        <p class="value-desc">We use professional-grade equipment and materials. The colors are sharp, the prints are durable, and the finished product looks exactly like what you envisioned.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-num">04</div>
+        <div class="value-name">Local &amp; Personal</div>
+        <p class="value-desc">We're a Charlotte business serving the Charlotte community. Real people, real communication — no call centers, no outsourcing, no guesswork.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCATION -->
+<section class="section location-section">
+  <div class="location-grid">
+    <div>
+      <span class="section-label">Find Us</span>
+      <h2 class="section-title">Visit The Studio</h2>
+      <div class="divider"></div>
+
+      <div class="contact-item">
+        <div class="contact-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div>
+          <div class="contact-label">Address</div>
+          <div class="contact-val">701 Morris St, Charlotte, NC 28202<br>United States</div>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="contact-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012.18 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.13a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0121 15.22z"/></svg>
+        </div>
+        <div>
+          <div class="contact-label">Phone</div>
+          <div class="contact-val"><a href="tel:+17043776626">+1 704-377-6626</a></div>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="contact-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div>
+          <div class="contact-label">Email</div>
+          <div class="contact-val"><a href="mailto:vistecfx@gmail.com">vistecfx@gmail.com</a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="location-map">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3258.7!2d-80.8457!3d35.2188!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88541fc4fc381a7b%3A0x884650e6bf8fdcb5!2s701%20Morris%20St%2C%20Charlotte%2C%20NC%2028202!5e0!3m2!1sen!2sus!4v1"
+        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title">Ready To <span>Create</span><br>Something Great?</h2>
+  <p class="cta-sub">Browse our products, jump into the designer, or reach out for a custom quote.</p>
+  <div class="cta-btns">
+    <a href="create.html" class="btn-gold">Shop Products</a>
+    <a href="designer.html" class="btn-outline">Open Designer</a>
+    <a href="index.html#contact" class="btn-outline">Get a Quote</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="images/Logo.png" alt="Vistec GraphX"/>
+      <p>Charlotte's custom print shop. DTF printing, screen printing, embroidery, and signs. No minimums. Fast turnaround. Real people.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Shop</a></li>
+        <li><a href="create.html">Products</a></li>
+        <li><a href="designs.html">Designs</a></li>
+        <li><a href="designer.html">Designer</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="tel:+17043776626">+1 704-377-6626</a></li>
+        <li><a href="mailto:vistecfx@gmail.com">vistecfx@gmail.com</a></li>
+        <li><a href="#">701 Morris St</a></li>
+        <li><a href="#">Charlotte, NC 28202</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    &copy; <span id="yr"></span> Vistec GraphX. All rights reserved. &nbsp;·&nbsp; Charlotte, NC
+  </div>
+</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
