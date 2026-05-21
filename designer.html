@@ -3,9 +3,19 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Designer — VistecPrints</title>
+<title>Online T-Shirt Designer Tool | VistecPrints Charlotte NC</title>
+<meta name="description" content="Design your own custom t-shirt or hoodie online. Upload artwork, add text, choose from our design library, and order — all in one tool."/>
+<meta name="keywords" content="custom t-shirt designer online, design your own shirt charlotte nc, online apparel designer"/>
+<link rel="canonical" href="https://rebuild.vistecprints.com/designer.html"/>
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="Online T-Shirt Designer | VistecPrints"/>
+<meta property="og:description" content="Design your own custom apparel online. Upload artwork, add text, and order."/>
+<meta property="og:url" content="https://rebuild.vistecprints.com/designer.html"/>
+<meta property="og:image" content="https://rebuild.vistecprints.com/vistecprints-logo.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Oswald:wght@400;600&family=Anton&family=Roboto:wght@400;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+<script src="design-library.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
@@ -68,8 +78,33 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
 .panel-section + .panel-section{border-top:1px solid rgba(255,255,255,0.06);}
 .panel-heading{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold-dim);margin-bottom:12px;font-weight:600;}
 
+/* Design Library panel */
+.lib-heading{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;margin-bottom:0;}
+.lib-heading.open{margin-bottom:10px;}
+.lib-toggle{font-size:14px;color:var(--gray);transition:transform 0.2s;line-height:1;}
+.lib-heading.open .lib-toggle{transform:rotate(180deg);}
+.lib-body{display:none;}
+.lib-body.open{display:block;}
+.lib-search{width:100%;background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--offwhite);padding:7px 10px;border-radius:3px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:8px;transition:border-color 0.2s;box-sizing:border-box;}
+.lib-search:focus{border-color:var(--gold-dim);}
+.lib-cats{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.lib-cat{background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--gray);padding:3px 8px;border-radius:2px;font-size:10px;letter-spacing:0.5px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.lib-cat:hover{border-color:var(--gold-dim);color:var(--offwhite);}
+.lib-cat.active{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:600;}
+.lib-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;max-height:300px;overflow-y:auto;}
+.lib-grid::-webkit-scrollbar{width:3px;}
+.lib-grid::-webkit-scrollbar-thumb{background:var(--dark4);}
+.lib-thumb{background:var(--dark3);border:1px solid rgba(255,255,255,0.08);border-radius:2px;aspect-ratio:1;overflow:hidden;cursor:pointer;position:relative;transition:border-color 0.15s;}
+.lib-thumb:hover{border-color:rgba(212,152,72,0.5);}
+.lib-thumb img{width:100%;height:100%;object-fit:contain;}
+.lib-thumb .lib-name{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.75);color:var(--offwhite);font-size:9px;padding:2px 4px;line-height:1.3;opacity:0;transition:opacity 0.15s;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;}
+.lib-thumb:hover .lib-name{opacity:1;}
+.lib-more{width:100%;margin-top:6px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--gray);padding:5px;font-size:10px;letter-spacing:1px;font-family:'DM Sans',sans-serif;cursor:pointer;border-radius:2px;transition:all 0.15s;}
+.lib-more:hover{border-color:var(--gold-dim);color:var(--gold);}
+.lib-count{font-size:10px;color:var(--gray2);margin-bottom:6px;}
+
 /* Garment type tabs */
-.garment-tabs{display:flex;gap:6px;}
+.garment-tabs{display:flex;gap:6px;flex-wrap:wrap;}
 .garment-tab{flex:1;padding:8px 4px;background:var(--dark3);border:1px solid rgba(255,255,255,0.08);border-radius:4px;cursor:pointer;text-align:center;font-size:11px;color:var(--gray);transition:all 0.2s;letter-spacing:0.5px;}
 .garment-tab.active,.garment-tab:hover{background:rgba(212,152,72,0.12);border-color:var(--gold-dim);color:var(--gold);}
 
@@ -156,7 +191,6 @@ input[type=checkbox].tgl:checked + label.tgl-btn::after{left:19px;background:var
   overflow:hidden;
   position:relative;
   background:var(--black);
-  background-image:radial-gradient(circle at center,rgba(212,152,72,0.03) 0%,transparent 70%);
 }
 .canvas-container{
   position:relative;
@@ -173,6 +207,14 @@ input[type=checkbox].tgl:checked + label.tgl-btn::after{left:19px;background:var
   object-fit:contain;
   pointer-events:none;
   display:block;
+}
+#mockupColorLayer{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  mix-blend-mode:multiply;
+  pointer-events:none;
+  transition:background 0.2s;
 }
 #designer-canvas{
   position:relative;
@@ -245,6 +287,40 @@ input[type=color]{width:36px;height:36px;padding:2px;background:var(--dark3);bor
 .style-btn{flex:1;padding:7px;background:var(--dark3);border:1px solid rgba(255,255,255,0.08);border-radius:4px;cursor:pointer;color:var(--gray);font-size:13px;text-align:center;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
 .style-btn.active,.style-btn:hover{background:rgba(212,152,72,0.12);border-color:var(--gold-dim);color:var(--gold);}
 
+/* DRAG SCRUBBER */
+.dscrub{display:flex;align-items:center;gap:6px;background:var(--dark3);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:8px 10px;cursor:ew-resize;user-select:none;transition:border-color 0.2s;position:relative;overflow:hidden;}
+.dscrub:hover{border-color:var(--gold-dim);}
+.dscrub-lbl{font-size:9px;color:var(--gold-dim);letter-spacing:1px;text-transform:uppercase;flex-shrink:0;}
+.dscrub-val{font-size:12px;color:var(--offwhite);flex:1;text-align:center;}
+.dscrub input{position:absolute;inset:0;opacity:0;width:100%;height:100%;padding:8px 10px;background:var(--dark3);border:1px solid var(--gold-dim);border-radius:4px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--offwhite);outline:none;display:none;z-index:2;box-sizing:border-box;text-align:center;}
+.dscrub.editing{cursor:text;}
+.dscrub.editing input{display:block;opacity:1;}
+.dscrub.editing .dscrub-val,.dscrub.editing .dscrub-lbl{opacity:0;}
+
+/* ADD TO CART TOOLBAR BUTTON */
+.tb-cart-btn{background:var(--gold);color:var(--black);padding:8px 18px;border-radius:2px;border:none;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.2s;}
+.tb-cart-btn:hover{background:var(--gold-light);}
+
+/* DESIGNER CART MODAL */
+.dc-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:800;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s;padding:20px;}
+.dc-overlay.open{opacity:1;pointer-events:all;}
+.dc-box{background:var(--dark2);border:1px solid rgba(212,152,72,0.25);border-radius:6px;width:100%;max-width:400px;padding:32px 28px;position:relative;text-align:center;}
+.dc-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--gray);font-size:24px;cursor:pointer;line-height:1;padding:4px 8px;}
+.dc-close:hover{color:var(--offwhite);}
+.dc-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--white);margin-bottom:6px;}
+.dc-sub{font-size:12px;color:var(--gray);margin-bottom:20px;}
+.dc-preview{width:110px;height:110px;object-fit:contain;border-radius:4px;background:var(--dark3);margin:0 auto 12px;display:block;}
+.dc-info{font-size:12px;color:var(--gray);margin-bottom:20px;letter-spacing:0.5px;}
+.dc-info strong{color:var(--offwhite);}
+.dc-sizes{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:18px;}
+.dc-sz{background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--gray);padding:8px 14px;border-radius:3px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px;font-family:'DM Sans',sans-serif;}
+.dc-sz:hover{border-color:var(--gold-dim);color:var(--offwhite);}
+.dc-sz.active{background:rgba(212,152,72,0.12);border-color:var(--gold);color:var(--gold);}
+.dc-note{font-size:11px;color:var(--gray);margin-bottom:16px;line-height:1.5;}
+.dc-add{width:100%;background:var(--gold);color:var(--black);border:none;padding:13px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:3px;font-family:'DM Sans',sans-serif;transition:background 0.2s;}
+.dc-add:hover{background:var(--gold-light);}
+.dc-add:disabled{opacity:0.4;cursor:not-allowed;}
+
 /* Align buttons */
 .align-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
 .align-btn{padding:7px;background:var(--dark3);border:1px solid rgba(255,255,255,0.08);border-radius:4px;cursor:pointer;color:var(--gray);display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
@@ -303,7 +379,7 @@ input[type=color]{width:36px;height:36px;padding:2px;background:var(--dark3);bor
 /* SCROLLBAR GLOBAL */
 ::-webkit-scrollbar{width:6px;height:6px;}
 ::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--dark4);border-radius:3px;}
+::-webkit-scrollbar-thumb{background:#d0d0d0;border-radius:3px;}
 
 /* Range slider */
 input[type=range]{width:100%;accent-color:var(--gold);}
@@ -320,10 +396,12 @@ input[type=range]{width:100%;accent-color:var(--gold);}
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="index.html" class="logo"><img src="logo.png" alt="Vistec GraphX"/></a>
+    <a href="index.html" class="logo"><img src="images/Logo.png" alt="Vistec GraphX"/></a>
     <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
       <li><a href="products.html">Shop</a></li>
       <li><a href="index.html#canvas">Products</a></li>
+      <li><a href="designs.html">Designs</a></li>
       <li><a href="designer.html" class="active">Designer</a></li>
       <li><a href="index.html#how">How It Works</a></li>
       <li><a href="tel:+17043776626" style="color:var(--gold);font-size:13px;font-weight:500;">+1 704-377-6626</a></li>
@@ -342,7 +420,9 @@ input[type=range]{width:100%;accent-color:var(--gold);}
       <div class="panel-heading">Garment</div>
       <div class="garment-tabs">
         <div class="garment-tab active" data-garment="tshirt">T-Shirt</div>
+        <div class="garment-tab" data-garment="tshirt-female">Women's Tee</div>
         <div class="garment-tab" data-garment="hoodie">Hoodie</div>
+        <div class="garment-tab" data-garment="hoodie-female">Women's Hoodie</div>
       </div>
     </div>
 
@@ -398,6 +478,21 @@ input[type=range]{width:100%;accent-color:var(--gold);}
       </div>
     </div>
 
+    <!-- ── DESIGN LIBRARY ── -->
+    <div class="panel-section" id="libPanel">
+      <div class="lib-heading" id="libToggle" onclick="toggleLibPanel()">
+        <span class="panel-heading" style="margin-bottom:0">Design Library</span>
+        <span class="lib-toggle" id="libArrow">&#9660;</span>
+      </div>
+      <div class="lib-body" id="libBody">
+        <input class="lib-search" id="libSearch" type="text" placeholder="Search designs…" oninput="renderLibGrid()"/>
+        <div class="lib-cats" id="libCats"></div>
+        <div class="lib-count" id="libCount"></div>
+        <div class="lib-grid" id="libGrid"></div>
+        <button class="lib-more" id="libMore" style="display:none" onclick="libLoadMore()">Show more</button>
+      </div>
+    </div>
+
     <div class="panel-section" style="margin-top:auto;">
       <div class="panel-heading">Design Size</div>
       <div class="prop-label">Width (in)</div>
@@ -445,14 +540,15 @@ input[type=range]{width:100%;accent-color:var(--gold);}
       </button>
       <div class="tb-spacer"></div>
       <button class="tb-download-btn" id="btnDownload">&#8595; Download PNG</button>
-      <button class="tb-quote-btn" id="btnQuote">Request a Quote</button>
+      <button class="tb-cart-btn" id="btnAddToCart">&#43; Add to Cart</button>
     </div>
 
     <!-- CANVAS WRAP -->
     <div class="canvas-wrap" id="canvasWrap">
       <div class="canvas-container" id="canvasContainer" style="width:520px;height:520px;">
-        <img class="mockup-img" id="mockupImg" src="mockups/tshirt-gray-front.png" alt="T-shirt mockup"
+        <img class="mockup-img" id="mockupImg" src="mockups/tshirt-white-front.png" alt="T-shirt mockup"
              onerror="this.style.opacity='0.1'; document.getElementById('mockupPlaceholder').classList.add('show')"/>
+        <div id="mockupColorLayer" style="background:#8c8c8c;"></div>
         <canvas id="designer-canvas" width="520" height="520"></canvas>
         <div class="print-zone-overlay" id="printZone"></div>
         <div class="mockup-placeholder" id="mockupPlaceholder">
@@ -610,15 +706,23 @@ input[type=range]{width:100%;accent-color:var(--gold);}
       <div id="imgProps" style="display:none;flex-direction:column;gap:14px;padding:0 0 8px;">
 
         <div class="prop-group">
-          <div class="prop-label">Size (px) &nbsp;<span id="ipAspectTag" style="font-size:9px;color:var(--gold-dim);letter-spacing:0;">locked</span></div>
+          <div class="prop-label">Size &nbsp;<span id="ipAspectTag" style="font-size:9px;color:var(--gold-dim);letter-spacing:0;">locked</span></div>
           <div class="prop-row">
             <div class="prop-group">
-              <div class="prop-label" style="font-size:9px;margin-bottom:3px;">Width</div>
-              <input type="number" class="prop-input" id="ipW" min="1" max="3000"/>
+              <div class="prop-label" style="font-size:9px;margin-bottom:4px;">Width</div>
+              <div class="dscrub" data-id="ipW" data-min="1" data-max="3000" data-step="1">
+                <span class="dscrub-lbl">W</span>
+                <span class="dscrub-val" id="ipW-disp">200</span>
+                <input type="number" id="ipW" value="200" min="1" max="3000"/>
+              </div>
             </div>
             <div class="prop-group">
-              <div class="prop-label" style="font-size:9px;margin-bottom:3px;">Height</div>
-              <input type="number" class="prop-input" id="ipH" min="1" max="3000"/>
+              <div class="prop-label" style="font-size:9px;margin-bottom:4px;">Height</div>
+              <div class="dscrub" data-id="ipH" data-min="1" data-max="3000" data-step="1">
+                <span class="dscrub-lbl">H</span>
+                <span class="dscrub-val" id="ipH-disp">200</span>
+                <input type="number" id="ipH" value="200" min="1" max="3000"/>
+              </div>
             </div>
           </div>
           <div class="toggle-wrap" style="margin-top:10px;">
@@ -629,15 +733,23 @@ input[type=range]{width:100%;accent-color:var(--gold);}
         </div>
 
         <div class="prop-group">
-          <div class="prop-label">Position (px)</div>
+          <div class="prop-label">Position</div>
           <div class="prop-row">
             <div class="prop-group">
-              <div class="prop-label" style="font-size:9px;margin-bottom:3px;">X (left)</div>
-              <input type="number" class="prop-input" id="ipX"/>
+              <div class="prop-label" style="font-size:9px;margin-bottom:4px;">X (left)</div>
+              <div class="dscrub" data-id="ipX" data-min="-2000" data-max="2000" data-step="1">
+                <span class="dscrub-lbl">X</span>
+                <span class="dscrub-val" id="ipX-disp">0</span>
+                <input type="number" id="ipX" value="0"/>
+              </div>
             </div>
             <div class="prop-group">
-              <div class="prop-label" style="font-size:9px;margin-bottom:3px;">Y (top)</div>
-              <input type="number" class="prop-input" id="ipY"/>
+              <div class="prop-label" style="font-size:9px;margin-bottom:4px;">Y (top)</div>
+              <div class="dscrub" data-id="ipY" data-min="-2000" data-max="2000" data-step="1">
+                <span class="dscrub-lbl">Y</span>
+                <span class="dscrub-val" id="ipY-disp">0</span>
+                <input type="number" id="ipY" value="0"/>
+              </div>
             </div>
           </div>
         </div>
@@ -680,6 +792,27 @@ input[type=range]{width:100%;accent-color:var(--gold);}
 
 <!-- ARTWORK HIDDEN INPUT -->
 <input type="file" id="artworkInput" accept="image/*" multiple/>
+
+<!-- DESIGNER ADD-TO-CART MODAL -->
+<div class="dc-overlay" id="dcModal" onclick="if(event.target===this)closeDcModal()">
+  <div class="dc-box">
+    <button class="dc-close" onclick="closeDcModal()">&#215;</button>
+    <div class="dc-title">Add to Cart</div>
+    <div class="dc-sub">Your custom design will be added for quoting.</div>
+    <img class="dc-preview" id="dcPreview" src="" alt="Design preview"/>
+    <div class="dc-info" id="dcInfo"></div>
+    <div class="dc-sizes" id="dcSizes">
+      <button class="dc-sz" data-size="S">S</button>
+      <button class="dc-sz" data-size="M">M</button>
+      <button class="dc-sz" data-size="L">L</button>
+      <button class="dc-sz" data-size="XL">XL</button>
+      <button class="dc-sz" data-size="2XL">2XL</button>
+      <button class="dc-sz" data-size="3XL">3XL</button>
+    </div>
+    <div class="dc-note">Pricing for custom designs is quoted after our team reviews your artwork.</div>
+    <button class="dc-add" id="dcAddBtn" disabled onclick="dcConfirmAdd()">Select a Size</button>
+  </div>
+</div>
 
 <!-- QUOTE MODAL -->
 <div class="modal-overlay" id="quoteModal">
@@ -742,19 +875,44 @@ input[type=range]{width:100%;accent-color:var(--gold);}
 // =========================================================
 const MOCKUPS = {
   tshirt: {
-    gray:   { front: 'mockups/tshirt-gray-front.png',  back: 'mockups/tshirt-gray-back.png'  },
-    white:  { front: 'mockups/tshirt-white-front.png', back: 'mockups/tshirt-white-back.png' },
-    // Colors without dedicated mockups fall back to gray
-    black:  { front: 'mockups/tshirt-gray-front.png',  back: 'mockups/tshirt-gray-back.png'  },
-    navy:   { front: 'mockups/tshirt-gray-front.png',  back: 'mockups/tshirt-gray-back.png'  },
-    red:    { front: 'mockups/tshirt-gray-front.png',  back: 'mockups/tshirt-gray-back.png'  },
-    royal:  { front: 'mockups/tshirt-gray-front.png',  back: 'mockups/tshirt-gray-back.png'  },
-    forest: { front: 'mockups/tshirt-gray-front.png',  back: 'mockups/tshirt-gray-back.png'  },
-    maroon: { front: 'mockups/tshirt-gray-front.png',  back: 'mockups/tshirt-gray-back.png'  },
+    gray:   { front: 'mockups/tshirt-gray-front.png',   back: 'mockups/tshirt-gray-back.png'   },
+    white:  { front: 'mockups/tshirt-white-front.png',  back: 'mockups/tshirt-white-back.png'  },
+    black:  { front: 'mockups/tshirt-black-front.png',  back: 'mockups/tshirt-black-back.png'  },
+    navy:   { front: 'mockups/tshirt-navy-front.png',   back: 'mockups/tshirt-navy-back.png'   },
+    red:    { front: 'mockups/tshirt-red-front.png',    back: 'mockups/tshirt-red-back.png'    },
+    royal:  { front: 'mockups/tshirt-royal-front.png',  back: 'mockups/tshirt-royal-back.png'  },
+    forest: { front: 'mockups/tshirt-forest-front.png', back: 'mockups/tshirt-forest-back.png' },
+    maroon: { front: 'mockups/tshirt-maroon-front.png', back: 'mockups/tshirt-maroon-back.png' },
+  },
+  'tshirt-female': {
+    gray:   { front: 'mockups/tshirt-female-gray-front.png',   back: 'mockups/tshirt-female-gray-back.png'   },
+    white:  { front: 'mockups/tshirt-female-white-front.png',  back: 'mockups/tshirt-female-white-back.png'  },
+    black:  { front: 'mockups/tshirt-female-black-front.png',  back: 'mockups/tshirt-female-black-back.png'  },
+    navy:   { front: 'mockups/tshirt-female-navy-front.png',   back: 'mockups/tshirt-female-navy-back.png'   },
+    red:    { front: 'mockups/tshirt-female-red-front.png',    back: 'mockups/tshirt-female-red-back.png'    },
+    royal:  { front: 'mockups/tshirt-female-royal-front.png',  back: 'mockups/tshirt-female-royal-back.png'  },
+    forest: { front: 'mockups/tshirt-female-forest-front.png', back: 'mockups/tshirt-female-forest-back.png' },
+    maroon: { front: 'mockups/tshirt-female-maroon-front.png', back: 'mockups/tshirt-female-maroon-back.png' },
   },
   hoodie: {
-    gray:  { front: 'mockups/hoodie-gray-front.png',  back: 'mockups/hoodie-gray-back.png'  },
-    white: { front: 'mockups/hoodie-white-front.png', back: 'mockups/hoodie-white-back.png' },
+    gray:   { front: 'mockups/hoodie-gray-front.png',   back: 'mockups/hoodie-gray-back.png'   },
+    white:  { front: 'mockups/hoodie-white-front.png',  back: 'mockups/hoodie-white-back.png'  },
+    black:  { front: 'mockups/hoodie-black-front.png',  back: 'mockups/hoodie-black-back.png'  },
+    navy:   { front: 'mockups/hoodie-navy-front.png',   back: 'mockups/hoodie-navy-back.png'   },
+    red:    { front: 'mockups/hoodie-red-front.png',    back: 'mockups/hoodie-red-back.png'    },
+    royal:  { front: 'mockups/hoodie-royal-front.png',  back: 'mockups/hoodie-royal-back.png'  },
+    forest: { front: 'mockups/hoodie-forest-front.png', back: 'mockups/hoodie-forest-back.png' },
+    maroon: { front: 'mockups/hoodie-maroon-front.png', back: 'mockups/hoodie-maroon-back.png' },
+  },
+  'hoodie-female': {
+    gray:   { front: 'mockups/hoodie-female-gray-front.png',   back: 'mockups/hoodie-female-gray-back.png'   },
+    white:  { front: 'mockups/hoodie-female-white-front.png',  back: 'mockups/hoodie-female-white-back.png'  },
+    black:  { front: 'mockups/hoodie-female-black-front.png',  back: 'mockups/hoodie-female-black-back.png'  },
+    navy:   { front: 'mockups/hoodie-female-navy-front.png',   back: 'mockups/hoodie-female-navy-back.png'   },
+    red:    { front: 'mockups/hoodie-female-red-front.png',    back: 'mockups/hoodie-female-red-back.png'    },
+    royal:  { front: 'mockups/hoodie-female-royal-front.png',  back: 'mockups/hoodie-female-royal-back.png'  },
+    forest: { front: 'mockups/hoodie-female-forest-front.png', back: 'mockups/hoodie-female-forest-back.png' },
+    maroon: { front: 'mockups/hoodie-female-maroon-front.png', back: 'mockups/hoodie-female-maroon-back.png' },
   }
 };
 
@@ -767,8 +925,10 @@ const PRINT_ZONES = {
 // =========================================================
 //  STATE
 // =========================================================
-let currentGarment = 'tshirt';
-let currentColor   = 'gray';
+// Pre-select garment/color from URL params (e.g. ?garment=tshirt-female&color=black)
+const _urlParams = new URLSearchParams(location.search);
+let currentGarment = MOCKUPS[_urlParams.get('garment')] ? _urlParams.get('garment') : 'tshirt';
+let currentColor   = _urlParams.get('color') || 'gray';
 let currentView    = 'front';
 let selectedObject = null;
 let suppressProps  = false;
@@ -822,15 +982,39 @@ document.getElementById('showZone').addEventListener('change', function() {
 // =========================================================
 //  MOCKUP SWITCHER
 // =========================================================
+const COLOR_HEX = {
+  gray:   '#8c8c8c',
+  white:  null,        // no overlay — white base shows through
+  black:  '#1e1e1e',
+  navy:   '#1a2744',
+  red:    '#c0392b',
+  royal:  '#2850a0',
+  forest: '#1e5e38',
+  maroon: '#6b1a1a',
+};
+
+const GARMENT_LABELS = {
+  tshirt: 'T-Shirt', 'tshirt-female': "Women's Tee",
+  hoodie: 'Hoodie',  'hoodie-female': "Women's Hoodie",
+};
+
 function updateMockup() {
-  const map = MOCKUPS[currentGarment];
-  const colors = map[currentColor] || map['gray'];
-  const src = colors[currentView] || colors['front'];
-  const img = document.getElementById('mockupImg');
+  const map  = MOCKUPS[currentGarment];
+  const base = map.white || map.gray;
+  const src  = base[currentView] || base.front;
+  // Fallback: female mockup not yet uploaded → use unisex version
+  const fallback = src.replace('-female-', '-');
+
+  const img         = document.getElementById('mockupImg');
+  const overlay     = document.getElementById('mockupColorLayer');
   const placeholder = document.getElementById('mockupPlaceholder');
+
   img.style.opacity = '1';
   placeholder.classList.remove('show');
+  img.onerror = () => { img.onerror = null; img.src = fallback; };
   img.src = src;
+
+  overlay.style.background = COLOR_HEX[currentColor] || 'transparent';
   updatePrintZone();
 }
 
@@ -842,6 +1026,9 @@ document.querySelectorAll('.garment-tab').forEach(tab => {
     currentGarment = this.dataset.garment;
     updateMockup();
   });
+  // Sync active state to URL param on load
+  if (tab.dataset.garment === currentGarment) tab.classList.add('active');
+  else tab.classList.remove('active');
 });
 
 // Color
@@ -1084,25 +1271,47 @@ document.getElementById('btnSendBck').addEventListener('click', () => {
 // =========================================================
 //  DOWNLOAD
 // =========================================================
-document.getElementById('btnDownload').addEventListener('click', () => {
-  const size  = 520;
-  const off   = document.createElement('canvas');
-  off.width   = size;
-  off.height  = size;
-  const ctx   = off.getContext('2d');
+function captureDesign(size = 520) {
+  // Deselect so handles don't appear in export
+  const prevActive = canvas.getActiveObject();
+  canvas.discardActiveObject();
+  canvas.renderAll();
 
+  // Hide print zone overlay during capture
+  const pz = document.getElementById('printZone');
+  const pzWas = pz.style.display;
+  pz.style.display = 'none';
+
+  const off = document.createElement('canvas');
+  off.width = off.height = size;
+  const ctx = off.getContext('2d');
+
+  // Draw the white shirt base
   const mockImg = document.getElementById('mockupImg');
-  try {
-    ctx.drawImage(mockImg, 0, 0, size, size);
-  } catch(e) { /* cross-origin fallback — skip mockup */ }
+  try { ctx.drawImage(mockImg, 0, 0, size, size); } catch(e) {}
 
-  // Draw Fabric canvas
-  const fabricEl = canvas.getElement();
-  ctx.drawImage(fabricEl, 0, 0);
+  // Apply shirt color via multiply (matches CSS mix-blend-mode:multiply)
+  if (COLOR_HEX[currentColor]) {
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.fillStyle = COLOR_HEX[currentColor];
+    ctx.fillRect(0, 0, size, size);
+    ctx.globalCompositeOperation = 'source-over';
+  }
 
-  const link     = document.createElement('a');
-  link.download  = 'vistec-design.png';
-  link.href      = off.toDataURL('image/png');
+  // Draw the design
+  ctx.drawImage(canvas.getElement(), 0, 0);
+
+  // Restore
+  pz.style.display = pzWas;
+  if (prevActive) { canvas.setActiveObject(prevActive); canvas.renderAll(); }
+
+  return off.toDataURL('image/png');
+}
+
+document.getElementById('btnDownload').addEventListener('click', () => {
+  const link    = document.createElement('a');
+  link.download = 'vistec-design.png';
+  link.href     = captureDesign();
   link.click();
   showToast('Design downloaded!', 'success');
 });
@@ -1166,10 +1375,14 @@ function onSelectObject() {
 function syncImgProps(obj) {
   if (!obj || suppressProps) return;
   suppressProps = true;
-  document.getElementById('ipW').value = Math.round(obj.getScaledWidth());
-  document.getElementById('ipH').value = Math.round(obj.getScaledHeight());
-  document.getElementById('ipX').value = Math.round(obj.left);
-  document.getElementById('ipY').value = Math.round(obj.top);
+  const wv = Math.round(obj.getScaledWidth());
+  const hv = Math.round(obj.getScaledHeight());
+  const xv = Math.round(obj.left);
+  const yv = Math.round(obj.top);
+  document.getElementById('ipW').value = wv; document.getElementById('ipW-disp').textContent = wv;
+  document.getElementById('ipH').value = hv; document.getElementById('ipH-disp').textContent = hv;
+  document.getElementById('ipX').value = xv; document.getElementById('ipX-disp').textContent = xv;
+  document.getElementById('ipY').value = yv; document.getElementById('ipY-disp').textContent = yv;
   const angle = Math.round(((obj.angle || 0) % 360 + 360) % 360);
   document.getElementById('ipRotation').value = angle;
   document.getElementById('ipRotVal').textContent = angle + '°';
@@ -1427,9 +1640,122 @@ canvas.on('selection:created', e => { if (e.selected[0]) switchTab('text'); });
 canvas.on('selection:updated', e => { if (e.selected[0]) switchTab('text'); });
 
 // =========================================================
+//  DRAG SCRUBBERS
+// =========================================================
+document.querySelectorAll('.dscrub').forEach(wrap => {
+  const input = wrap.querySelector('input');
+  const disp  = wrap.querySelector('.dscrub-val');
+  const min   = parseFloat(wrap.dataset.min ?? -Infinity);
+  const max   = parseFloat(wrap.dataset.max ??  Infinity);
+  const step  = parseFloat(wrap.dataset.step ?? 1);
+  let startX, startVal, moved = false;
+
+  function clamp(v) { return Math.round(Math.max(min, Math.min(max, v)) / step) * step; }
+  function push(v) {
+    v = clamp(v);
+    input.value = v;
+    disp.textContent = v;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  wrap.addEventListener('mousedown', e => {
+    if (wrap.classList.contains('editing')) return;
+    e.preventDefault();
+    moved = false;
+    startX   = e.clientX;
+    startVal = parseFloat(input.value) || 0;
+    const onMove = e => { moved = true; push(startVal + (e.clientX - startX)); };
+    const onUp   = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup',   onUp);
+      if (moved) input.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup',   onUp);
+  });
+
+  wrap.addEventListener('dblclick', () => {
+    wrap.classList.add('editing');
+    input.focus(); input.select();
+  });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === 'Escape') {
+      wrap.classList.remove('editing');
+      disp.textContent = input.value;
+      if (e.key === 'Enter') input.dispatchEvent(new Event('change', { bubbles: true }));
+      input.blur();
+    }
+  });
+  input.addEventListener('blur', () => {
+    wrap.classList.remove('editing');
+    disp.textContent = input.value;
+  });
+});
+
+// =========================================================
+//  ADD TO CART (DESIGNER)
+// =========================================================
+let dcSelectedSize = null;
+
+document.getElementById('btnAddToCart').addEventListener('click', () => {
+  dcSelectedSize = null;
+  document.querySelectorAll('.dc-sz').forEach(b => b.classList.remove('active'));
+  document.getElementById('dcAddBtn').disabled = true;
+  document.getElementById('dcAddBtn').textContent = 'Select a Size';
+
+  const garmentLabel = GARMENT_LABELS[currentGarment] || 'T-Shirt';
+  const colorLabel   = document.querySelector(`.swatch[data-color="${currentColor}"]`)?.title || currentColor;
+  document.getElementById('dcInfo').innerHTML =
+    `<strong>${garmentLabel}</strong> &nbsp;·&nbsp; ${colorLabel}`;
+  document.getElementById('dcPreview').src = captureDesign(220);
+  document.getElementById('dcModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+});
+
+document.querySelectorAll('.dc-sz').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.dc-sz').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    dcSelectedSize = this.dataset.size;
+    document.getElementById('dcAddBtn').disabled = false;
+    document.getElementById('dcAddBtn').textContent = `Add Size ${dcSelectedSize} to Cart`;
+  });
+});
+
+function closeDcModal() {
+  document.getElementById('dcModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function dcConfirmAdd() {
+  if (!dcSelectedSize) return;
+  const garmentLabel = GARMENT_LABELS[currentGarment] || 'T-Shirt';
+  const colorLabel   = document.querySelector(`.swatch[data-color="${currentColor}"]`)?.title || currentColor;
+
+  const isPreset = presetDesign && presetDesign.price > 0;
+  const item = {
+    id:       (isPreset ? 'design-' + presetDesign.id : 'custom') + '-' + Date.now(),
+    name:     isPreset ? presetDesign.name + ' — ' + garmentLabel : 'Custom Design — ' + garmentLabel,
+    garment:  garmentLabel + ' (' + colorLabel + ')',
+    size:     dcSelectedSize,
+    price:    isPreset ? presetDesign.price : 0,
+    priceStr: isPreset ? '$' + presetDesign.price.toFixed(2) : 'Quote Required',
+    qty:      1,
+    img:      captureDesign(220),
+  };
+  const cart = JSON.parse(localStorage.getItem('vp_cart') || '[]');
+  cart.push(item);
+  localStorage.setItem('vp_cart', JSON.stringify(cart));
+  closeDcModal();
+  showToast(isPreset ? `Added to cart — $${presetDesign.price.toFixed(2)}` : 'Added to cart! Proceed to checkout for a quote.', 'success');
+  const badge = document.getElementById('cartBadge');
+  if (badge) badge.textContent = cart.reduce((s, i) => s + i.qty, 0) || '';
+}
+
+// =========================================================
 //  QUOTE MODAL
 // =========================================================
-document.getElementById('btnQuote').addEventListener('click', () => {
+document.getElementById('btnQuote') && document.getElementById('btnQuote').addEventListener('click', () => {
   document.getElementById('quoteModal').classList.add('open');
 });
 document.getElementById('quoteCancel').addEventListener('click', () => {
@@ -1468,7 +1794,7 @@ document.getElementById('quoteSubmit').addEventListener('click', () => {
     `Quantity: ${quoteData.qty}\nGarment: ${quoteData.garment} (${quoteData.color})\n` +
     `Notes: ${quoteData.notes}`
   );
-  window.location.href = `mailto:info@vistecprints.com?subject=${subject}&body=${body}`;
+  window.location.href = `mailto:vistecfx@gmail.com?subject=${subject}&body=${body}`;
 
   document.getElementById('quoteForm').style.display    = 'none';
   document.getElementById('quoteSuccess').style.display = 'block';
@@ -1510,13 +1836,177 @@ canvas.on('object:moving', function(e) {
 });
 
 // =========================================================
+//  DESIGN LIBRARY PANEL
+// =========================================================
+let libActiveCat  = 'all';
+let libVisibleN   = 16;
+const LIB_PAGE    = 16;
+
+function toggleLibPanel() {
+  const body    = document.getElementById('libBody');
+  const heading = document.getElementById('libToggle');
+  const isOpen  = body.classList.toggle('open');
+  heading.classList.toggle('open', isOpen);
+  if (isOpen && !document.getElementById('libGrid').children.length) {
+    buildLibCats();
+    renderLibGrid();
+  }
+}
+
+function buildLibCats() {
+  const wrap = document.getElementById('libCats');
+  wrap.innerHTML = DESIGN_CATS.map(c =>
+    `<button class="lib-cat${c.key === libActiveCat ? ' active' : ''}" onclick="setLibCat('${c.key}')">${c.label}</button>`
+  ).join('');
+}
+
+function setLibCat(key) {
+  libActiveCat = key;
+  libVisibleN  = LIB_PAGE;
+  buildLibCats();
+  renderLibGrid();
+}
+
+function getLibFiltered() {
+  const q = (document.getElementById('libSearch')?.value || '').toLowerCase().trim();
+  let list = libActiveCat === 'all' ? ALL_LIBRARY_DESIGNS
+           : ALL_LIBRARY_DESIGNS.filter(d => d.cat === libActiveCat);
+  if (q) list = list.filter(d => d.name.toLowerCase().includes(q));
+  return list;
+}
+
+function renderLibGrid() {
+  const filtered = getLibFiltered();
+  const shown    = filtered.slice(0, libVisibleN);
+  const grid     = document.getElementById('libGrid');
+  const count    = document.getElementById('libCount');
+  const moreBtn  = document.getElementById('libMore');
+
+  count.textContent = filtered.length + ' designs';
+  grid.innerHTML = shown.map(d => {
+    const src  = designImgUrl(d.id);
+    const fall = designImgFallback(d.id);
+    return `<div class="lib-thumb" title="${d.name}" onclick="addLibDesign(${d.id},'${d.name.replace(/'/g,"\\'")}','${d.cat}')">
+      <img src="${src}" loading="lazy" onerror="this.src='${fall}';this.onerror=null"/>
+      <div class="lib-name">${d.name}</div>
+    </div>`;
+  }).join('');
+
+  moreBtn.style.display = filtered.length > libVisibleN ? 'block' : 'none';
+  if (moreBtn.style.display !== 'none') {
+    moreBtn.textContent = `Show more (${Math.min(LIB_PAGE, filtered.length - libVisibleN)} more)`;
+  }
+}
+
+function libLoadMore() {
+  libVisibleN += LIB_PAGE;
+  renderLibGrid();
+}
+
+function addLibDesign(id, name, cat) {
+  presetDesign = { id, name, price: 20 };
+
+  // Update/create the preset banner
+  let banner = document.getElementById('presetBanner');
+  if (banner) banner.remove();
+  banner = document.createElement('div');
+  banner.id = 'presetBanner';
+  banner.style.cssText = [
+    'position:fixed','bottom:70px','left:50%','transform:translateX(-50%)',
+    'background:rgba(26,26,26,0.97)','border:1px solid rgba(212,152,72,0.5)',
+    'color:var(--offwhite)','padding:10px 20px','border-radius:4px',
+    'font-size:12px','letter-spacing:0.5px','z-index:500',
+    'display:flex','align-items:center','gap:12px','white-space:nowrap',
+    'box-shadow:0 4px 24px rgba(0,0,0,0.6)',
+  ].join(';');
+  banner.innerHTML = `
+    <span style="color:var(--gold-dim);font-size:10px;text-transform:uppercase;letter-spacing:1px;">Preset Design</span>
+    <span style="font-weight:600;">${name}</span>
+    <span style="color:var(--gold);font-weight:700;">$20.00</span>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--gray);cursor:pointer;font-size:16px;line-height:1;padding:0 0 0 4px;">&times;</button>
+  `;
+  document.body.appendChild(banner);
+
+  const imgSrc = designImgUrl(id);
+  fabric.Image.fromURL(imgSrc, function(img) {
+    const maxSize = 220;
+    const scale   = Math.min(maxSize / img.width, maxSize / img.height);
+    img.set({
+      left: canvas.width / 2, top: canvas.height / 2,
+      originX: 'center', originY: 'center',
+      scaleX: scale, scaleY: scale,
+    });
+    canvas.add(img);
+    canvas.setActiveObject(img);
+    canvas.renderAll();
+    updateLayersPanel();
+    saveState();
+    showToast(`"${name}" added — $20.00`, 'success');
+  }, { crossOrigin: 'anonymous' });
+}
+
+// =========================================================
 //  INIT
 // =========================================================
 updateUndoRedoBtns();
 updateLayersPanel();
 
-// Welcome hint
-setTimeout(() => showToast('Click "Add Text" or upload artwork to start designing!'), 800);
+// =========================================================
+//  PRESET DESIGN (from designs.html)
+// =========================================================
+const _urlParams     = new URLSearchParams(location.search);
+const _presetId      = _urlParams.get('design_id');
+const _presetName    = _urlParams.get('design_name');
+const _presetPrice   = parseFloat(_urlParams.get('price') || '0');
+let   presetDesign   = null;
+
+if (_presetId && _presetName) {
+  presetDesign = { id: _presetId, name: _presetName, price: _presetPrice };
+
+  // Show preset banner
+  const banner = document.createElement('div');
+  banner.id = 'presetBanner';
+  banner.style.cssText = [
+    'position:fixed','bottom:70px','left:50%','transform:translateX(-50%)',
+    'background:rgba(26,26,26,0.97)','border:1px solid rgba(212,152,72,0.5)',
+    'color:var(--offwhite)','padding:10px 20px','border-radius:4px',
+    'font-size:12px','letter-spacing:0.5px','z-index:500',
+    'display:flex','align-items:center','gap:12px','white-space:nowrap',
+    'box-shadow:0 4px 24px rgba(0,0,0,0.6)',
+  ].join(';');
+  banner.innerHTML = `
+    <span style="color:var(--gold-dim);font-size:10px;text-transform:uppercase;letter-spacing:1px;">Preset Design</span>
+    <span style="font-weight:600;">${_presetName}</span>
+    <span style="color:var(--gold);font-weight:700;">$${_presetPrice.toFixed(2)}</span>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--gray);cursor:pointer;font-size:16px;line-height:1;padding:0 0 0 4px;">&times;</button>
+  `;
+  document.body.appendChild(banner);
+
+  // Load design image onto canvas
+  const imgSrc = 'design-images/' + _presetId + '.jpg';
+  fabric.Image.fromURL(imgSrc, function(img) {
+    const maxSize = 220;
+    const scale   = Math.min(maxSize / img.width, maxSize / img.height);
+    img.set({
+      left:    canvas.width  / 2,
+      top:     canvas.height / 2,
+      originX: 'center',
+      originY: 'center',
+      scaleX:  scale,
+      scaleY:  scale,
+    });
+    canvas.add(img);
+    canvas.setActiveObject(img);
+    canvas.renderAll();
+    updateLayersPanel();
+    saveState();
+    showToast('Design loaded! Add text or customize, then Add to Cart.', 'success');
+  }, { crossOrigin: 'anonymous' });
+
+} else {
+  setTimeout(() => showToast('Click "Add Text" or upload artwork to start designing!'), 800);
+}
+fetch('track.php?page=designer&ref='+encodeURIComponent(document.referrer),{keepalive:true}).catch(()=>{});
 </script>
 </body>
 </html>

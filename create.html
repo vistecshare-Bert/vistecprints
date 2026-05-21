@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Create Custom Apparel — VistecPrints</title>
+<meta name="description" content="Choose your blank garment and start designing. DTF printing, no minimums. T-shirts, hoodies, long sleeves for men, women, and youth."/>
+<link rel="canonical" href="https://rebuild.vistecprints.com/create"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --black:#0a0a0a;--dark:#111111;--dark2:#1a1a1a;--dark3:#222222;
+  --gold:#D49848;--gold-light:#E8B96A;--gold-dim:#9A6B2E;
+  --white:#FFFFFF;--offwhite:#F0EDE8;--gray:#888888;--gray2:#555555;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden;}
+
+/* ── NAV ── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.06);padding:0 24px;}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:60px;max-width:1200px;margin:0 auto;}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--gold);text-decoration:none;}
+.nav-logo span{color:var(--offwhite);}
+.nav-links{display:flex;align-items:center;gap:24px;}
+.nav-links a{color:var(--gray);text-decoration:none;font-size:13px;letter-spacing:.5px;transition:color .2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);}
+.nav-cart{display:flex;align-items:center;gap:6px;background:var(--gold);color:#000;border:none;padding:8px 16px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:2px;text-decoration:none;}
+.nav-cart:hover{background:var(--gold-light);}
+
+/* ── HERO ── */
+.hero{padding:64px 24px 48px;text-align:center;max-width:700px;margin:0 auto;}
+.hero-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:12px;}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,72px);letter-spacing:2px;line-height:1.05;color:var(--offwhite);margin-bottom:16px;}
+.hero-title span{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--gray);max-width:480px;margin:0 auto;}
+
+/* ── FILTERS ── */
+.filters{display:flex;justify-content:center;gap:8px;padding:0 24px 32px;flex-wrap:wrap;}
+.filter-btn{padding:7px 18px;border:1px solid rgba(255,255,255,0.12);border-radius:20px;background:transparent;color:var(--gray);font-size:12px;font-family:'DM Sans',sans-serif;letter-spacing:.5px;cursor:pointer;transition:all .2s;}
+.filter-btn:hover,.filter-btn.active{background:var(--gold);border-color:var(--gold);color:#000;font-weight:500;}
+
+/* ── PRODUCT GRID ── */
+.grid-wrap{max-width:1200px;margin:0 auto;padding:0 24px 80px;}
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
+
+/* ── PRODUCT CARD ── */
+.card{background:var(--dark2);border:1px solid rgba(255,255,255,0.07);border-radius:6px;overflow:hidden;transition:transform .2s,border-color .2s;cursor:pointer;display:flex;flex-direction:column;}
+.card:hover{transform:translateY(-3px);border-color:rgba(212,152,72,0.35);}
+.card-img{aspect-ratio:1;background:var(--dark3);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.card-img img{width:75%;height:75%;object-fit:contain;display:block;}
+.card-badge{position:absolute;top:10px;left:10px;background:var(--gold);color:#000;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:2px;}
+.card-badge.women{background:#c47daa;}
+.card-badge.youth{background:#5b8dd9;}
+.card-badge.long{background:#5bab72;}
+.card-body{padding:16px;flex:1;display:flex;flex-direction:column;gap:10px;}
+.card-brand{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dim);font-weight:600;}
+.card-name{font-size:14px;font-weight:600;color:var(--offwhite);line-height:1.35;}
+.card-sku{font-size:11px;color:var(--gray2);margin-top:-4px;}
+.card-sizes{font-size:11px;color:var(--gray);display:flex;align-items:center;gap:4px;}
+.card-sizes strong{color:var(--gray2);font-weight:500;min-width:36px;}
+.card-colors{display:flex;gap:5px;flex-wrap:wrap;}
+.cc{width:18px;height:18px;border-radius:50%;border:2px solid transparent;transition:transform .15s;cursor:pointer;}
+.cc:hover{transform:scale(1.2);}
+.cc.gray{background:#8c8c8c;}
+.cc.white{background:#f0f0f0;border-color:#aaa;}
+.cc.black{background:#1a1a1a;border-color:#555;}
+.cc.navy{background:#1a2744;}
+.cc.red{background:#c0392b;}
+.cc.royal{background:#2850a0;}
+.cc.forest{background:#1e5e38;}
+.cc.maroon{background:#6b1a1a;}
+.card-foot{padding:12px 16px;border-top:1px solid rgba(255,255,255,0.06);}
+.btn-design{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;background:var(--gold);color:#000;border:none;border-radius:3px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;letter-spacing:1px;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:background .2s;}
+.btn-design:hover{background:var(--gold-light);}
+.btn-design svg{flex-shrink:0;}
+
+/* ── HOW IT WORKS ── */
+.how{max-width:900px;margin:0 auto;padding:0 24px 80px;text-align:center;}
+.how-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--offwhite);margin-bottom:40px;}
+.how-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;}
+.how-step{background:var(--dark2);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:28px 20px;text-align:center;}
+.how-num{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--gold);line-height:1;margin-bottom:8px;}
+.how-step h4{font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--offwhite);margin-bottom:8px;}
+.how-step p{font-size:12px;color:var(--gray);line-height:1.6;}
+
+/* ── FOOTER ── */
+.footer{background:var(--dark2);border-top:1px solid rgba(255,255,255,0.06);padding:32px 24px;text-align:center;}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:var(--gold);margin-bottom:8px;}
+.footer-logo span{color:var(--offwhite);}
+.footer p{font-size:12px;color:var(--gray2);}
+
+@media(max-width:600px){
+  .nav-links{display:none;}
+  .product-grid{grid-template-columns:1fr 1fr;}
+  .card-body{padding:12px;}
+  .card-name{font-size:13px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html">VISTEC<span>PRINTS</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="create.html" class="active">Create</a>
+      <a href="designer.html">Designer</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+    <a class="nav-cart" href="checkout.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.61L23 6H6"/></svg>
+      Cart
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">DTF Printing · No Minimums · 48hr Turnaround</p>
+  <h1 class="hero-title">Choose Your <span>Blank.</span><br>Design It Yours.</h1>
+  <p class="hero-sub">Pick a garment, choose your colors, then open the designer to add your artwork or text. We print and ship fast.</p>
+</section>
+
+<!-- FILTERS -->
+<div class="filters">
+  <button class="filter-btn active" data-filter="all">All Garments</button>
+  <button class="filter-btn" data-filter="mens">Men's / Unisex</button>
+  <button class="filter-btn" data-filter="womens">Women's</button>
+  <button class="filter-btn" data-filter="youth">Youth</button>
+  <button class="filter-btn" data-filter="longsleeve">Long Sleeve</button>
+</div>
+
+<!-- PRODUCT GRID -->
+<div class="grid-wrap">
+  <div class="product-grid" id="productGrid">
+
+    <!-- 1: Gildan 5000 Unisex -->
+    <div class="card" data-category="mens">
+      <div class="card-img">
+        <img src="mockups/tshirt-white-front.png" alt="Gildan 5000" onerror="this.style.opacity='0.2'"/>
+        <span class="card-badge">Best Seller</span>
+      </div>
+      <div class="card-body">
+        <div class="card-brand">Gildan</div>
+        <div class="card-name">Heavy Cotton 100% Cotton T-Shirt</div>
+        <div class="card-sku">SKU: 5000</div>
+        <div class="card-sizes"><strong>Sizes:</strong> S · M · L · XL · 2XL · 3XL · 4XL · 5XL</div>
+        <div class="card-colors">
+          <div class="cc gray" title="Gray"></div><div class="cc white" title="White"></div>
+          <div class="cc black" title="Black"></div><div class="cc navy" title="Navy"></div>
+          <div class="cc red" title="Red"></div><div class="cc royal" title="Royal Blue"></div>
+          <div class="cc forest" title="Forest Green"></div><div class="cc maroon" title="Maroon"></div>
+        </div>
+      </div>
+      <div class="card-foot">
+        <a class="btn-design" href="designer.html?garment=tshirt">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Start Designing
+        </a>
+      </div>
+    </div>
+
+    <!-- 2: Bella+Canvas BC3001 -->
+    <div class="card" data-category="mens">
+      <div class="card-img">
+        <img src="mockups/tshirt-white-front.png" alt="Bella Canvas BC3001" onerror="this.style.opacity='0.2'"/>
+        <span class="card-badge" style="background:#7c5cbf;">Premium</span>
+      </div>
+      <div class="card-body">
+        <div class="card-brand">Bella + Canvas</div>
+        <div class="card-name">Unisex Jersey Short Sleeve Tee</div>
+        <div class="card-sku">SKU: BC3001</div>
+        <div class="card-sizes"><strong>Sizes:</strong> XS · S · M · L · XL · 2XL · 3XL · 4XL · 5XL</div>
+        <div class="card-colors">
+          <div class="cc gray" title="Gray"></div><div class="cc white" title="White"></div>
+          <div class="cc black" title="Black"></div><div class="cc navy" title="Navy"></div>
+          <div class="cc red" title="Red"></div><div class="cc royal" title="Royal Blue"></div>
+          <div class="cc forest" title="Forest Green"></div><div class="cc maroon" title="Maroon"></div>
+        </div>
+      </div>
+      <div class="card-foot">
+        <a class="btn-design" href="designer.html?garment=tshirt">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Start Designing
+        </a>
+      </div>
+    </div>
+
+    <!-- 3: Gildan 5000L Women's -->
+    <div class="card" data-category="womens">
+      <div class="card-img">
+        <img src="mockups/tshirt-female-white-front.png" alt="Gildan 5000L Women's" onerror="this.src='mockups/tshirt-white-front.png'"/>
+        <span class="card-badge women">Women's</span>
+      </div>
+      <div class="card-body">
+        <div class="card-brand">Gildan</div>
+        <div class="card-name">Women's Heavy Cotton T-Shirt</div>
+        <div class="card-sku">SKU: 5000L</div>
+        <div class="card-sizes"><strong>Sizes:</strong> S · M · L · XL · 2XL · 3XL</div>
+        <div class="card-colors">
+          <div class="cc gray" title="Gray"></div><div class="cc white" title="White"></div>
+          <div class="cc black" title="Black"></div><div class="cc navy" title="Navy"></div>
+          <div class="cc red" title="Red"></div><div class="cc royal" title="Royal Blue"></div>
+          <div class="cc forest" title="Forest Green"></div><div class="cc maroon" title="Maroon"></div>
+        </div>
+      </div>
+      <div class="card-foot">
+        <a class="btn-design" href="designer.html?garment=tshirt-female">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Start Designing
+        </a>
+      </div>
+    </div>
+
+    <!-- 4: Gildan 64000 Softstyle -->
+    <div class="card" data-category="mens">
+      <div class="card-img">
+        <img src="mockups/tshirt-white-front.png" alt="Gildan Softstyle 64000" onerror="this.style.opacity='0.2'"/>
+      </div>
+      <div class="card-body">
+        <div class="card-brand">Gildan</div>
+        <div class="card-name">Softstyle T-Shirt</div>
+        <div class="card-sku">SKU: 64000</div>
+        <div class="card-sizes"><strong>Sizes:</strong> XS · S · M · L · XL · 2XL · 3XL · 4XL</div>
+        <div class="card-colors">
+          <div class="cc gray" title="Gray"></div><div class="cc white" title="White"></div>
+          <div class="cc black" title="Black"></div><div class="cc navy" title="Navy"></div>
+          <div class="cc red" title="Red"></div><div class="cc royal" title="Royal Blue"></div>
+          <div class="cc forest" title="Forest Green"></div><div class="cc maroon" title="Maroon"></div>
+        </div>
+      </div>
+      <div class="card-foot">
+        <a class="btn-design" href="designer.html?garment=tshirt">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Start Designing
+        </a>
+      </div>
+    </div>
+
+    <!-- 5: Next Level NL6211 Long Sleeve -->
+    <div class="card" data-category="longsleeve">
+      <div class="card-img">
+        <img src="mockups/tshirt-white-front.png" alt="Next Level Long Sleeve" onerror="this.style.opacity='0.2'"/>
+        <span class="card-badge long">Long Sleeve</span>
+      </div>
+      <div class="card-body">
+        <div class="card-brand">Next Level Apparel</div>
+        <div class="card-name">Adult CVC Long Sleeve Tee</div>
+        <div class="card-sku">SKU: NL6211</div>
+        <div class="card-sizes"><strong>Sizes:</strong> XS · S · M · L · XL · 2XL · 3XL</div>
+        <div class="card-colors">
+          <div class="cc gray" title="Gray"></div><div class="cc white" title="White"></div>
+          <div class="cc black" title="Black"></div><div class="cc navy" title="Navy"></div>
+          <div class="cc red" title="Red"></div><div class="cc royal" title="Royal Blue"></div>
+          <div class="cc forest" title="Forest Green"></div><div class="cc maroon" title="Maroon"></div>
+        </div>
+      </div>
+      <div class="card-foot">
+        <a class="btn-design" href="designer.html?garment=tshirt">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Start Designing
+        </a>
+      </div>
+    </div>
+
+    <!-- 6: Gildan Youth 5000B -->
+    <div class="card" data-category="youth">
+      <div class="card-img">
+        <img src="mockups/tshirt-white-front.png" alt="Gildan Youth 5000B" onerror="this.style.opacity='0.2'"/>
+        <span class="card-badge youth">Youth</span>
+      </div>
+      <div class="card-body">
+        <div class="card-brand">Gildan</div>
+        <div class="card-name">Youth Heavy Cotton T-Shirt</div>
+        <div class="card-sku">SKU: 5000B</div>
+        <div class="card-sizes"><strong>Sizes:</strong> XS · S · M · L · XL</div>
+        <div class="card-colors">
+          <div class="cc gray" title="Gray"></div><div class="cc white" title="White"></div>
+          <div class="cc black" title="Black"></div><div class="cc navy" title="Navy"></div>
+          <div class="cc red" title="Red"></div><div class="cc royal" title="Royal Blue"></div>
+          <div class="cc forest" title="Forest Green"></div><div class="cc maroon" title="Maroon"></div>
+        </div>
+      </div>
+      <div class="card-foot">
+        <a class="btn-design" href="designer.html?garment=tshirt">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Start Designing
+        </a>
+      </div>
+    </div>
+
+    <!-- 7: Next Level Youth NL3310 -->
+    <div class="card" data-category="youth">
+      <div class="card-img">
+        <img src="mockups/tshirt-white-front.png" alt="Next Level Youth NL3310" onerror="this.style.opacity='0.2'"/>
+        <span class="card-badge youth">Youth</span>
+      </div>
+      <div class="card-body">
+        <div class="card-brand">Next Level Apparel</div>
+        <div class="card-name">Youth Cotton Tee</div>
+        <div class="card-sku">SKU: NL3310</div>
+        <div class="card-sizes"><strong>Sizes:</strong> XS · S · M · L · XL</div>
+        <div class="card-colors">
+          <div class="cc gray" title="Gray"></div><div class="cc white" title="White"></div>
+          <div class="cc black" title="Black"></div><div class="cc navy" title="Navy"></div>
+          <div class="cc red" title="Red"></div><div class="cc royal" title="Royal Blue"></div>
+          <div class="cc forest" title="Forest Green"></div><div class="cc maroon" title="Maroon"></div>
+        </div>
+      </div>
+      <div class="card-foot">
+        <a class="btn-design" href="designer.html?garment=tshirt">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Start Designing
+        </a>
+      </div>
+    </div>
+
+    <!-- 8: Gildan Youth Softstyle 64000B -->
+    <div class="card" data-category="youth">
+      <div class="card-img">
+        <img src="mockups/tshirt-white-front.png" alt="Gildan Youth Softstyle 64000B" onerror="this.style.opacity='0.2'"/>
+        <span class="card-badge youth">Youth</span>
+      </div>
+      <div class="card-body">
+        <div class="card-brand">Gildan</div>
+        <div class="card-name">Youth Softstyle T-Shirt</div>
+        <div class="card-sku">SKU: 64000B</div>
+        <div class="card-sizes"><strong>Sizes:</strong> XS · S · M · L · XL</div>
+        <div class="card-colors">
+          <div class="cc gray" title="Gray"></div><div class="cc white" title="White"></div>
+          <div class="cc black" title="Black"></div><div class="cc navy" title="Navy"></div>
+          <div class="cc red" title="Red"></div><div class="cc royal" title="Royal Blue"></div>
+          <div class="cc forest" title="Forest Green"></div><div class="cc maroon" title="Maroon"></div>
+        </div>
+      </div>
+      <div class="card-foot">
+        <a class="btn-design" href="designer.html?garment=tshirt">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Start Designing
+        </a>
+      </div>
+    </div>
+
+  </div><!-- /.product-grid -->
+</div><!-- /.grid-wrap -->
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <h2 class="how-title">How It Works</h2>
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="how-num">01</div>
+      <h4>Choose Garment</h4>
+      <p>Pick the blank that fits your project — unisex tees, women's cuts, youth sizes, or long sleeves.</p>
+    </div>
+    <div class="how-step">
+      <div class="how-num">02</div>
+      <h4>Design Online</h4>
+      <p>Open the designer tool. Upload your artwork, add custom text, pick fonts and colors.</p>
+    </div>
+    <div class="how-step">
+      <div class="how-num">03</div>
+      <h4>We Print &amp; Ship</h4>
+      <p>Submit your order. We DTF print and ship within 48 hours. No minimums required.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">VISTEC<span>PRINTS</span></div>
+  <p>Charlotte, NC &nbsp;·&nbsp; DTF Printing &nbsp;·&nbsp; No Minimums &nbsp;·&nbsp; 48hr Turnaround</p>
+</footer>
+
+<script>
+// ── Filter buttons ───────────────────────────────────────────────────
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    const filter = this.dataset.filter;
+    document.querySelectorAll('.card').forEach(card => {
+      if (filter === 'all' || card.dataset.category === filter) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+});
+
+// ── Pass garment param to designer when card is clicked ──────────────
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('click', function(e) {
+    // Only navigate if the click wasn't on the button (button handles its own link)
+    if (e.target.closest('.btn-design')) return;
+    const link = card.querySelector('.btn-design');
+    if (link) window.location.href = link.href;
+  });
+});
+
+// ── Pre-select garment in designer via URL param ─────────────────────
+// In designer.html, add this near the top of the <script>:
+// const params = new URLSearchParams(location.search);
+// if (params.get('garment')) { currentGarment = params.get('garment'); }
+// (This is handled in designer.html if the ?garment= param support is wired up)
+</script>
+</body>
+</html>

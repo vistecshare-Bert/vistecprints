@@ -40,17 +40,45 @@ function handleImageUpload($cat) {
     return null;
 }
 
-$categories = [
+$catFile = __DIR__ . '/categories.json';
+$defaultCategories = [
     'fun'      => 'Fun Print',
     'anime'    => 'Anime',
     'boots'    => 'Boots on the Ground',
     'no_kings' => 'No Kings',
     'jesus'    => 'Jesus Christ',
 ];
+if (file_exists($catFile)) {
+    $loaded = json_decode(file_get_contents($catFile), true);
+    $categories = is_array($loaded) ? $loaded : $defaultCategories;
+} else {
+    $categories = $defaultCategories;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action   = $_POST['action'] ?? '';
     $products = loadProducts($jsonFile);
+
+    // -- CATEGORY MANAGEMENT --
+    if ($action === 'add_category') {
+        $key   = preg_replace('/[^a-z0-9_]/', '_', strtolower(trim($_POST['cat_key'] ?? '')));
+        $label = trim($_POST['cat_label'] ?? '');
+        if ($key && $label) {
+            $categories[$key] = $label;
+            file_put_contents($catFile, json_encode($categories, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        }
+        header('Location: dashboard.php?tab=decorated');
+        exit;
+    }
+    if ($action === 'delete_category') {
+        $key = trim($_POST['cat_key'] ?? '');
+        if ($key && isset($categories[$key])) {
+            unset($categories[$key]);
+            file_put_contents($catFile, json_encode($categories, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        }
+        header('Location: dashboard.php?tab=decorated');
+        exit;
+    }
 
     // â”€â”€ CREATE DECORATED PRODUCT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if ($action === 'add_decorated') {
@@ -559,7 +587,9 @@ tr:hover td{background:#fafafa;}
             <div class="dec-ctrl-group">
               <span class="dec-ctrl-label">Garment</span>
               <button type="button" class="mockup-btn active" data-garment="tshirt" onclick="setDecGarment('tshirt',this)">T-Shirt</button>
+              <button type="button" class="mockup-btn" data-garment="tshirt-female" onclick="setDecGarment('tshirt-female',this)">Women's Tee</button>
               <button type="button" class="mockup-btn" data-garment="hoodie" onclick="setDecGarment('hoodie',this)">Hoodie</button>
+              <button type="button" class="mockup-btn" data-garment="hoodie-female" onclick="setDecGarment('hoodie-female',this)">Women's Hoodie</button>
             </div>
             <div class="dec-ctrl-group">
               <span class="dec-ctrl-label">View</span>
@@ -676,6 +706,38 @@ tr:hover td{background:#fafafa;}
         </div><!-- /.dec-form-col -->
       </div><!-- /.dec-creator -->
     </form>
+
+    <!-- Manage Categories -->
+    <div style="background:#fff;border:1px solid #e8e8e8;border-radius:3px;padding:20px;margin-bottom:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <h3 style="font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#333;">Manage Categories</h3>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
+        <?php foreach ($categories as $k => $v): ?>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:3px;padding:5px 10px;font-size:12px;">
+          <span><?= htmlspecialchars($v) ?></span>
+          <span style="color:#aaa;font-size:10px;"><?= htmlspecialchars($k) ?></span>
+          <form method="POST" style="display:inline;" onsubmit="return confirm('Delete category \'<?= htmlspecialchars($v) ?>\'?')">
+            <input type="hidden" name="action" value="delete_category"/>
+            <input type="hidden" name="cat_key" value="<?= htmlspecialchars($k) ?>"/>
+            <button type="submit" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:14px;line-height:1;padding:0 2px;" title="Delete">&times;</button>
+          </form>
+        </div>
+        <?php endforeach; ?>
+      </div>
+      <form method="POST" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
+        <input type="hidden" name="action" value="add_category"/>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;">Category Key (no spaces)</label>
+          <input type="text" name="cat_key" required placeholder="e.g. sports" style="border:1px solid #ddd;padding:7px 10px;border-radius:2px;font-size:12px;width:150px;"/>
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;">Display Name</label>
+          <input type="text" name="cat_label" required placeholder="e.g. Sports &amp; Athletics" style="border:1px solid #ddd;padding:7px 10px;border-radius:2px;font-size:12px;width:200px;"/>
+        </div>
+        <button type="submit" class="btn btn-gold" style="align-self:flex-end;">+ Add Category</button>
+      </form>
+    </div>
 
     <!-- Existing decorated products -->
     <?php if (!empty($decProducts)): ?>
@@ -995,6 +1057,26 @@ document.querySelectorAll('.ftab').forEach(btn => {
       forest: { front:'../mockups/hoodie-forest-front.png', back:'../mockups/hoodie-forest-back.png' },
       maroon: { front:'../mockups/hoodie-maroon-front.png', back:'../mockups/hoodie-maroon-back.png' },
     },
+    'tshirt-female': {
+      gray:   { front:'../mockups/tshirt-female-gray-front.png',   back:'../mockups/tshirt-female-gray-back.png'   },
+      white:  { front:'../mockups/tshirt-female-white-front.png',  back:'../mockups/tshirt-female-white-back.png'  },
+      black:  { front:'../mockups/tshirt-female-black-front.png',  back:'../mockups/tshirt-female-black-back.png'  },
+      navy:   { front:'../mockups/tshirt-female-navy-front.png',   back:'../mockups/tshirt-female-navy-back.png'   },
+      red:    { front:'../mockups/tshirt-female-red-front.png',    back:'../mockups/tshirt-female-red-back.png'    },
+      royal:  { front:'../mockups/tshirt-female-royal-front.png',  back:'../mockups/tshirt-female-royal-back.png'  },
+      forest: { front:'../mockups/tshirt-female-forest-front.png', back:'../mockups/tshirt-female-forest-back.png' },
+      maroon: { front:'../mockups/tshirt-female-maroon-front.png', back:'../mockups/tshirt-female-maroon-back.png' },
+    },
+    'hoodie-female': {
+      gray:   { front:'../mockups/hoodie-female-gray-front.png',   back:'../mockups/hoodie-female-gray-back.png'   },
+      white:  { front:'../mockups/hoodie-female-white-front.png',  back:'../mockups/hoodie-female-white-back.png'  },
+      black:  { front:'../mockups/hoodie-female-black-front.png',  back:'../mockups/hoodie-female-black-back.png'  },
+      navy:   { front:'../mockups/hoodie-female-navy-front.png',   back:'../mockups/hoodie-female-navy-back.png'   },
+      red:    { front:'../mockups/hoodie-female-red-front.png',    back:'../mockups/hoodie-female-red-back.png'    },
+      royal:  { front:'../mockups/hoodie-female-royal-front.png',  back:'../mockups/hoodie-female-royal-back.png'  },
+      forest: { front:'../mockups/hoodie-female-forest-front.png', back:'../mockups/hoodie-female-forest-back.png' },
+      maroon: { front:'../mockups/hoodie-female-maroon-front.png', back:'../mockups/hoodie-female-maroon-back.png' },
+    },
   };
 
   const DEC_COLOR_HEX = {
@@ -1041,11 +1123,19 @@ document.querySelectorAll('.ftab').forEach(btn => {
     el.style.height = (z.height * SIZE) + 'px';
   }
 
+  const DEC_GARMENT_LABELS = {
+    tshirt:'T-Shirt', 'tshirt-female':"Women's Tee",
+    hoodie:'Hoodie',  'hoodie-female':"Women's Hoodie",
+  };
+
   function updateDecMockup() {
     const map  = DEC_MOCKUPS[decGarment] || DEC_MOCKUPS.tshirt;
     const base = map.white || map.gray;
     const src  = base[decView] || base.front;
-    document.getElementById('decMockupImg').src = src;
+    const fallback = src.replace('-female-', '-');
+    const img = document.getElementById('decMockupImg');
+    img.onerror = () => { img.onerror = null; img.src = fallback; };
+    img.src = src;
     const hex = DEC_COLOR_HEX[decColor];
     document.getElementById('decMockupColor').style.background = hex || 'transparent';
     updateDecPrintZone();
