@@ -137,10 +137,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,10,0.9
 .features-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
 .features-list li{font-size:12px;color:var(--offwhite);display:flex;align-items:baseline;gap:8px;}
 .features-list li::before{content:"✓";color:var(--gold);font-size:11px;flex-shrink:0;}
-.size-table{width:100%;border-collapse:collapse;font-size:12px;}
-.size-table th{text-align:left;color:var(--gray2);font-weight:600;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.08);text-transform:uppercase;letter-spacing:.5px;font-size:11px;}
-.size-table td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,0.05);color:var(--offwhite);}
-.size-table tr:last-child td{border-bottom:none;}
+.size-guide-wrap{margin-bottom:16px;}
+.size-guide-fig{display:block;margin:0 auto 12px;}
+.size-table-h{width:100%;border-collapse:collapse;font-size:12px;}
+.size-table-h th{text-align:center;color:var(--gray2);font-weight:600;padding:8px 4px;border-top:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1);text-transform:uppercase;letter-spacing:.5px;font-size:11px;}
+.size-table-h th:first-child{text-align:left;min-width:44px;}
+.size-table-h td{text-align:center;padding:8px 4px;color:var(--offwhite);border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px;}
+.size-table-h td:first-child{text-align:left;color:var(--gray2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;}
+.size-table-h tr:last-child td{border-bottom:none;}
 .modal-cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:var(--gold);color:#000;border:none;border-radius:3px;font-size:13px;font-weight:700;font-family:"DM Sans",sans-serif;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-top:24px;text-decoration:none;transition:background .2s;}
 .modal-cta:hover{background:var(--gold-light);}
 @media(max-width:700px){
@@ -490,10 +494,25 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
           <ul class="features-list" id="modalFeatures"></ul>
         </div>
         <div class="modal-panel" id="tabSizes">
-          <table class="size-table">
-            <thead><tr><th>Size</th><th>Chest</th></tr></thead>
-            <tbody id="modalSizeRows"></tbody>
-          </table>
+          <div class="size-guide-wrap">
+            <svg class="size-guide-fig" width="160" height="148" viewBox="0 0 160 148" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- figure -->
+              <circle cx="90" cy="16" r="13" stroke="#666" stroke-width="1.5"/>
+              <path d="M83,29 L83,36 Q68,38 63,47 L60,96 L76,98 L76,142 L104,142 L104,98 L120,96 L117,47 Q112,38 97,36 L97,29" stroke="#666" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="63" y1="47" x2="55" y2="80" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="117" y1="47" x2="125" y2="80" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+              <!-- chest measurement line -->
+              <line x1="4" y1="56" x2="136" y2="56" stroke="#D49848" stroke-dasharray="4,3" stroke-width="1.5"/>
+              <polyline points="9,52 4,56 9,60" stroke="#D49848" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="131,52 136,56 131,60" stroke="#D49848" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- label -->
+              <text x="4" y="74" font-family="DM Sans,sans-serif" font-size="10" fill="#D49848" font-weight="600" letter-spacing="0.5">Chest</text>
+            </svg>
+            <table class="size-table-h">
+              <thead id="modalSizeHead"></thead>
+              <tbody id="modalSizeRows"></tbody>
+            </table>
+          </div>
         </div>
         <div class="modal-panel" id="tabCare">
           <div class="spec-row"><span class="spec-label">Weight</span><span class="spec-val" id="modalWeight"></span></div>
@@ -620,9 +639,11 @@ function openProductModal(id) {
   // Features
   const fl = document.getElementById('modalFeatures');
   fl.innerHTML = p.features.map(f => `<li>${f}</li>`).join('');
-  // Size chart
-  const tbody = document.getElementById('modalSizeRows');
-  tbody.innerHTML = p.sizes.map(([s,c]) => `<tr><td>${s}</td><td>${c}</td></tr>`).join('');
+  // Size chart - horizontal layout
+  document.getElementById('modalSizeHead').innerHTML =
+    '<tr><th></th>' + p.sizes.map(([s]) => `<th>${s}</th>`).join('') + '</tr>';
+  document.getElementById('modalSizeRows').innerHTML =
+    '<tr><td>Chest</td>' + p.sizes.map(([,c]) => `<td>${c}</td>`).join('') + '</tr>';
   // Colors
   const cc = document.getElementById('modalColors');
   cc.innerHTML = COLORS.map(c =>
