@@ -237,7 +237,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
     <!-- 2: Bella+Canvas BC3001 -->
     <div class="card" data-category="mens" data-product="bc3001" onclick="openProductModal('bc3001')">
       <div class="card-img">
-        <img src="mockups/tshirt-white-front.png" alt="Bella Canvas BC3001" onerror="this.style.opacity='0.2'"/>
+        <img src="mockups/bc3001-white-front.jpg" alt="Bella Canvas BC3001" onerror="this.src='mockups/tshirt-white-front.png'"/>
         <span class="card-badge" style="background:#7c5cbf;">Premium</span>
       </div>
       <div class="card-body">
@@ -263,7 +263,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
     <!-- 3: Gildan 5000L Women's -->
     <div class="card" data-category="womens" data-product="gildan-5000l" onclick="openProductModal('gildan-5000l')">
       <div class="card-img">
-        <img src="mockups/tshirt-female-white-front.png" alt="Gildan 5000L Women's" onerror="this.src='mockups/tshirt-white-front.png'"/>
+        <img src="mockups/womens-white-front.jpg" alt="Gildan 5000L Women's" onerror="this.src='mockups/tshirt-white-front.png'"/>
         <span class="card-badge women">Women's</span>
       </div>
       <div class="card-body">
@@ -314,7 +314,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
     <!-- 5: Next Level NL6211 Long Sleeve -->
     <div class="card" data-category="longsleeve" data-product="nl6211" onclick="openProductModal('nl6211')">
       <div class="card-img">
-        <img src="mockups/tshirt-white-front.png" alt="Next Level Long Sleeve" onerror="this.style.opacity='0.2'"/>
+        <img src="mockups/nl6211-sand-front.jpg" alt="Next Level Long Sleeve" onerror="this.src='mockups/tshirt-white-front.png'"/>
         <span class="card-badge long">Long Sleeve</span>
       </div>
       <div class="card-body">
@@ -366,7 +366,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
     <!-- 7: Next Level Youth NL3310 -->
     <div class="card" data-category="youth" data-product="nl3310" onclick="openProductModal('nl3310')">
       <div class="card-img">
-        <img src="mockups/tshirt-white-front.png" alt="Next Level Youth NL3310" onerror="this.style.opacity='0.2'"/>
+        <img src="mockups/nl3310-white-front.png" alt="Next Level Youth NL3310" onerror="this.src='mockups/tshirt-white-front.png'"/>
         <span class="card-badge youth">Youth</span>
       </div>
       <div class="card-body">
@@ -565,7 +565,7 @@ const PRODUCT_DATA = {
     care:'Machine wash cold · Tumble dry low · Inside out recommended',
     features:['Side-seamed construction','Retail fit','Tear-away label','Airlume combed ring-spun cotton','Shoulder-to-shoulder tape'],
     sizes:[['XS','32–34"'],['S','34–36"'],['M','38–40"'],['L','42–44"'],['XL','46–48"'],['2XL','50–52"'],['3XL','54–56"'],['4XL','58–60"'],['5XL','62–64"']],
-    mockup:'mockups/tshirt-white-front.png', garment:'tshirt',
+    mockup:'mockups/bc3001-white-front.jpg', garment:'tshirt',
   },
   'gildan-5000l': {
     brand:'Gildan', name:"Women's Heavy Cotton T-Shirt", sku:'SKU: 5000L',
@@ -574,7 +574,7 @@ const PRODUCT_DATA = {
     care:'Machine wash cold · Tumble dry low · Do not bleach',
     features:["Contoured women's fit",'Seamless double-needle collar','Double-needle sleeves and hem','Taped neck and shoulders','Pre-shrunk'],
     sizes:[['S','32–34"'],['M','35–37"'],['L','38–40"'],['XL','42–44"'],['2XL','46–48"'],['3XL','50–52"']],
-    mockup:'mockups/tshirt-female-white-front.png', garment:'tshirt-female',
+    mockup:'mockups/womens-white-front.jpg', garment:'tshirt-female',
   },
   'gildan-64000': {
     brand:'Gildan', name:'Softstyle T-Shirt', sku:'SKU: 64000',
@@ -592,7 +592,7 @@ const PRODUCT_DATA = {
     care:'Machine wash cold · Tumble dry low · Inside out for best results',
     features:['CVC blend for softness and durability','Set-in sleeves','Side-seamed','Tear-away label','Great for full-chest prints'],
     sizes:[['XS','32–34"'],['S','34–36"'],['M','38–40"'],['L','42–44"'],['XL','46–48"'],['2XL','50–52"'],['3XL','54–56"']],
-    mockup:'mockups/tshirt-white-front.png', garment:'tshirt',
+    mockup:'mockups/nl6211-sand-front.jpg', garment:'tshirt',
   },
   'gildan-5000b': {
     brand:'Gildan', name:'Youth Heavy Cotton T-Shirt', sku:'SKU: 5000B',
@@ -610,7 +610,7 @@ const PRODUCT_DATA = {
     care:'Machine wash cold · Tumble dry low',
     features:['Combed ring-spun cotton','Side-seamed for a clean fit','Tear-away label','Durable ribbed collar'],
     sizes:[['XS','24–26"'],['S','26–28"'],['M','28–30"'],['L','30–32"'],['XL','32–34"']],
-    mockup:'mockups/tshirt-white-front.png', garment:'tshirt',
+    mockup:'mockups/nl3310-white-front.png', garment:'tshirt',
   },
   'gildan-64000b': {
     brand:'Gildan', name:'Youth Softstyle T-Shirt', sku:'SKU: 64000B',
