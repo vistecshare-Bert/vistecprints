@@ -211,14 +211,6 @@ input[type=checkbox].tgl:checked + label.tgl-btn::after{left:19px;background:var
   pointer-events:none;
   display:block;
 }
-#mockupColorLayer{
-  position:absolute;
-  inset:0;
-  z-index:1;
-  mix-blend-mode:multiply;
-  pointer-events:none;
-  transition:background 0.2s;
-}
 #designer-canvas{
   position:relative;
   z-index:2;
@@ -560,7 +552,6 @@ input[type=range]{width:100%;accent-color:var(--gold);}
       <div class="canvas-container" id="canvasContainer" style="width:520px;height:520px;">
         <img class="mockup-img" id="mockupImg" src="mockups/tshirt-white-front.png" alt="T-shirt mockup"
              onerror="this.style.opacity='0.1'; document.getElementById('mockupPlaceholder').classList.add('show')"/>
-        <div id="mockupColorLayer" style="background:#8c8c8c;"></div>
         <canvas id="designer-canvas" width="520" height="520"></canvas>
         <div class="print-zone-overlay" id="printZone"></div>
         <div class="mockup-placeholder" id="mockupPlaceholder">
@@ -1010,23 +1001,49 @@ const GARMENT_LABELS = {
   hoodie: 'Hoodie',  'hoodie-female': "Women's Hoodie",
 };
 
+// Draw white mockup on offscreen canvas, multiply-blend the shirt color,
+// then restore alpha so transparent areas stay transparent.
+function applyColorToMockup(src, cb) {
+  const hex = COLOR_HEX[currentColor];
+  if (!hex) { cb(src); return; }          // white → show raw image
+  const tmp = new Image();
+  tmp.crossOrigin = 'anonymous';
+  tmp.onload = () => {
+    try {
+      const c = document.createElement('canvas');
+      c.width = tmp.naturalWidth;
+      c.height = tmp.naturalHeight;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(tmp, 0, 0);           // white shirt
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = hex;
+      ctx.fillRect(0, 0, c.width, c.height); // tint
+      ctx.globalCompositeOperation = 'destination-in';
+      ctx.drawImage(tmp, 0, 0);           // restore alpha mask
+      cb(c.toDataURL('image/png'));
+    } catch(e) { cb(src); }
+  };
+  tmp.onerror = () => cb(src);
+  tmp.src = src;
+}
+
 function updateMockup() {
-  const map  = MOCKUPS[currentGarment];
-  const base = map.white || map.gray;
-  const src  = base[currentView] || base.front;
-  // Fallback: female mockup not yet uploaded → use unisex version
+  const map      = MOCKUPS[currentGarment];
+  const base     = map.white || map.gray;
+  const src      = base[currentView] || base.front;
   const fallback = src.replace('-female-', '-');
-
   const img         = document.getElementById('mockupImg');
-  const overlay     = document.getElementById('mockupColorLayer');
   const placeholder = document.getElementById('mockupPlaceholder');
-
   img.style.opacity = '1';
   placeholder.classList.remove('show');
-  img.onerror = () => { img.onerror = null; img.src = fallback; };
-  img.src = src;
 
-  overlay.style.background = COLOR_HEX[currentColor] || 'transparent';
+  applyColorToMockup(src, result => {
+    img.onerror = () => {
+      img.onerror = null;
+      applyColorToMockup(fallback, fb => { img.src = fb; });
+    };
+    img.src = result;
+  });
   updatePrintZone();
 }
 
