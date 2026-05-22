@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Contact Vistec GraphX — Custom Printing Charlotte NC</title>
+<meta name="description" content="Get in touch with Vistec GraphX — Charlotte's custom print shop. Ask about pricing, request a quote, or check on your order."/>
+<link rel="canonical" href="https://rebuild.vistecprints.com/contact"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --black:#0a0a0a;--dark:#111111;--dark2:#1a1a1a;--dark3:#222222;
+  --gold:#D49848;--gold-light:#E8B96A;--gold-dim:#9A6B2E;
+  --white:#FFFFFF;--offwhite:#F0EDE8;--gray:#888888;--gray2:#555555;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden;}
+.nav-spacer{height:100px;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,152,72,0.15);padding:0 5%;}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:100px;}
+.logo{text-decoration:none;display:flex;align-items:center;}
+.logo img{height:90px;width:auto;display:block;}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
+.nav-links a{color:var(--gray);text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500;transition:color 0.2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);}
+.nav-phone{color:#D49848;font-size:13px;font-weight:500;text-decoration:none;white-space:nowrap;}
+.nav-right{display:flex;align-items:center;gap:24px;}
+.nav-cta{background:var(--gold);color:var(--black);padding:10px 22px;border-radius:2px;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:background 0.2s;}
+.nav-cta:hover{background:var(--gold-light);}
+.cart-btn{background:transparent;border:none;cursor:pointer;color:var(--offwhite);position:relative;padding:8px 10px;display:flex;align-items:center;transition:color 0.2s;}
+.cart-btn:hover{color:var(--gold);}
+.cart-badge{position:absolute;top:2px;right:4px;background:var(--gold);color:var(--black);font-size:9px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;opacity:0;transform:scale(0);transition:all 0.2s;}
+.cart-badge.show{opacity:1;transform:scale(1);}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.hamburger span{display:block;width:24px;height:2px;background:var(--gold);}
+@media(max-width:768px){
+  .nav-links{display:none;position:fixed;top:100px;left:0;right:0;background:rgba(10,10,10,0.98);flex-direction:column;padding:24px 5%;gap:0;border-bottom:1px solid rgba(212,152,72,0.2);}
+  .nav-links.open{display:flex;}
+  .nav-links li{border-bottom:1px solid rgba(255,255,255,0.05);}
+  .nav-links a{padding:14px 0;display:block;}
+  .nav-cta{display:none;}
+  .nav-phone{display:none;}
+  .hamburger{display:flex;}
+}
+
+/* ── HERO ── */
+.hero{position:relative;padding:100px 5% 80px;overflow:hidden;border-bottom:1px solid rgba(212,152,72,0.1);}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#000 0%,#0d0d0d 60%,#111 100%);}
+.hero-pattern{position:absolute;inset:0;opacity:0.04;background-image:repeating-linear-gradient(45deg,#D49848 0,#D49848 1px,transparent 0,transparent 50%);background-size:30px 30px;}
+.hero-glow{position:absolute;top:-20%;right:-5%;width:600px;height:600px;background:radial-gradient(circle,rgba(212,152,72,0.07) 0%,transparent 70%);pointer-events:none;}
+.hero-content{position:relative;z-index:1;max-width:800px;}
+.hero-eyebrow{display:inline-block;border:1px solid var(--gold-dim);color:var(--gold);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:6px 16px;margin-bottom:28px;}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,10vw,110px);line-height:0.95;letter-spacing:2px;color:var(--white);margin-bottom:28px;}
+.hero h1 .gold{color:var(--gold);}
+.hero-sub{font-size:17px;color:var(--gray);max-width:540px;line-height:1.7;}
+
+/* ── CONTACT LAYOUT ── */
+.contact-section{padding:80px 5%;}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1200px;margin:0 auto;align-items:start;}
+@media(max-width:900px){.contact-grid{grid-template-columns:1fr;gap:48px;}}
+
+/* ── FORM ── */
+.form-wrap{background:var(--dark2);border:1px solid rgba(212,152,72,0.12);border-radius:4px;padding:40px;}
+.form-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--offwhite);margin-bottom:8px;}
+.form-sub{font-size:14px;color:var(--gray);margin-bottom:32px;line-height:1.6;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+@media(max-width:600px){.form-row{grid-template-columns:1fr;}}
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600;margin-bottom:8px;}
+.form-group input,
+.form-group select,
+.form-group textarea{width:100%;background:var(--dark3);border:1px solid rgba(255,255,255,0.08);border-radius:3px;color:var(--offwhite);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 14px;outline:none;transition:border-color 0.2s;}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{border-color:var(--gold-dim);}
+.form-group select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;}
+.form-group select option{background:var(--dark2);color:var(--offwhite);}
+.form-group textarea{resize:vertical;min-height:120px;line-height:1.6;}
+.submit-btn{width:100%;background:var(--gold);color:var(--black);border:none;padding:14px 24px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:2px;cursor:pointer;transition:background 0.2s;margin-top:8px;}
+.submit-btn:hover{background:var(--gold-light);}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.form-msg{display:none;padding:14px 16px;border-radius:3px;font-size:14px;margin-top:16px;line-height:1.5;}
+.form-msg.success{background:rgba(212,152,72,0.1);border:1px solid rgba(212,152,72,0.3);color:var(--gold);}
+.form-msg.error{background:rgba(220,50,50,0.08);border:1px solid rgba(220,50,50,0.3);color:#f88;}
+
+/* ── CONTACT INFO ── */
+.info-wrap{padding:8px 0;}
+.info-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-weight:600;display:block;margin-bottom:12px;}
+.info-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,4vw,52px);letter-spacing:2px;color:var(--offwhite);line-height:1.05;margin-bottom:16px;}
+.info-divider{width:48px;height:2px;background:var(--gold);margin:24px 0;}
+.info-body{font-size:15px;color:var(--gray);line-height:1.8;margin-bottom:40px;}
+.info-items{display:flex;flex-direction:column;gap:24px;margin-bottom:48px;}
+.info-item{display:flex;align-items:flex-start;gap:16px;}
+.info-icon{width:42px;height:42px;background:rgba(212,152,72,0.08);border:1px solid rgba(212,152,72,0.2);border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.info-icon svg{stroke:var(--gold);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.info-item-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600;margin-bottom:4px;}
+.info-item-val{font-size:15px;color:var(--offwhite);line-height:1.5;}
+.info-item-val a{color:var(--offwhite);text-decoration:none;transition:color 0.2s;}
+.info-item-val a:hover{color:var(--gold);}
+.hours-grid{display:grid;grid-template-columns:auto 1fr;gap:6px 24px;font-size:14px;color:var(--gray);}
+.hours-day{font-weight:600;color:var(--offwhite);}
+.hours-val{color:var(--gray);}
+
+/* ── FOOTER ── */
+footer{background:var(--dark);border-top:1px solid rgba(255,255,255,0.06);padding:60px 5% 0;}
+.footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;max-width:1200px;margin:0 auto;padding-bottom:48px;}
+.footer-brand img{height:50px;width:auto;margin-bottom:16px;display:block;}
+.footer-brand p{font-size:13px;color:var(--gray);line-height:1.7;max-width:280px;}
+.footer-col h4{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:20px;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:10px;}
+.footer-col ul li a{font-size:13px;color:var(--gray);text-decoration:none;transition:color 0.2s;}
+.footer-col ul li a:hover{color:var(--offwhite);}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.06);padding:20px 0;text-align:center;font-size:12px;color:var(--gray2);max-width:1200px;margin:0 auto;}
+@media(max-width:768px){.footer-inner{grid-template-columns:1fr;gap:32px;}}
+</style>
+</head>
+<body>
+
+<div class="nav-spacer"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo"><img src="images/Logo.png" alt="VistecPrints"/></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html">Shop</a></li>
+      <li><a href="create.html">Products</a></li>
+      <li><a href="designs.html">Designs</a></li>
+      <li><a href="designer.html">Designer</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html" class="active">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="tel:+17043776626" class="nav-phone">+1 704-377-6626</a>
+      <a href="contact.html" class="nav-cta">Get a Quote</a>
+      <button class="cart-btn" id="cartBtn" onclick="openCart()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.2"/><circle cx="20" cy="21" r="1.2"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="cart-badge" id="cartBadge"></span>
+      </button>
+    </div>
+    <div class="hamburger" id="hamburger" onclick="this.classList.toggle('open');document.getElementById('navLinks').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-pattern"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">Get In Touch</span>
+    <h1>Let's <span class="gold">Talk</span><br>Printing</h1>
+    <p class="hero-sub">Have a question, need a quote, or want to check on your order? We're here and ready to help.</p>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section">
+  <div class="contact-grid">
+
+    <!-- FORM -->
+    <div class="form-wrap">
+      <div class="form-title">Send Us a Message</div>
+      <p class="form-sub">Fill out the form below and we'll get back to you within 1 business day.</p>
+
+      <form id="contactForm" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Full Name <span style="color:var(--gold)">*</span></label>
+            <input type="text" id="name" name="name" placeholder="John Smith" required/>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" placeholder="+1 (704) 000-0000"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address <span style="color:var(--gold)">*</span></label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required/>
+        </div>
+
+        <div class="form-group">
+          <label for="inquiry">Inquiry Type <span style="color:var(--gold)">*</span></label>
+          <select id="inquiry" name="inquiry" required>
+            <option value="" disabled selected>Select an option...</option>
+            <option value="Quote Request">Quote Request</option>
+            <option value="General Question">General Question</option>
+            <option value="Order Status">Order Status</option>
+            <option value="Design Help">Design Help</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="message">Message <span style="color:var(--gold)">*</span></label>
+          <textarea id="message" name="message" placeholder="Tell us what you need — product type, quantity, deadline, any details..." required></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Send Message</button>
+        <div class="form-msg" id="formMsg"></div>
+      </form>
+    </div>
+
+    <!-- INFO -->
+    <div class="info-wrap">
+      <span class="info-label">Contact Details</span>
+      <h2 class="info-title">We're Based in<br><span style="color:var(--gold)">Charlotte, NC</span></h2>
+      <div class="info-divider"></div>
+      <p class="info-body">Walk-ins welcome during business hours, or reach out any time — we typically respond to emails and calls same day.</p>
+
+      <div class="info-items">
+        <div class="info-item">
+          <div class="info-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div>
+            <div class="info-item-label">Address</div>
+            <div class="info-item-val">701 Morris St, Charlotte, NC 28202<br>United States</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012.18 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.13a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0121 15.22z"/></svg>
+          </div>
+          <div>
+            <div class="info-item-label">Phone</div>
+            <div class="info-item-val"><a href="tel:+17043776626">+1 704-377-6626</a></div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <div class="info-item-label">Email</div>
+            <div class="info-item-val"><a href="mailto:vistecfx@gmail.com">vistecfx@gmail.com</a></div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+          </div>
+          <div>
+            <div class="info-item-label">Business Hours</div>
+            <div class="info-item-val">
+              <div class="hours-grid">
+                <span class="hours-day">Mon – Fri</span><span class="hours-val">9:00 AM – 6:00 PM</span>
+                <span class="hours-day">Saturday</span><span class="hours-val">10:00 AM – 4:00 PM</span>
+                <span class="hours-day">Sunday</span><span class="hours-val">Closed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="images/Logo.png" alt="Vistec GraphX"/>
+      <p>Charlotte's custom print shop. DTF printing, screen printing, embroidery, and signs. No minimums. Fast turnaround. Real people.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Shop</a></li>
+        <li><a href="create.html">Products</a></li>
+        <li><a href="designs.html">Designs</a></li>
+        <li><a href="designer.html">Designer</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="tel:+17043776626">+1 704-377-6626</a></li>
+        <li><a href="mailto:vistecfx@gmail.com">vistecfx@gmail.com</a></li>
+        <li><a href="#">701 Morris St</a></li>
+        <li><a href="#">Charlotte, NC 28202</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    &copy; <span id="yr"></span> Vistec GraphX. All rights reserved. &nbsp;&middot;&nbsp; Charlotte, NC
+  </div>
+</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+function openCart() {}
+
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const msg = document.getElementById('formMsg');
+
+  const name    = document.getElementById('name').value.trim();
+  const email   = document.getElementById('email').value.trim();
+  const phone   = document.getElementById('phone').value.trim();
+  const inquiry = document.getElementById('inquiry').value;
+  const message = document.getElementById('message').value.trim();
+
+  if (!name || !email || !inquiry || !message) {
+    msg.className = 'form-msg error';
+    msg.style.display = 'block';
+    msg.textContent = 'Please fill in all required fields.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  msg.style.display = 'none';
+
+  try {
+    const res = await fetch('contact-submit.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({name, email, phone, inquiry, message})
+    });
+    const data = await res.json();
+    if (data.success) {
+      msg.className = 'form-msg success';
+      msg.innerHTML = '<strong>Message sent!</strong> We\'ll get back to you within 1 business day. Reference: ' + data.id;
+      msg.style.display = 'block';
+      document.getElementById('contactForm').reset();
+      btn.textContent = 'Message Sent';
+    } else {
+      throw new Error(data.error || 'Submission failed.');
+    }
+  } catch (err) {
+    msg.className = 'form-msg error';
+    msg.style.display = 'block';
+    msg.textContent = err.message || 'Something went wrong. Please try again or email us directly.';
+    btn.disabled = false;
+    btn.textContent = 'Send Message';
+  }
+});
+</script>
+</body>
+</html>
