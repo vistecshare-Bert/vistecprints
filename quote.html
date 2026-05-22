@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Quick Quote — Vistec GraphX Custom Printing Charlotte NC</title>
+<meta name="description" content="Get an instant price estimate for custom t-shirts, hoodies, DTF transfers, screen printing and embroidery. No commitment required."/>
+<link rel="canonical" href="https://rebuild.vistecprints.com/quote"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --black:#0a0a0a;--dark:#111111;--dark2:#1a1a1a;--dark3:#222222;--dark4:#2a2a2a;
+  --gold:#D49848;--gold-light:#E8B96A;--gold-dim:#9A6B2E;
+  --white:#FFFFFF;--offwhite:#F0EDE8;--gray:#888888;--gray2:#555555;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--offwhite);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden;}
+.nav-spacer{height:100px;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,152,72,0.15);padding:0 5%;}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:100px;}
+.logo{text-decoration:none;display:flex;align-items:center;}
+.logo img{height:90px;width:auto;display:block;}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
+.nav-links a{color:var(--gray);text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500;transition:color 0.2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--gold);}
+.nav-phone{color:#D49848;font-size:13px;font-weight:500;text-decoration:none;white-space:nowrap;}
+.nav-right{display:flex;align-items:center;gap:24px;}
+.nav-cta{background:var(--gold);color:var(--black);padding:10px 22px;border-radius:2px;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:background 0.2s;}
+.nav-cta:hover{background:var(--gold-light);}
+.cart-btn{background:transparent;border:none;cursor:pointer;color:var(--offwhite);position:relative;padding:8px 10px;display:flex;align-items:center;transition:color 0.2s;}
+.cart-btn:hover{color:var(--gold);}
+.cart-badge{position:absolute;top:2px;right:4px;background:var(--gold);color:var(--black);font-size:9px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;opacity:0;transform:scale(0);transition:all 0.2s;}
+.cart-badge.show{opacity:1;transform:scale(1);}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.hamburger span{display:block;width:24px;height:2px;background:var(--gold);}
+@media(max-width:768px){
+  .nav-links{display:none;position:fixed;top:100px;left:0;right:0;background:rgba(10,10,10,0.98);flex-direction:column;padding:24px 5%;gap:0;border-bottom:1px solid rgba(212,152,72,0.2);}
+  .nav-links.open{display:flex;}
+  .nav-links li{border-bottom:1px solid rgba(255,255,255,0.05);}
+  .nav-links a{padding:14px 0;display:block;}
+  .nav-cta{display:none;}
+  .nav-phone{display:none;}
+  .hamburger{display:flex;}
+}
+
+/* ── HERO ── */
+.hero{position:relative;padding:80px 5% 60px;overflow:hidden;border-bottom:1px solid rgba(212,152,72,0.1);}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#000 0%,#0d0d0d 60%,#111 100%);}
+.hero-pattern{position:absolute;inset:0;opacity:0.04;background-image:repeating-linear-gradient(45deg,#D49848 0,#D49848 1px,transparent 0,transparent 50%);background-size:30px 30px;}
+.hero-glow{position:absolute;top:-20%;right:-5%;width:600px;height:600px;background:radial-gradient(circle,rgba(212,152,72,0.07) 0%,transparent 70%);pointer-events:none;}
+.hero-content{position:relative;z-index:1;max-width:700px;}
+.hero-eyebrow{display:inline-block;border:1px solid var(--gold-dim);color:var(--gold);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:6px 16px;margin-bottom:24px;}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,8vw,96px);line-height:0.95;letter-spacing:2px;color:var(--white);margin-bottom:20px;}
+.hero h1 .gold{color:var(--gold);}
+.hero-sub{font-size:16px;color:var(--gray);max-width:500px;line-height:1.7;}
+
+/* ── LAYOUT ── */
+.page-body{padding:60px 5%;max-width:1300px;margin:0 auto;}
+.quote-grid{display:grid;grid-template-columns:1fr 380px;gap:40px;align-items:start;}
+@media(max-width:1024px){.quote-grid{grid-template-columns:1fr;}}
+
+/* ── STEPS ── */
+.step{background:var(--dark2);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:28px 32px;margin-bottom:20px;}
+.step-head{display:flex;align-items:center;gap:14px;margin-bottom:24px;}
+.step-num{width:32px;height:32px;border-radius:50%;background:rgba(212,152,72,0.15);border:1px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0;}
+.step-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1.5px;color:var(--offwhite);}
+
+/* ── GARMENT GRID ── */
+.garment-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;}
+.garment-card{background:var(--dark3);border:1.5px solid rgba(255,255,255,0.08);border-radius:4px;padding:16px 10px;text-align:center;cursor:pointer;transition:all 0.18s;}
+.garment-card:hover{border-color:var(--gold-dim);background:var(--dark4);}
+.garment-card.selected{border-color:var(--gold);background:rgba(212,152,72,0.08);}
+.garment-icon{font-size:28px;margin-bottom:8px;line-height:1;}
+.garment-name{font-size:11px;letter-spacing:0.8px;text-transform:uppercase;color:var(--gray);font-weight:600;line-height:1.3;}
+.garment-price{font-size:12px;color:var(--gold);margin-top:4px;font-weight:600;}
+
+/* ── OPTION ROW (location, method) ── */
+.option-row{display:flex;flex-wrap:wrap;gap:10px;}
+.option-pill{background:var(--dark3);border:1.5px solid rgba(255,255,255,0.08);border-radius:3px;padding:9px 16px;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--gray);transition:all 0.18s;white-space:nowrap;}
+.option-pill:hover{border-color:var(--gold-dim);color:var(--offwhite);}
+.option-pill.selected{border-color:var(--gold);color:var(--gold);background:rgba(212,152,72,0.08);}
+.option-sub{font-size:11px;color:var(--gray2);margin-top:8px;}
+
+/* ── QUANTITY ── */
+.qty-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.qty-stepper{display:flex;align-items:center;gap:0;border:1px solid rgba(255,255,255,0.12);border-radius:3px;overflow:hidden;}
+.qty-btn{background:var(--dark3);border:none;color:var(--offwhite);width:40px;height:44px;font-size:18px;cursor:pointer;transition:background 0.15s;}
+.qty-btn:hover{background:var(--dark4);}
+.qty-input{background:var(--dark2);border:none;border-left:1px solid rgba(255,255,255,0.1);border-right:1px solid rgba(255,255,255,0.1);color:var(--offwhite);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;width:72px;height:44px;text-align:center;outline:none;}
+.qty-tiers{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+.qty-tier{font-size:11px;background:var(--dark3);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:4px 12px;color:var(--gray);cursor:pointer;transition:all 0.15s;}
+.qty-tier:hover,.qty-tier.active{background:rgba(212,152,72,0.1);border-color:var(--gold-dim);color:var(--gold);}
+.tier-label{font-weight:700;color:var(--offwhite);}
+
+/* ── CONTACT FORM ── */
+.form-row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:580px){.form-row2{grid-template-columns:1fr;}}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600;margin-bottom:7px;}
+.field input,.field textarea,.field select{width:100%;background:var(--dark3);border:1px solid rgba(255,255,255,0.08);border-radius:3px;color:var(--offwhite);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 13px;outline:none;transition:border-color 0.2s;}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold-dim);}
+.field textarea{resize:vertical;min-height:90px;line-height:1.6;}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;}
+.field select option{background:var(--dark2);}
+
+.upload-area{border:1.5px dashed rgba(255,255,255,0.15);border-radius:3px;padding:24px;text-align:center;cursor:pointer;transition:border-color 0.2s;position:relative;}
+.upload-area:hover{border-color:var(--gold-dim);}
+.upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:24px;margin-bottom:8px;}
+.upload-text{font-size:13px;color:var(--gray);}
+.upload-text span{color:var(--gold);}
+.upload-files{margin-top:10px;font-size:12px;color:var(--gold);}
+
+.submit-btn{width:100%;background:var(--gold);color:var(--black);border:none;padding:15px 24px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-radius:2px;cursor:pointer;transition:background 0.2s;margin-top:4px;}
+.submit-btn:hover{background:var(--gold-light);}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.form-msg{display:none;padding:14px 16px;border-radius:3px;font-size:14px;margin-top:14px;line-height:1.5;}
+.form-msg.success{background:rgba(212,152,72,0.1);border:1px solid rgba(212,152,72,0.3);color:var(--gold);}
+.form-msg.error{background:rgba(220,50,50,0.08);border:1px solid rgba(220,50,50,0.3);color:#f88;}
+
+/* ── ESTIMATE SIDEBAR ── */
+.estimate-wrap{position:sticky;top:120px;}
+.estimate-card{background:var(--dark2);border:1px solid rgba(212,152,72,0.2);border-radius:4px;padding:28px 28px 24px;}
+.est-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--offwhite);margin-bottom:20px;}
+.est-line{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;color:var(--gray);}
+.est-line:last-of-type{border-bottom:none;}
+.est-line .label{flex:1;}
+.est-line .val{color:var(--offwhite);font-weight:600;text-align:right;}
+.est-total-row{display:flex;justify-content:space-between;align-items:baseline;padding:16px 0 0;border-top:1px solid rgba(212,152,72,0.2);margin-top:8px;}
+.est-total-label{font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--gray);}
+.est-total-val{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:1px;color:var(--gold);line-height:1;}
+.est-per{font-size:12px;color:var(--gray);text-align:right;margin-top:4px;}
+.est-discount{background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.2);border-radius:3px;padding:8px 12px;margin-top:16px;font-size:12px;color:#4CAF50;display:none;}
+.est-note{font-size:11px;color:var(--gray2);margin-top:16px;line-height:1.6;text-align:center;}
+
+/* Trust items */
+.trust-items{display:flex;flex-direction:column;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07);}
+.trust-item{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--gray);}
+.trust-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;}
+
+/* Footer */
+footer{background:var(--dark);border-top:1px solid rgba(255,255,255,0.06);padding:60px 5% 0;margin-top:80px;}
+.footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;max-width:1200px;margin:0 auto;padding-bottom:48px;}
+.footer-brand img{height:50px;width:auto;margin-bottom:16px;display:block;}
+.footer-brand p{font-size:13px;color:var(--gray);line-height:1.7;max-width:280px;}
+.footer-col h4{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:20px;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:10px;}
+.footer-col ul li a{font-size:13px;color:var(--gray);text-decoration:none;transition:color 0.2s;}
+.footer-col ul li a:hover{color:var(--offwhite);}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.06);padding:20px 0;text-align:center;font-size:12px;color:var(--gray2);max-width:1200px;margin:0 auto;}
+@media(max-width:768px){.footer-inner{grid-template-columns:1fr;gap:32px;}}
+
+/* Success screen */
+.success-screen{display:none;text-align:center;padding:60px 20px;}
+.success-icon{width:64px;height:64px;border-radius:50%;background:rgba(212,152,72,0.1);border:1px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;}
+.success-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;color:var(--white);margin-bottom:12px;}
+.success-sub{font-size:15px;color:var(--gray);max-width:400px;margin:0 auto 24px;}
+.success-id{font-family:monospace;color:var(--gold);background:rgba(212,152,72,0.08);border:1px solid rgba(212,152,72,0.2);padding:8px 16px;border-radius:3px;font-size:14px;display:inline-block;margin-bottom:32px;}
+</style>
+</head>
+<body>
+
+<div class="nav-spacer"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo"><img src="images/Logo.png" alt="VistecPrints"/></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html">Shop</a></li>
+      <li><a href="create.html">Products</a></li>
+      <li><a href="designs.html">Designs</a></li>
+      <li><a href="designer.html">Designer</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="tel:+17043776626" class="nav-phone">+1 704-377-6626</a>
+      <a href="quote.html" class="nav-cta active">Get a Quote</a>
+      <button class="cart-btn" id="cartBtn" onclick="openCart()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.2"/><circle cx="20" cy="21" r="1.2"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="cart-badge" id="cartBadge"></span>
+      </button>
+    </div>
+    <div class="hamburger" id="hamburger" onclick="this.classList.toggle('open');document.getElementById('navLinks').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-pattern"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">Instant Estimate</span>
+    <h1>Get an <span class="gold">Instant</span><br>Quote</h1>
+    <p class="hero-sub">Select your garment, print details, and quantity — see your price in real time. No commitment required.</p>
+  </div>
+</section>
+
+<div class="page-body">
+  <div class="quote-grid">
+
+    <!-- LEFT: FORM -->
+    <div id="quoteFormWrap">
+
+      <!-- STEP 1: GARMENT -->
+      <div class="step">
+        <div class="step-head">
+          <div class="step-num">1</div>
+          <div class="step-title">Choose Your Garment</div>
+        </div>
+        <div class="garment-grid" id="garmentGrid">
+          <div class="garment-card selected" data-garment="tshirt" data-base="8.50" onclick="selectGarment(this)">
+            <div class="garment-icon">👕</div>
+            <div class="garment-name">T-Shirt</div>
+            <div class="garment-price">from $8.50</div>
+          </div>
+          <div class="garment-card" data-garment="hoodie" data-base="16.00" onclick="selectGarment(this)">
+            <div class="garment-icon">🧥</div>
+            <div class="garment-name">Hoodie</div>
+            <div class="garment-price">from $16.00</div>
+          </div>
+          <div class="garment-card" data-garment="zip_hoodie" data-base="20.00" onclick="selectGarment(this)">
+            <div class="garment-icon">🧤</div>
+            <div class="garment-name">Zip Hoodie</div>
+            <div class="garment-price">from $20.00</div>
+          </div>
+          <div class="garment-card" data-garment="tank" data-base="6.50" onclick="selectGarment(this)">
+            <div class="garment-icon">🎽</div>
+            <div class="garment-name">Tank Top</div>
+            <div class="garment-price">from $6.50</div>
+          </div>
+          <div class="garment-card" data-garment="long_sleeve" data-base="10.00" onclick="selectGarment(this)">
+            <div class="garment-icon">🧣</div>
+            <div class="garment-name">Long Sleeve</div>
+            <div class="garment-price">from $10.00</div>
+          </div>
+          <div class="garment-card" data-garment="crewneck" data-base="14.00" onclick="selectGarment(this)">
+            <div class="garment-icon">👔</div>
+            <div class="garment-name">Crewneck</div>
+            <div class="garment-price">from $14.00</div>
+          </div>
+          <div class="garment-card" data-garment="tote" data-base="6.00" onclick="selectGarment(this)">
+            <div class="garment-icon">👜</div>
+            <div class="garment-name">Tote Bag</div>
+            <div class="garment-price">from $6.00</div>
+          </div>
+          <div class="garment-card" data-garment="cap" data-base="9.00" onclick="selectGarment(this)">
+            <div class="garment-icon">🧢</div>
+            <div class="garment-name">Cap / Hat</div>
+            <div class="garment-price">from $9.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: PRINT DETAILS -->
+      <div class="step">
+        <div class="step-head">
+          <div class="step-num">2</div>
+          <div class="step-title">Print Details</div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600;margin-bottom:10px;">Print Location</div>
+          <div class="option-row" id="locationRow">
+            <div class="option-pill selected" data-location="full_front" data-mult="1.0" onclick="selectOption(this,'location')">Full Front</div>
+            <div class="option-pill" data-location="full_back" data-mult="1.0" onclick="selectOption(this,'location')">Full Back</div>
+            <div class="option-pill" data-location="left_chest" data-mult="0.6" onclick="selectOption(this,'location')">Left Chest</div>
+            <div class="option-pill" data-location="sleeve" data-mult="0.5" onclick="selectOption(this,'location')">Sleeve</div>
+            <div class="option-pill" data-location="front_back" data-mult="1.8" onclick="selectOption(this,'location')">Front + Back</div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600;margin-bottom:10px;">Print Method</div>
+          <div class="option-row" id="methodRow">
+            <div class="option-pill selected" data-method="dtf" data-mult="1.0" onclick="selectOption(this,'method')">DTF Transfer</div>
+            <div class="option-pill" data-method="screen" data-mult="0.85" onclick="selectOption(this,'method')">Screen Print</div>
+            <div class="option-pill" data-method="embroidery" data-mult="1.4" onclick="selectOption(this,'method')">Embroidery</div>
+            <div class="option-pill" data-method="sublimation" data-mult="1.2" onclick="selectOption(this,'method')">Sublimation</div>
+          </div>
+          <div class="option-sub">DTF works on most fabrics. Embroidery ideal for hats & polos. Screen print best for 12+ same-color orders.</div>
+        </div>
+      </div>
+
+      <!-- STEP 3: QUANTITY -->
+      <div class="step">
+        <div class="step-head">
+          <div class="step-num">3</div>
+          <div class="step-title">Quantity</div>
+        </div>
+        <div class="qty-row">
+          <div class="qty-stepper">
+            <button class="qty-btn" onclick="adjustQty(-1)">−</button>
+            <input class="qty-input" type="number" id="qtyInput" value="12" min="1" max="9999" oninput="calcEstimate()"/>
+            <button class="qty-btn" onclick="adjustQty(1)">+</button>
+          </div>
+          <span style="font-size:13px;color:var(--gray);">pieces</span>
+        </div>
+        <div class="qty-tiers">
+          <div class="qty-tier" onclick="setQty(1)"><span class="tier-label">1–5</span> · no discount</div>
+          <div class="qty-tier" onclick="setQty(6)"><span class="tier-label">6–11</span> · save 5%</div>
+          <div class="qty-tier active" onclick="setQty(12)"><span class="tier-label">12–23</span> · save 10%</div>
+          <div class="qty-tier" onclick="setQty(24)"><span class="tier-label">24–47</span> · save 15%</div>
+          <div class="qty-tier" onclick="setQty(48)"><span class="tier-label">48–99</span> · save 20%</div>
+          <div class="qty-tier" onclick="setQty(100)"><span class="tier-label">100+</span> · save 25%</div>
+        </div>
+      </div>
+
+      <!-- STEP 4: ARTWORK & CONTACT -->
+      <div class="step">
+        <div class="step-head">
+          <div class="step-num">4</div>
+          <div class="step-title">Your Info &amp; Artwork</div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600;margin-bottom:10px;">Do you have artwork ready?</div>
+          <div class="option-row" id="artworkRow">
+            <div class="option-pill selected" data-artwork="yes" onclick="selectOption(this,'artwork');toggleUpload(true)">Yes, I have files</div>
+            <div class="option-pill" data-artwork="no" onclick="selectOption(this,'artwork');toggleUpload(false)">No, I need help</div>
+            <div class="option-pill" data-artwork="need_help" onclick="selectOption(this,'artwork');toggleUpload(false)">Not sure yet</div>
+          </div>
+        </div>
+
+        <div id="artworkUpload" style="margin-bottom:20px;">
+          <div class="upload-area" id="uploadArea">
+            <input type="file" id="artworkFiles" multiple accept=".jpg,.jpeg,.png,.pdf,.ai,.eps,.svg" onchange="showFiles()"/>
+            <div class="upload-icon">📎</div>
+            <div class="upload-text">Drop files here or <span>browse</span></div>
+            <div class="upload-text" style="margin-top:4px;">JPG, PNG, PDF, AI, EPS, SVG — max 20MB each</div>
+            <div class="upload-files" id="uploadFileList"></div>
+          </div>
+        </div>
+
+        <form id="quoteForm" novalidate>
+          <div class="form-row2">
+            <div class="field">
+              <label>Full Name <span style="color:var(--gold)">*</span></label>
+              <input type="text" id="qName" placeholder="John Smith" required/>
+            </div>
+            <div class="field">
+              <label>Phone</label>
+              <input type="tel" id="qPhone" placeholder="+1 (704) 000-0000"/>
+            </div>
+          </div>
+          <div class="field">
+            <label>Email Address <span style="color:var(--gold)">*</span></label>
+            <input type="email" id="qEmail" placeholder="you@example.com" required/>
+          </div>
+          <div class="field">
+            <label>Colors &amp; Additional Notes</label>
+            <textarea id="qNotes" placeholder="Shirt colors needed, special requirements, deadline, any other details..."></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">Submit Quote Request</button>
+          <div class="form-msg" id="formMsg"></div>
+        </form>
+      </div>
+    </div><!-- /quoteFormWrap -->
+
+    <!-- FORM SUCCESS -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D49848" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="success-title">Quote Submitted!</div>
+      <p class="success-sub">We received your request and will get back to you within 1 business day with a detailed quote.</p>
+      <div class="success-id" id="successId"></div>
+      <br/>
+      <a href="create.html" style="color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(212,152,72,0.3);">Browse Products →</a>
+    </div>
+
+    <!-- RIGHT: ESTIMATE SIDEBAR -->
+    <div class="estimate-wrap">
+      <div class="estimate-card">
+        <div class="est-title">Price Estimate</div>
+
+        <div class="est-line"><span class="label">Garment</span><span class="val" id="estGarment">T-Shirt</span></div>
+        <div class="est-line"><span class="label">Garment cost</span><span class="val" id="estGarmentCost">$8.50 / ea</span></div>
+        <div class="est-line"><span class="label">Print location</span><span class="val" id="estLocation">Full Front</span></div>
+        <div class="est-line"><span class="label">Print method</span><span class="val" id="estMethod">DTF Transfer</span></div>
+        <div class="est-line"><span class="label">Print cost</span><span class="val" id="estPrintCost">$4.00 / ea</span></div>
+        <div class="est-line"><span class="label">Quantity</span><span class="val" id="estQty">12</span></div>
+        <div class="est-line"><span class="label">Volume discount</span><span class="val" id="estDiscount" style="color:#4CAF50;">−10%</span></div>
+
+        <div class="est-total-row">
+          <div>
+            <div class="est-total-label">Estimated Total</div>
+            <div class="est-per" id="estPer">$11.25 / ea</div>
+          </div>
+          <div class="est-total-val" id="estTotal">$135</div>
+        </div>
+
+        <div class="est-discount" id="estDiscountBanner"></div>
+
+        <div class="est-note">Estimate only. Final price includes your design complexity, exact garment brand, and any rush fees. We'll confirm everything before you commit.</div>
+
+        <div class="trust-items">
+          <div class="trust-item"><div class="trust-dot"></div>No minimums on DTF transfers</div>
+          <div class="trust-item"><div class="trust-dot"></div>300 DPI print quality guaranteed</div>
+          <div class="trust-item"><div class="trust-dot"></div>Free design help available</div>
+          <div class="trust-item"><div class="trust-dot"></div>Turnaround: 5–7 business days</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="images/Logo.png" alt="Vistec GraphX"/>
+      <p>Charlotte's custom print shop. DTF printing, screen printing, embroidery, and signs. No minimums. Fast turnaround. Real people.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Shop</a></li>
+        <li><a href="create.html">Products</a></li>
+        <li><a href="designs.html">Designs</a></li>
+        <li><a href="designer.html">Designer</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="tel:+17043776626">+1 704-377-6626</a></li>
+        <li><a href="mailto:vistecfx@gmail.com">vistecfx@gmail.com</a></li>
+        <li><a href="#">701 Morris St</a></li>
+        <li><a href="#">Charlotte, NC 28202</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    &copy; <span id="yr"></span> Vistec GraphX. All rights reserved. &nbsp;&middot;&nbsp; Charlotte, NC
+  </div>
+</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+function openCart() {}
+
+// ── PRICING DATA ─────────────────────────────────────────────────────────────
+const GARMENT_LABELS = {
+  tshirt:'T-Shirt', hoodie:'Hoodie', zip_hoodie:'Zip Hoodie', tank:'Tank Top',
+  long_sleeve:'Long Sleeve', crewneck:'Crewneck', tote:'Tote Bag', cap:'Cap / Hat'
+};
+const LOCATION_LABELS = {
+  full_front:'Full Front', full_back:'Full Back', left_chest:'Left Chest',
+  sleeve:'Sleeve', front_back:'Front + Back'
+};
+const METHOD_LABELS = {
+  dtf:'DTF Transfer', screen:'Screen Print', embroidery:'Embroidery', sublimation:'Sublimation'
+};
+const TIERS = [
+  { min:1,   max:5,   disc:0    },
+  { min:6,   max:11,  disc:0.05 },
+  { min:12,  max:23,  disc:0.10 },
+  { min:24,  max:47,  disc:0.15 },
+  { min:48,  max:99,  disc:0.20 },
+  { min:100, max:Infinity, disc:0.25 },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let state = {
+  garment:'tshirt', garmentBase:8.50,
+  location:'full_front', locationMult:1.0,
+  method:'dtf', methodMult:1.0,
+  qty:12, artwork:'yes'
+};
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function getDiscount(qty) {
+  return (TIERS.find(t => qty >= t.min && qty <= t.max) || TIERS[0]).disc;
+}
+
+function calcEstimate() {
+  const qty = parseInt(document.getElementById('qtyInput').value) || 1;
+  state.qty = qty;
+
+  const printCost = 4.0 * state.locationMult * state.methodMult;
+  const unitCost  = state.garmentBase + printCost;
+  const disc      = getDiscount(qty);
+  const unitFinal = unitCost * (1 - disc);
+  const total     = unitFinal * qty;
+
+  document.getElementById('estGarment').textContent     = GARMENT_LABELS[state.garment] || state.garment;
+  document.getElementById('estGarmentCost').textContent = '$' + state.garmentBase.toFixed(2) + ' / ea';
+  document.getElementById('estLocation').textContent    = LOCATION_LABELS[state.location] || state.location;
+  document.getElementById('estMethod').textContent      = METHOD_LABELS[state.method] || state.method;
+  document.getElementById('estPrintCost').textContent   = '$' + printCost.toFixed(2) + ' / ea';
+  document.getElementById('estQty').textContent         = qty;
+  document.getElementById('estDiscount').textContent    = disc > 0 ? '−' + Math.round(disc*100) + '%' : 'None';
+  document.getElementById('estPer').textContent         = '$' + unitFinal.toFixed(2) + ' / ea';
+  document.getElementById('estTotal').textContent       = '$' + Math.round(total);
+
+  const banner = document.getElementById('estDiscountBanner');
+  if (disc > 0) {
+    banner.style.display = 'block';
+    banner.textContent   = '🎉 Volume discount applied: ' + Math.round(disc*100) + '% off';
+  } else {
+    banner.style.display = 'none';
+  }
+
+  // Highlight active tier
+  document.querySelectorAll('.qty-tier').forEach((t, i) => {
+    t.classList.toggle('active', qty >= TIERS[i].min && qty <= TIERS[i].max);
+  });
+}
+
+function selectGarment(el) {
+  document.querySelectorAll('.garment-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.garment     = el.dataset.garment;
+  state.garmentBase = parseFloat(el.dataset.base);
+  calcEstimate();
+}
+
+function selectOption(el, type) {
+  const row = document.getElementById(
+    type === 'location' ? 'locationRow' : type === 'method' ? 'methodRow' : 'artworkRow'
+  );
+  row.querySelectorAll('.option-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  if (type === 'location') {
+    state.location     = el.dataset.location;
+    state.locationMult = parseFloat(el.dataset.mult);
+  } else if (type === 'method') {
+    state.method     = el.dataset.method;
+    state.methodMult = parseFloat(el.dataset.mult);
+  } else {
+    state.artwork = el.dataset.artwork;
+  }
+  calcEstimate();
+}
+
+function adjustQty(delta) {
+  const inp = document.getElementById('qtyInput');
+  inp.value = Math.max(1, (parseInt(inp.value) || 1) + delta);
+  calcEstimate();
+}
+
+function setQty(n) {
+  document.getElementById('qtyInput').value = n;
+  calcEstimate();
+}
+
+function toggleUpload(show) {
+  document.getElementById('artworkUpload').style.display = show ? '' : 'none';
+}
+
+function showFiles() {
+  const files = document.getElementById('artworkFiles').files;
+  const el    = document.getElementById('uploadFileList');
+  if (!files.length) { el.textContent = ''; return; }
+  el.textContent = Array.from(files).map(f => f.name).join(', ');
+}
+
+// ── FORM SUBMIT ───────────────────────────────────────────────────────────────
+document.getElementById('quoteForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn  = document.getElementById('submitBtn');
+  const msg  = document.getElementById('formMsg');
+  const name  = document.getElementById('qName').value.trim();
+  const email = document.getElementById('qEmail').value.trim();
+  const phone = document.getElementById('qPhone').value.trim();
+  const notes = document.getElementById('qNotes').value.trim();
+
+  if (!name || !email) {
+    msg.className = 'form-msg error'; msg.style.display = 'block';
+    msg.textContent = 'Please fill in your name and email.';
+    return;
+  }
+
+  const qty       = state.qty;
+  const printCost = 4.0 * state.locationMult * state.methodMult;
+  const disc      = getDiscount(qty);
+  const unitFinal = (state.garmentBase + printCost) * (1 - disc);
+  const total     = unitFinal * qty;
+
+  btn.disabled = true; btn.textContent = 'Submitting...'; msg.style.display = 'none';
+
+  const payload = {
+    name, email, phone,
+    product: GARMENT_LABELS[state.garment] + ' · ' + LOCATION_LABELS[state.location] + ' · ' + METHOD_LABELS[state.method],
+    qty: String(qty),
+    budget: '$' + total.toFixed(2) + ' estimated',
+    notes,
+    garment_type: state.garment,
+    print_location: state.location,
+    print_method: state.method,
+    estimated_price: total.toFixed(2),
+    estimated_unit: unitFinal.toFixed(2),
+    discount_pct: Math.round(disc * 100),
+    artwork_status: state.artwork
+  };
+
+  try {
+    const res  = await fetch('quote-request.php', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('quoteFormWrap').style.display = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+      document.getElementById('successId').textContent = 'Reference: ' + data.id;
+    } else {
+      throw new Error(data.error || 'Submission failed.');
+    }
+  } catch(err) {
+    msg.className = 'form-msg error'; msg.style.display = 'block';
+    msg.textContent = err.message || 'Something went wrong. Please try again or call us.';
+    btn.disabled = false; btn.textContent = 'Submit Quote Request';
+  }
+});
+
+// init
+calcEstimate();
+</script>
+</body>
+</html>
