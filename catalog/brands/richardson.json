@@ -1,0 +1,42 @@
+{
+  "brand": "Richardson",
+  "count": 6,
+  "products": [
+    {
+      "id": "336088196",
+      "code": "R112",
+      "name": "Richardson Trucker Snapback Cap",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918191/4/prod.jpg"
+    },
+    {
+      "id": "336088201",
+      "code": "R112PFP",
+      "name": "Richardson Five-Panel Printed Trucker Cap",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918206/4/prod.jpg"
+    },
+    {
+      "id": "336088206",
+      "code": "R115",
+      "name": "Richardson Low Pro Trucker Cap",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918211/4/prod.jpg"
+    },
+    {
+      "id": "336088211",
+      "code": "R112P",
+      "name": "Richardson Printed Trucker Cap",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918216/4/prod.jpg"
+    },
+    {
+      "id": "336088216",
+      "code": "R168",
+      "name": "Richardson Seven Panel Trucker Cap",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918221/4/prod.jpg"
+    },
+    {
+      "id": "336088221",
+      "code": "R256",
+      "name": "Richardson Umpqua Old School Grandpa Cap",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918226/4/prod.jpg"
+    }
+  ]
+}

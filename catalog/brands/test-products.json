@@ -1,0 +1,18 @@
+{
+  "brand": "Test Products",
+  "count": 2,
+  "products": [
+    {
+      "id": "305887906",
+      "code": "Test01",
+      "name": "Custom Shirt",
+      "img": "https://www.vistecprints.com/images/dnm/placeholder-product.png"
+    },
+    {
+      "id": "307171406",
+      "code": "0101",
+      "name": "Testing",
+      "img": "https://www.vistecprints.com/images/dnm/placeholder-product.png"
+    }
+  ]
+}

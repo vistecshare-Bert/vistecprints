@@ -1,0 +1,82 @@
+{
+  "total": 427,
+  "generated": "2026-06-11T14:51:44.175Z",
+  "brands": [
+    {
+      "brand": "Augusta Sportswear",
+      "count": 140
+    },
+    {
+      "brand": "Gildan",
+      "count": 108
+    },
+    {
+      "brand": "Bella+Canvas",
+      "count": 75
+    },
+    {
+      "brand": "Next Level",
+      "count": 49
+    },
+    {
+      "brand": "SOL'S",
+      "count": 15
+    },
+    {
+      "brand": "Custom Transfers",
+      "count": 8
+    },
+    {
+      "brand": "Jerzees",
+      "count": 6
+    },
+    {
+      "brand": "Comfort Colors",
+      "count": 6
+    },
+    {
+      "brand": "Richardson",
+      "count": 6
+    },
+    {
+      "brand": "AWDis",
+      "count": 2
+    },
+    {
+      "brand": "SF Clothing",
+      "count": 2
+    },
+    {
+      "brand": "Tee Jays",
+      "count": 2
+    },
+    {
+      "brand": "Test Products",
+      "count": 2
+    },
+    {
+      "brand": "FNB",
+      "count": 1
+    },
+    {
+      "brand": "Native Spirit",
+      "count": 1
+    },
+    {
+      "brand": "Yoko",
+      "count": 1
+    },
+    {
+      "brand": "Other",
+      "count": 1
+    },
+    {
+      "brand": "Paragon",
+      "count": 1
+    },
+    {
+      "brand": "Yupoong",
+      "count": 1
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "brand": "Jerzees",
+  "count": 6,
+  "products": [
+    {
+      "id": "303134036",
+      "code": "29BLR",
+      "name": "Youth Dri-Power Long Sleeve 50/50 T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1184013/4/prod.jpg"
+    },
+    {
+      "id": "303134066",
+      "code": "29LSR",
+      "name": "Unisex Dri-Power Long Sleeve 50/50 T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1159858/4/prod.jpg"
+    },
+    {
+      "id": "336088171",
+      "code": "996",
+      "name": "Jerzees 8.2 oz Hooded Sweat",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918146/4/prod.jpg"
+    },
+    {
+      "id": "336088176",
+      "code": "562",
+      "name": "Jerzees Adult 8.2 oz Set-in Crew",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918151/4/prod.jpg"
+    },
+    {
+      "id": "336088181",
+      "code": "29M",
+      "name": "Jerzees Dri-Power Unisex T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918156/4/prod.jpg"
+    },
+    {
+      "id": "336088186",
+      "code": "363M",
+      "name": "Jerzees Classics Unisex T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918161/4/prod.jpg"
+    }
+  ]
+}

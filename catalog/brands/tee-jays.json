@@ -1,0 +1,18 @@
+{
+  "brand": "Tee Jays",
+  "count": 2,
+  "products": [
+    {
+      "id": "303133916",
+      "code": "JT100B",
+      "name": "AWDis The 100 Kids T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/8331266/4/prod.jpg"
+    },
+    {
+      "id": "303133946",
+      "code": "T1100B",
+      "name": "Tee Jays Kids Power T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/8305026/4/prod.jpg"
+    }
+  ]
+}

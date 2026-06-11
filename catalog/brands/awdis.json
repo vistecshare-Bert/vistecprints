@@ -1,0 +1,18 @@
+{
+  "brand": "AWDis",
+  "count": 2,
+  "products": [
+    {
+      "id": "303133871",
+      "code": "AT001",
+      "name": "AWDis Unisex 150 T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/11762711/4/prod.jpg"
+    },
+    {
+      "id": "303133881",
+      "code": "AT002",
+      "name": "AWDis Unisex 180 T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/11762721/4/prod.jpg"
+    }
+  ]
+}

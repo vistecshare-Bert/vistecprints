@@ -1,0 +1,42 @@
+{
+  "brand": "Comfort Colors",
+  "count": 6,
+  "products": [
+    {
+      "id": "336088111",
+      "code": "CC1717",
+      "name": "Comfort Colors 6.1oz 100% Cotton Ringspun T",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918046/4/prod.jpg"
+    },
+    {
+      "id": "336088116",
+      "code": "CC6030",
+      "name": "Comfort Colors 6.1oz 100% Pocket T",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918056/4/prod.jpg"
+    },
+    {
+      "id": "336088121",
+      "code": "CC6014",
+      "name": "Comfort Colors 6.1oz 100% Longsleeve T",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918061/4/prod.jpg"
+    },
+    {
+      "id": "336088126",
+      "code": "CC1566",
+      "name": "Comfort Colors Adult Ringspun Crewneck Sweatshirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918076/4/prod.jpg"
+    },
+    {
+      "id": "336088131",
+      "code": "CC9018",
+      "name": "Comfort Colors Youth 5.4oz 100% Cotton T",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918081/4/prod.jpg"
+    },
+    {
+      "id": "336088136",
+      "code": "CC4410",
+      "name": "Comfort Colors Long Sleeve Pocket T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918086/4/prod.jpg"
+    }
+  ]
+}

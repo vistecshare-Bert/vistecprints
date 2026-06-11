@@ -1,0 +1,654 @@
+{
+  "brand": "Gildan",
+  "count": 108,
+  "products": [
+    {
+      "id": "303137411",
+      "code": "5000",
+      "name": "Heavy Cotton 100% Cotton T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/461993/4/prod.jpg"
+    },
+    {
+      "id": "303140206",
+      "code": "5000L",
+      "name": "Women's Heavy Cotton 100% Cotton T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1547517/4/prod.jpg"
+    },
+    {
+      "id": "303134251",
+      "code": "5000B",
+      "name": "Youth Heavy Cotton 100% Cotton T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/522003/4/prod.jpg"
+    },
+    {
+      "id": "303137681",
+      "code": "64000",
+      "name": "Softstyle T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/740788/4/prod.jpg"
+    },
+    {
+      "id": "303166711",
+      "code": "64000B",
+      "name": "Youth Softstyle T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/7755036/4/prod.jpg"
+    },
+    {
+      "id": "303133976",
+      "code": "4820",
+      "name": "Unisex Gold Soft Touch Long Sleeve T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1157148/4/prod.jpg"
+    },
+    {
+      "id": "303133981",
+      "code": "245Y",
+      "name": "Youth Raglan T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/7000111/4/prod.jpg"
+    },
+    {
+      "id": "303133986",
+      "code": "CE10L",
+      "name": "Unisex Capital Long Sleeve Performance T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/11984326/4/prod.jpg"
+    },
+    {
+      "id": "303133991",
+      "code": "5286",
+      "name": "Essential-T Long Sleeve T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1159628/4/prod.jpg"
+    },
+    {
+      "id": "303133996",
+      "code": "5400",
+      "name": "Unisex Heavy Cotton Long Sleeve T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1159648/4/prod.jpg"
+    },
+    {
+      "id": "303134006",
+      "code": "5400B",
+      "name": "Youth Heavy Cotton Long Sleeve T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1184028/4/prod.jpg"
+    },
+    {
+      "id": "303134011",
+      "code": "498L",
+      "name": "Unisex Perfect-T Long Sleeve T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/2945047/4/prod.jpg"
+    },
+    {
+      "id": "303134016",
+      "code": "202LS",
+      "name": "Unisex Fine Jersey Long Sleeve T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/10045261/4/prod.jpg"
+    },
+    {
+      "id": "303134021",
+      "code": "3311",
+      "name": "Toddler Cotton Jersey Long Sleeve Tee",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1161263/4/prod.jpg"
+    },
+    {
+      "id": "303134026",
+      "code": "4411",
+      "name": "Infant Long Sleeve Baby Rib Bodysuit",
+      "img": "https://www.vistecprints.com/rshared/pdimages/3633708/4/prod.jpg"
+    },
+    {
+      "id": "303134031",
+      "code": "48400Y",
+      "name": "Youth Pro-Lock Performance Long Sleeve T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/11773196/4/prod.jpg"
+    },
+    {
+      "id": "303134041",
+      "code": "2400",
+      "name": "Unisex Ultra Cotton Long Sleeve T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1860407/4/prod.jpg"
+    },
+    {
+      "id": "303134056",
+      "code": "64400",
+      "name": "Unisex Softstyle Long Sleeve T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1159723/4/prod.jpg"
+    },
+    {
+      "id": "303134061",
+      "code": "8400",
+      "name": "Unisex DryBlend 50/50 Long Sleeve T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1159863/4/prod.jpg"
+    },
+    {
+      "id": "303134236",
+      "code": "18500",
+      "name": "Heavy Blend Hooded Sweatshirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/461828/4/prod.jpg"
+    },
+    {
+      "id": "303134241",
+      "code": "2300",
+      "name": "Ultra Cotton 100% US Cotton T Shirt with Pocket",
+      "img": "https://www.vistecprints.com/rshared/pdimages/461878/4/prod.jpg"
+    },
+    {
+      "id": "303134246",
+      "code": "2000B",
+      "name": "Youth Ultra Cotton 100% US Cotton T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/521988/4/prod.jpg"
+    },
+    {
+      "id": "303134261",
+      "code": "64000L",
+      "name": "Softstyle Women's T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/740793/4/prod.jpg"
+    },
+    {
+      "id": "303134266",
+      "code": "8000B",
+      "name": "Youth DryBlend 50 Cotton/50 Poly T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/740878/4/prod.jpg"
+    },
+    {
+      "id": "303134271",
+      "code": "8800",
+      "name": "DryBlend 6 Ounce Jersey Knit Sport Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/740883/4/prod.jpg"
+    },
+    {
+      "id": "303134276",
+      "code": "18600",
+      "name": "Heavy Blend Full Zip Hooded Sweatshirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/756828/4/prod.jpg"
+    },
+    {
+      "id": "303134281",
+      "code": "2000L",
+      "name": "Women's Ultra Cotton 100% US Cotton T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/756833/4/prod.jpg"
+    },
+    {
+      "id": "303134286",
+      "code": "8300",
+      "name": "DryBlend 50 Cotton/50 Poly Pocket T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/756868/4/prod.jpg"
+    },
+    {
+      "id": "303134291",
+      "code": "8400",
+      "name": "DryBlend 50 Cotton/50 Poly Long Sleeve T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/756873/4/prod.jpg"
+    },
+    {
+      "id": "303134296",
+      "code": "18500B",
+      "name": "Youth Heavy Blend Hooded Sweatshirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1084023/4/prod.jpg"
+    },
+    {
+      "id": "303134301",
+      "code": "2410",
+      "name": "Ultra Cotton 100% US Cotton Long Sleeve T Shirt with Pocket",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1084503/4/prod.jpg"
+    },
+    {
+      "id": "303134306",
+      "code": "18600B",
+      "name": "Youth Heavy Blend Full Zip Hooded Sweatshirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1084508/4/prod.jpg"
+    },
+    {
+      "id": "303137376",
+      "code": "18000",
+      "name": "Heavy Blend Crewneck Sweatshirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/461818/4/prod.jpg"
+    },
+    {
+      "id": "303137381",
+      "code": "2000",
+      "name": "Ultra Cotton 100% US Cotton T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/461843/4/prod.jpg"
+    },
+    {
+      "id": "303137386",
+      "code": "2200",
+      "name": "Ultra Cotton 100% US Cotton Tank Top",
+      "img": "https://www.vistecprints.com/rshared/pdimages/461873/4/prod.jpg"
+    },
+    {
+      "id": "303137581",
+      "code": "5400",
+      "name": "Heavy Cotton 100% Cotton Long Sleeve T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/522103/4/prod.jpg"
+    },
+    {
+      "id": "303137591",
+      "code": "8000",
+      "name": "DryBlend 50 Cotton/50 Poly T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/522118/4/prod.jpg"
+    },
+    {
+      "id": "303137601",
+      "code": "G2400",
+      "name": "Ultra Cotton 100% US Cotton Long Sleeve T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/522143/4/prod.jpg"
+    },
+    {
+      "id": "303137651",
+      "code": "18200",
+      "name": "Heavy Blend Sweatpant",
+      "img": "https://www.vistecprints.com/rshared/pdimages/740513/4/prod.jpg"
+    },
+    {
+      "id": "303137976",
+      "code": "18000B",
+      "name": "Youth Heavy Blend Crewneck Sweatshirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/740503/4/prod.jpg"
+    },
+    {
+      "id": "303140116",
+      "code": "42000",
+      "name": "Gildan Performance T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1547362/4/prod.jpg"
+    },
+    {
+      "id": "303140121",
+      "code": "42000B",
+      "name": "Youth Gildan Performance T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1547372/4/prod.jpg"
+    },
+    {
+      "id": "303140211",
+      "code": "980",
+      "name": "100% Ring Spun Cotton T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1547522/4/prod.jpg"
+    },
+    {
+      "id": "303141146",
+      "code": "18200B",
+      "name": "Youth Heavy Blend Sweatpant",
+      "img": "https://www.vistecprints.com/rshared/pdimages/1799517/4/prod.jpg"
+    },
+    {
+      "id": "303143061",
+      "code": "5400B",
+      "name": "Youth Heavy Cotton 100% Cotton Long Sleeve T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/2085443/4/prod.jpg"
+    },
+    {
+      "id": "303143066",
+      "code": "5V00L",
+      "name": "Women's Heavy Cotton 100% Cotton V Neck T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/2085453/4/prod.jpg"
+    },
+    {
+      "id": "303143071",
+      "code": "64200L",
+      "name": "Softstyle Junior Fit Tank Top",
+      "img": "https://www.vistecprints.com/rshared/pdimages/2085458/4/prod.jpg"
+    },
+    {
+      "id": "303143076",
+      "code": "64400",
+      "name": "Softstyle Long Sleeve T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/2085463/4/prod.jpg"
+    },
+    {
+      "id": "303143081",
+      "code": "64V00",
+      "name": "Softstyle V Neck T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/2085468/4/prod.jpg"
+    },
+    {
+      "id": "303143086",
+      "code": "64V00L",
+      "name": "Softstyle Women's Fit V Neck T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/2085473/4/prod.jpg"
+    },
+    {
+      "id": "303144211",
+      "code": "18400",
+      "name": "Heavy Blend Open Bottom Sweatpant",
+      "img": "https://www.vistecprints.com/rshared/pdimages/2587617/4/prod.jpg"
+    },
+    {
+      "id": "303144216",
+      "code": "42400",
+      "name": "Performance Long Sleeve T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/2587632/4/prod.jpg"
+    },
+    {
+      "id": "303144221",
+      "code": "5100P",
+      "name": "Heavy Cotton Toddler T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/2587647/4/prod.jpg"
+    },
+    {
+      "id": "303144226",
+      "code": "8800B",
+      "name": "Youth DryBlend 6 Ounce Jersey Knit Sport Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/2587687/4/prod.jpg"
+    },
+    {
+      "id": "303144936",
+      "code": "5700",
+      "name": "Heavy Cotton 3/4 Sleeve Raglan T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/2778487/4/prod.jpg"
+    },
+    {
+      "id": "303151431",
+      "code": "5300",
+      "name": "Heavy Cotton 100% Cotton Pocket T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/4451512/4/prod.jpg"
+    },
+    {
+      "id": "303151436",
+      "code": "H000",
+      "name": "Hammer T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/4452517/4/prod.jpg"
+    },
+    {
+      "id": "303164086",
+      "code": "SF000",
+      "name": "Softstyle Crewneck Sweatshirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/7252596/4/prod.jpg"
+    },
+    {
+      "id": "303164091",
+      "code": "SF500",
+      "name": "Softstyle Midweight Pullover Hooded Sweatshirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/7252601/4/prod.jpg"
+    },
+    {
+      "id": "303168216",
+      "code": "2000T",
+      "name": "Tall 100% US Cotton T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/8180141/4/prod.jpg"
+    },
+    {
+      "id": "303168221",
+      "code": "64200",
+      "name": "Softstyle Tank Top",
+      "img": "https://www.vistecprints.com/rshared/pdimages/8180151/4/prod.jpg"
+    },
+    {
+      "id": "303177246",
+      "code": "SF500B",
+      "name": "Youth Softstyle Midweight Fleece Hoodie",
+      "img": "https://www.vistecprints.com/rshared/pdimages/10078841/4/prod.jpg"
+    },
+    {
+      "id": "303181671",
+      "code": "SF600",
+      "name": "Softstyle Midweight Fleece Full Zip Hooded Sweatshirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/11783481/4/prod.jpg"
+    },
+    {
+      "id": "303181726",
+      "code": "64220LCVC",
+      "name": "Softstyle Women's CVC Racerback Tank",
+      "img": "https://www.vistecprints.com/rshared/pdimages/11786341/4/prod.jpg"
+    },
+    {
+      "id": "303181906",
+      "code": "64000BCVC",
+      "name": "Youth Softstyle CVC Tee",
+      "img": "https://www.vistecprints.com/rshared/pdimages/11790876/4/prod.jpg"
+    },
+    {
+      "id": "303181911",
+      "code": "64000CVC",
+      "name": "Softstyle CVC Tee",
+      "img": "https://www.vistecprints.com/rshared/pdimages/11790886/4/prod.jpg"
+    },
+    {
+      "id": "303181916",
+      "code": "64001LCVC",
+      "name": "Softstyle Women's CVC T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/11790901/4/prod.jpg"
+    },
+    {
+      "id": "303181921",
+      "code": "64440CVC",
+      "name": "Softstyle CVC Long Sleeve Tee",
+      "img": "https://www.vistecprints.com/rshared/pdimages/11790916/4/prod.jpg"
+    },
+    {
+      "id": "303273161",
+      "code": "18900",
+      "name": "Heavy Blend Fleece Stadium Blanket",
+      "img": "https://www.vistecprints.com/rshared/pdimages/10057486/4/prod.jpg"
+    },
+    {
+      "id": "303273166",
+      "code": "64800",
+      "name": "Softstyle Pique Polo",
+      "img": "https://www.vistecprints.com/rshared/pdimages/11488421/4/prod.jpg"
+    },
+    {
+      "id": "303273171",
+      "code": "64800L",
+      "name": "Softstyle Women's Pique Polo",
+      "img": "https://www.vistecprints.com/rshared/pdimages/11736191/4/prod.jpg"
+    },
+    {
+      "id": "303273176",
+      "code": "85800",
+      "name": "Hammer Pique Polo",
+      "img": "https://www.vistecprints.com/rshared/pdimages/11736196/4/prod.jpg"
+    },
+    {
+      "id": "305461146",
+      "code": "3000",
+      "name": "Light Cotton Tee",
+      "img": "https://www.vistecprints.com/rshared/pdimages/12011551/4/prod.jpg"
+    },
+    {
+      "id": "305461166",
+      "code": "65000",
+      "name": "Softstyle Midweight Tee",
+      "img": "https://www.vistecprints.com/rshared/pdimages/12011571/4/prod.jpg"
+    },
+    {
+      "id": "305461171",
+      "code": "65000B",
+      "name": "Youth Softstyle Midweight Tee",
+      "img": "https://www.vistecprints.com/rshared/pdimages/12011576/4/prod.jpg"
+    },
+    {
+      "id": "305461176",
+      "code": "65000L",
+      "name": "Women's Softstyle Midweight Tee",
+      "img": "https://www.vistecprints.com/rshared/pdimages/12011581/4/prod.jpg"
+    },
+    {
+      "id": "305461181",
+      "code": "75000",
+      "name": "Hammer Maxweight Tee",
+      "img": "https://www.vistecprints.com/rshared/pdimages/12011586/4/prod.jpg"
+    },
+    {
+      "id": "307976186",
+      "code": "G5200",
+      "name": "Heavy Cotton Tank Top",
+      "img": "https://www.vistecprints.com/rshared/pdimages/2778637/4/prod.jpg"
+    },
+    {
+      "id": "307976221",
+      "code": "SF008",
+      "name": "Softstyle Midweight Fleece 1/4 Zip",
+      "img": "https://www.vistecprints.com/rshared/pdimages/12043586/4/prod.jpg"
+    },
+    {
+      "id": "307976226",
+      "code": "SF100",
+      "name": "Softstyle Midweight Pocket Sweatpants",
+      "img": "https://www.vistecprints.com/rshared/pdimages/12043591/4/prod.jpg"
+    },
+    {
+      "id": "307976231",
+      "code": "19000",
+      "name": "Hammer Maxweight Crewneck Sweatshirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/12096226/4/prod.jpg"
+    },
+    {
+      "id": "307976236",
+      "code": "19500",
+      "name": "Hammer Maxweight Hooded Sweatshirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/12096231/4/prod.jpg"
+    },
+    {
+      "id": "307976241",
+      "code": "3000B",
+      "name": "Youth Light Cotton Tee",
+      "img": "https://www.vistecprints.com/rshared/pdimages/12104881/4/prod.jpg"
+    },
+    {
+      "id": "312392631",
+      "code": "5000",
+      "name": "Heavy Cotton 100% Cotton T Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/461993/4/prod.jpg"
+    },
+    {
+      "id": "336087771",
+      "code": "64PLSMA",
+      "name": "Softstyle Plasma Print Tee",
+      "img": "https://www.vistecprints.com/rshared/pdimages/12962086/4/prod.jpg"
+    },
+    {
+      "id": "336087996",
+      "code": "5000",
+      "name": "Gildan Heavy Cotton T-Shirt 5.3 oz",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917891/4/prod.jpg"
+    },
+    {
+      "id": "336088001",
+      "code": "5000B",
+      "name": "Gildan Youth 5.3oz 100% Heavy T",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917901/4/prod.jpg"
+    },
+    {
+      "id": "336088006",
+      "code": "18000",
+      "name": "Gildan 7.75oz 50/50 Crew Sweat",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917916/4/prod.jpg"
+    },
+    {
+      "id": "336088011",
+      "code": "18500",
+      "name": "Gildan 8.0 oz 50/50 Hooded Sweat",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917926/4/prod.jpg"
+    },
+    {
+      "id": "336088016",
+      "code": "18500B",
+      "name": "Gildan Youth 8.0 oz 50/50 Hooded Sweat",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917931/4/prod.jpg"
+    },
+    {
+      "id": "336088021",
+      "code": "64000",
+      "name": "Gildan 4.5oz Softstyle T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917936/4/prod.jpg"
+    },
+    {
+      "id": "336088026",
+      "code": "64000B",
+      "name": "Gildan Softstyle Youth T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917941/4/prod.jpg"
+    },
+    {
+      "id": "336088031",
+      "code": "64000CV",
+      "name": "Gildan Adult Softstyle CVC T-shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917946/4/prod.jpg"
+    },
+    {
+      "id": "336088036",
+      "code": "8000",
+      "name": "Gildan Dry Blend 50/50 T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917956/4/prod.jpg"
+    },
+    {
+      "id": "336088041",
+      "code": "8000B",
+      "name": "Gildan Youth Dry Blend 50/50 T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917961/4/prod.jpg"
+    },
+    {
+      "id": "336088046",
+      "code": "2030",
+      "name": "Gildan Ultra Cotton T-Shirt 6.1 oz",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917971/4/prod.jpg"
+    },
+    {
+      "id": "336088051",
+      "code": "2400",
+      "name": "Gildan Ultra Cotton Heavyweight Long Sleeve T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917981/4/prod.jpg"
+    },
+    {
+      "id": "336088056",
+      "code": "5400",
+      "name": "Gildan 5.4oz Longsleeve T",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917986/4/prod.jpg"
+    },
+    {
+      "id": "336088061",
+      "code": "SF500",
+      "name": "Gildan Softstyle Midweight Adult Hoodie",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13917996/4/prod.jpg"
+    },
+    {
+      "id": "336088066",
+      "code": "18600",
+      "name": "Gildan 8.0 oz 50/50 Full Zip Hood",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918001/4/prod.jpg"
+    },
+    {
+      "id": "336088071",
+      "code": "8400",
+      "name": "Gildan 50/50 Long Sleeve T-shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918006/4/prod.jpg"
+    },
+    {
+      "id": "336088076",
+      "code": "2300",
+      "name": "Gildan Ultra Cotton Heavyweight Pocket T-Shirt 6.1oz",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918011/4/prod.jpg"
+    },
+    {
+      "id": "336088081",
+      "code": "SF000",
+      "name": "Gildan Softstyle Adult Crewneck Sweatshirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918016/4/prod.jpg"
+    },
+    {
+      "id": "336088086",
+      "code": "3000",
+      "name": "Gildan Light Cotton Adult T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918021/4/prod.jpg"
+    },
+    {
+      "id": "336088091",
+      "code": "2410",
+      "name": "Gildan 6.1oz 100% Longsleeve Pocket T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918026/4/prod.jpg"
+    },
+    {
+      "id": "336088096",
+      "code": "8800",
+      "name": "Gildan Ultra Blend 50/50 Jersey Knit Golf",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918031/4/prod.jpg"
+    },
+    {
+      "id": "336088101",
+      "code": "8300",
+      "name": "Gildan 50/50 Pocket T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918036/4/prod.jpg"
+    },
+    {
+      "id": "336088106",
+      "code": "2030B",
+      "name": "Gildan Youth Ultra Cotton T-Shirt 6.1 oz",
+      "img": "https://www.vistecprints.com/rshared/pdimages/13918041/4/prod.jpg"
+    }
+  ]
+}

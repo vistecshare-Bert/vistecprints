@@ -1,0 +1,18 @@
+{
+  "brand": "SF Clothing",
+  "count": 2,
+  "products": [
+    {
+      "id": "303133876",
+      "code": "SF130",
+      "name": "SF Clothing Unisex Sustainable Generation T-Shirt",
+      "img": "https://www.vistecprints.com/rshared/pdimages/8055481/4/prod.jpg"
+    },
+    {
+      "id": "303133921",
+      "code": "SM106",
+      "name": "SF Clothing Kids Cropped Top",
+      "img": "https://www.vistecprints.com/rshared/pdimages/7780126/4/prod.jpg"
+    }
+  ]
+}
