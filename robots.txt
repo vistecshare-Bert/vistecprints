@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin.php
+Disallow: /track.php
+Disallow: /quote-request.php
+Disallow: /create-checkout-session.php
+Disallow: /stripe-success.php
+Disallow: /quotes/
+Disallow: /orders/
+Disallow: /pending_orders/
+Disallow: /visits/
+Disallow: /download-designs.php
+
+Sitemap: https://rebuild.vistecprints.com/sitemap.xml

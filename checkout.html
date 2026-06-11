@@ -84,8 +84,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.97);backdrop-fi
 
 <nav>
   <div class="nav-inner">
-    <a href="index.html" class="logo"><img src="logo.png" alt="Vistec GraphX"/></a>
-    <a href="index.html#products" class="nav-back">
+    <a href="index.html" class="logo"><img src="images/Logo.png" alt="Vistec GraphX"/></a>
+    <a href="products.html" class="nav-back">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
       Continue Shopping
     </a>
@@ -97,7 +97,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.97);backdrop-fi
   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="rgba(212,152,72,0.3)" stroke-width="1.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
   <h2 style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--white);margin:20px 0 10px;">Your cart is empty</h2>
   <p style="color:var(--gray);font-size:14px;margin-bottom:28px;">Add some products before checking out.</p>
-  <a href="index.html#products" class="back-shop">Shop Now</a>
+  <a href="products.html" class="back-shop">Shop Now</a>
 </div>
 
 <!-- MAIN CHECKOUT -->
@@ -159,13 +159,17 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.97);backdrop-fi
         </div>
       </div>
 
-      <button type="submit" class="submit-btn" id="submitBtn">Place Order</button>
+      <div id="errorMsg" style="display:none;background:rgba(224,85,85,0.12);border:1px solid rgba(224,85,85,0.4);border-radius:3px;padding:14px 16px;margin-bottom:12px;font-size:13px;color:#e05555;line-height:1.5;"></div>
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <svg style="display:inline;vertical-align:middle;margin-right:8px;" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Pay with Card
+      </button>
       <div class="secure-note">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Secure &amp; Encrypted
+        Secured by Stripe &nbsp;·&nbsp; All major cards accepted
       </div>
       <div class="payment-note">
-        <strong>Payment Instructions:</strong> After placing your order, we will contact you at the email provided with payment options including PayPal, Zelle, or Cash App. Your order will be processed once payment is confirmed. Questions? Call us at <strong>+1 704-377-6626</strong>.
+        <strong>Secure online payment</strong> powered by Stripe. You'll be redirected to Stripe's hosted checkout to enter your card details — we never see your card number. Questions? Call <strong>+1 704-377-6626</strong>.
       </div>
 
     </form>
@@ -199,12 +203,24 @@ const SHIPPING = 4.99;
 let cart = JSON.parse(localStorage.getItem('vp_cart') || '[]');
 
 function init() {
+  const params = new URLSearchParams(location.search);
+  if (params.get('cancelled') === '1') {
+    showCancelBanner();
+  }
   if (!cart.length) {
     document.getElementById('emptyWrap').style.display = 'block';
     return;
   }
   document.getElementById('checkoutWrap').style.display = 'grid';
   renderSummary();
+}
+
+function showCancelBanner() {
+  const banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:80px;left:0;right:0;z-index:200;background:rgba(30,20,0,0.97);border-bottom:1px solid rgba(212,152,72,0.3);padding:14px 5%;text-align:center;font-size:13px;color:#E8B96A;';
+  banner.innerHTML = 'Payment cancelled — your cart is still saved. Complete your details below and try again. &nbsp;<button onclick="this.parentNode.remove()" style="background:none;border:none;color:inherit;cursor:pointer;font-size:16px;vertical-align:middle;margin-left:8px;">×</button>';
+  document.body.insertBefore(banner, document.body.firstChild);
+  history.replaceState(null, '', location.pathname);
 }
 
 function renderSummary() {
@@ -225,14 +241,22 @@ function renderSummary() {
     </div>`).join('');
 }
 
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 async function submitOrder(e) {
   e.preventDefault();
+  document.getElementById('errorMsg').style.display = 'none';
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.textContent = 'Placing Order...';
+  btn.innerHTML = '<svg style="display:inline;vertical-align:middle;margin-right:8px;animation:spin 1s linear infinite;" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Preparing checkout…';
 
-  const sub   = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  const order = {
+  const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const payload = {
     customer: {
       name:    document.getElementById('fFirstName').value.trim() + ' ' + document.getElementById('fLastName').value.trim(),
       email:   document.getElementById('fEmail').value.trim(),
@@ -245,44 +269,33 @@ async function submitOrder(e) {
       }
     },
     notes:    document.getElementById('fNotes').value.trim(),
-    items:    cart,
+    items:    cart.map(i => ({ name: i.name, size: i.size, price: i.price, qty: i.qty, garment: i.garment })),
     subtotal: sub,
-    shipping: SHIPPING,
-    total:    sub + SHIPPING,
   };
 
   try {
-    const res  = await fetch('process-order.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(order) });
+    const res  = await fetch('create-checkout-session.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
     const data = await res.json();
-    if (data.success) {
-      localStorage.removeItem('vp_cart');
-      showSuccess(data.orderId, order);
-    } else {
-      throw new Error(data.error || 'Unknown error');
+    if (data.url) {
+      window.location.href = data.url;
+      return;
     }
+    throw new Error(data.error || 'Could not start checkout. Please try again.');
   } catch(err) {
-    alert('Error placing order: ' + err.message + '\n\nPlease call us at 704-377-6626.');
+    showError(err.message);
     btn.disabled = false;
-    btn.textContent = 'Place Order';
+    btn.innerHTML = '<svg style="display:inline;vertical-align:middle;margin-right:8px;" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Pay with Card';
   }
-}
-
-function showSuccess(orderId, order) {
-  document.getElementById('checkoutWrap').style.display = 'none';
-  document.getElementById('successWrap').style.display  = 'block';
-  const sub = order.subtotal, total = order.total;
-  document.getElementById('successDetails').innerHTML = `
-    <p>Order #: <strong>${orderId}</strong></p>
-    <p>Name: <strong>${order.customer.name}</strong></p>
-    <p>Email: <strong>${order.customer.email}</strong></p>
-    <p>Ship to: <strong>${order.customer.address.line1}, ${order.customer.address.city}, ${order.customer.address.state} ${order.customer.address.zip}</strong></p>
-    <p style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);">
-      Items: <strong>${cart.reduce((s,i)=>s+i.qty,0)}</strong> &nbsp;·&nbsp; Total: <strong style="color:var(--gold);">$${total.toFixed(2)}</strong>
-    </p>`;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 init();
 </script>
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
 </body>
 </html>

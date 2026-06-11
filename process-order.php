@@ -61,6 +61,32 @@ foreach ($items as $item) {
 }
 $addr = "{$customer['address']['line1']}, {$customer['address']['city']}, {$customer['address']['state']} {$customer['address']['zip']}";
 
+// ── Auto-create DTF pipeline entry ─────────────────────
+$dtfDir = __DIR__ . '/orders/';
+if (!is_dir($dtfDir)) mkdir($dtfDir, 0755, true);
+$dtfId         = 'ORD-' . date('Ymd') . '-' . strtoupper(substr(md5($orderId), 0, 6));
+$garmentTypes  = array_unique(array_filter(array_map(fn($i) => trim($i['garment'] ?? ''), $items)));
+$dtfRec = [
+    'id'              => $dtfId,
+    'web_order_id'    => $orderId,
+    'customer_name'   => $customer['name']  ?? '',
+    'customer_email'  => $customer['email'] ?? '',
+    'customer_phone'  => $customer['phone'] ?? '',
+    'garment_type'    => implode(', ', $garmentTypes),
+    'qty'             => array_sum(array_map(fn($i) => intval($i['qty'] ?? 1), $items)),
+    'print_location'  => '',
+    'sizes_breakdown' => '',
+    'print_type'      => '',
+    'price_charged'   => number_format($total, 2),
+    'production_cost' => '',
+    'due_date'        => '',
+    'notes'           => "Web order #{$orderId}\n" . trim($itemLines),
+    'stage'           => 'new_order',
+    'date'            => date('c'),
+    'source'          => 'web_order',
+];
+file_put_contents($dtfDir . $dtfId . '.json', json_encode($dtfRec, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
 // ── Email to store ─────────────────────────────────────
 $toStore   = 'vistecshare@gmail.com';
 $subjStore = "[New Order] #{$orderId} — {$customer['name']}";

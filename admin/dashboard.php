@@ -56,7 +56,115 @@ if (file_exists($catFile)) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action   = $_POST['action'] ?? '';
+    $action = $_POST['action'] ?? '';
+
+    // ── Non-product actions: handle and exit before loading products ──
+    if ($action === 'order_status') {
+        $oFile = __DIR__ . '/../orders.json';
+        $orders = file_exists($oFile) ? (json_decode(file_get_contents($oFile), true) ?: []) : [];
+        $orderId = $_POST['order_id'] ?? ''; $newSt = $_POST['status'] ?? 'pending';
+        foreach ($orders as &$o) { if ($o['id'] === $orderId) { $o['status'] = $newSt; break; } }
+        unset($o);
+        file_put_contents($oFile, json_encode($orders, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        header('Location: dashboard.php?tab=orders&msg=' . urlencode("Order {$orderId} marked {$newSt}.") . '&type=success'); exit;
+    }
+    if ($action === 'order_delete') {
+        $oFile = __DIR__ . '/../orders.json';
+        $orders = file_exists($oFile) ? (json_decode(file_get_contents($oFile), true) ?: []) : [];
+        $orderId = $_POST['order_id'] ?? '';
+        $orders = array_values(array_filter($orders, fn($o) => $o['id'] !== $orderId));
+        file_put_contents($oFile, json_encode($orders, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        header('Location: dashboard.php?tab=orders&msg=Order+deleted.&type=warning'); exit;
+    }
+    if ($action === 'quote_status') {
+        $qFile = __DIR__ . '/../quotes/' . basename($_POST['quote_id'] ?? '') . '.json';
+        if (file_exists($qFile)) { $q = json_decode(file_get_contents($qFile), true) ?: []; $q['status'] = $_POST['status'] ?? 'new'; file_put_contents($qFile, json_encode($q, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)); }
+        header('Location: dashboard.php?tab=quotes&msg=Quote+updated.&type=success'); exit;
+    }
+    if ($action === 'quote_delete') {
+        $qFile = __DIR__ . '/../quotes/' . basename($_POST['quote_id'] ?? '') . '.json';
+        if (file_exists($qFile)) unlink($qFile);
+        header('Location: dashboard.php?tab=quotes&msg=Quote+deleted.&type=warning'); exit;
+    }
+    if ($action === 'contact_status') {
+        $cFile = __DIR__ . '/../contacts/' . basename($_POST['contact_id'] ?? '') . '.json';
+        if (file_exists($cFile)) { $c = json_decode(file_get_contents($cFile), true) ?: []; $c['status'] = $_POST['status'] ?? 'new'; file_put_contents($cFile, json_encode($c, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)); }
+        header('Location: dashboard.php?tab=contacts&msg=Contact+updated.&type=success'); exit;
+    }
+    if ($action === 'contact_delete') {
+        $cFile = __DIR__ . '/../contacts/' . basename($_POST['contact_id'] ?? '') . '.json';
+        if (file_exists($cFile)) unlink($cFile);
+        header('Location: dashboard.php?tab=contacts&msg=Contact+deleted.&type=warning'); exit;
+    }
+    if ($action === 'dtf_status') {
+        $dFile = __DIR__ . '/../orders/' . basename($_POST['order_id'] ?? '') . '.json';
+        if (file_exists($dFile)) { $d = json_decode(file_get_contents($dFile), true) ?: []; $d['stage'] = $_POST['stage'] ?? 'new_order'; file_put_contents($dFile, json_encode($d, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)); }
+        header('Location: dashboard.php?tab=dtf&msg=Order+updated.&type=success'); exit;
+    }
+    if ($action === 'dtf_add') {
+        $dDir = __DIR__ . '/../orders/';
+        if (!is_dir($dDir)) mkdir($dDir, 0755, true);
+        $oid = 'ORD-' . date('Ymd') . '-' . substr(uniqid(), -6);
+        $rec = [
+            'id'              => $oid,
+            'customer_name'   => trim($_POST['customer_name']   ?? ''),
+            'customer_email'  => trim($_POST['customer_email']  ?? ''),
+            'customer_phone'  => trim($_POST['customer_phone']  ?? ''),
+            'garment_type'    => trim($_POST['garment_type']    ?? ''),
+            'qty'             => (int)($_POST['qty'] ?? 1),
+            'print_location'  => trim($_POST['print_location']  ?? ''),
+            'sizes_breakdown' => trim($_POST['sizes_breakdown'] ?? ''),
+            'print_type'      => trim($_POST['print_type']      ?? ''),
+            'price_charged'   => trim($_POST['price_charged']   ?? ''),
+            'production_cost' => trim($_POST['production_cost'] ?? ''),
+            'due_date'        => trim($_POST['due_date']        ?? ''),
+            'notes'           => trim($_POST['notes']           ?? ''),
+            'stage'           => 'new_order',
+            'date'            => date('c'),
+            'source'          => 'manual',
+        ];
+        if (!empty($_FILES['artwork']['name'])) {
+            $artDir = __DIR__ . '/../orders/artwork/';
+            if (!is_dir($artDir)) mkdir($artDir, 0755, true);
+            $ext     = strtolower(pathinfo($_FILES['artwork']['name'], PATHINFO_EXTENSION));
+            $artFile = $oid . '_artwork.' . $ext;
+            if (move_uploaded_file($_FILES['artwork']['tmp_name'], $artDir . $artFile)) {
+                $rec['artwork']      = 'orders/artwork/' . $artFile;
+                $rec['artwork_name'] = basename($_FILES['artwork']['name']);
+            }
+        }
+        file_put_contents($dDir . $oid . '.json', json_encode($rec, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        header('Location: dashboard.php?tab=dtf&msg=' . urlencode("Order {$oid} created.") . '&type=success'); exit;
+    }
+    if ($action === 'dtf_edit') {
+        $dFile = __DIR__ . '/../orders/' . basename($_POST['order_id'] ?? '') . '.json';
+        if (file_exists($dFile)) {
+            $d = json_decode(file_get_contents($dFile), true) ?: [];
+            foreach (['customer_name','customer_email','customer_phone','garment_type','print_location','sizes_breakdown','print_type','price_charged','production_cost','due_date','notes'] as $f) {
+                $d[$f] = trim($_POST[$f] ?? $d[$f] ?? '');
+            }
+            $d['qty']   = (int)($_POST['qty']  ?? $d['qty']   ?? 1);
+            $d['stage'] = trim($_POST['stage'] ?? $d['stage'] ?? 'new_order');
+            if (!empty($_FILES['artwork']['name'])) {
+                $artDir  = __DIR__ . '/../orders/artwork/';
+                if (!is_dir($artDir)) mkdir($artDir, 0755, true);
+                $ext     = strtolower(pathinfo($_FILES['artwork']['name'], PATHINFO_EXTENSION));
+                $artFile = $d['id'] . '_artwork.' . $ext;
+                if (move_uploaded_file($_FILES['artwork']['tmp_name'], $artDir . $artFile)) {
+                    $d['artwork']      = 'orders/artwork/' . $artFile;
+                    $d['artwork_name'] = basename($_FILES['artwork']['name']);
+                }
+            }
+            file_put_contents($dFile, json_encode($d, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        }
+        header('Location: dashboard.php?tab=dtf&msg=Order+updated.&type=success'); exit;
+    }
+    if ($action === 'dtf_delete') {
+        $dFile = __DIR__ . '/../orders/' . basename($_POST['order_id'] ?? '') . '.json';
+        if (file_exists($dFile)) unlink($dFile);
+        header('Location: dashboard.php?tab=dtf&msg=Order+deleted.&type=warning'); exit;
+    }
+
     $products = loadProducts($jsonFile);
 
     // -- CATEGORY MANAGEMENT --
@@ -179,36 +287,52 @@ $products  = loadProducts($jsonFile);
 $flashMsg  = $_GET['msg'] ?? '';
 $flashType = $_GET['type'] ?? 'success';
 
-// â”€â”€ ORDERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $ordersFile = __DIR__ . '/../orders.json';
 function loadOrders($file) {
     if (!file_exists($file)) return [];
     $data = json_decode(file_get_contents($file), true);
     return is_array($data) ? $data : [];
 }
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'order_status') {
-    $orders   = loadOrders($ordersFile);
-    $orderId  = $_POST['order_id'] ?? '';
-    $newStatus = $_POST['status'] ?? 'pending';
-    foreach ($orders as &$o) {
-        if ($o['id'] === $orderId) { $o['status'] = $newStatus; break; }
+$orders = loadOrders($ordersFile);
+// Load quotes
+$quotesDir = __DIR__ . '/../quotes/';
+$quotes = [];
+if (is_dir($quotesDir)) {
+    foreach (glob($quotesDir . '*.json') as $f) {
+        $q = json_decode(file_get_contents($f), true);
+        if (is_array($q)) $quotes[] = $q;
     }
-    unset($o);
-    file_put_contents($ordersFile, json_encode($orders, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-    header('Location: dashboard.php?tab=orders&msg=' . urlencode("Order {$orderId} marked as {$newStatus}.") . '&type=success');
-    exit;
+    usort($quotes, fn($a,$b) => strcmp($b['date']??'', $a['date']??''));
 }
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'order_delete') {
-    $orders  = loadOrders($ordersFile);
-    $orderId = $_POST['order_id'] ?? '';
-    $orders  = array_values(array_filter($orders, fn($o) => $o['id'] !== $orderId));
-    file_put_contents($ordersFile, json_encode($orders, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-    header('Location: dashboard.php?tab=orders&msg=Order+deleted.&type=warning');
-    exit;
+// Load contacts
+$contactsDir = __DIR__ . '/../contacts/';
+$contacts = [];
+if (is_dir($contactsDir)) {
+    foreach (glob($contactsDir . '*.json') as $f) {
+        $c = json_decode(file_get_contents($f), true);
+        if (is_array($c)) $contacts[] = $c;
+    }
+    usort($contacts, fn($a,$b) => strcmp($b['date']??'', $a['date']??''));
 }
-$orders   = loadOrders($ordersFile);
+// Load DTF orders
+$dtfDir = __DIR__ . '/../orders/';
+$dtfOrders = [];
+if (is_dir($dtfDir)) {
+    foreach (glob($dtfDir . '*.json') as $f) {
+        $d = json_decode(file_get_contents($f), true);
+        if (is_array($d)) $dtfOrders[] = $d;
+    }
+    usort($dtfOrders, fn($a,$b) => strcmp($b['date']??'', $a['date']??''));
+}
+$newQuotes    = count(array_filter($quotes,    fn($q) => ($q['status']??'new') === 'new'));
+$newContacts  = count(array_filter($contacts,  fn($c) => ($c['status']??'new') === 'new'));
+$newDtfOrders = count(array_filter($dtfOrders, fn($d) => ($d['stage']??'')    === 'new_order'));
 $activeTab = $_GET['tab'] ?? 'products';
 $pendingCount = count(array_filter($orders, fn($o) => ($o['status'] ?? '') === 'pending'));
+$carolinaMeta = [];
+$carolinaMetaFile = __DIR__ . '/../carolina-sync-meta.json';
+if (file_exists($carolinaMetaFile)) { $carolinaMeta = json_decode(file_get_contents($carolinaMetaFile), true) ?: []; }
+$carolinaHasConfig = file_exists(__DIR__ . '/../carolina-config.php');
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -403,6 +527,49 @@ tr:hover td{background:#fafafa;}
 .size-check+.size-label{display:block;text-align:center;padding:7px 4px;border:1px solid #ddd;border-radius:2px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;}
 .size-check:checked+.size-label{background:var(--gold);border-color:var(--gold);color:#000;}
 .dec-form-foot{display:flex;gap:10px;margin-top:20px;}
+
+/* carolina made panels */
+.cm-card{background:#fff;border:1px solid #e8e8e8;border-radius:3px;overflow:hidden;}
+.cm-card-head{display:flex;align-items:center;gap:8px;padding:14px 20px;background:#f9f9f9;border-bottom:1px solid #e8e8e8;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#444;}
+.cm-card-head svg{stroke:#888;flex-shrink:0;}
+.cm-card-body{padding:20px;}
+.cm-card table th,.cm-card table td{padding:10px 14px;border-bottom:1px solid #f0f0f0;font-size:12px;text-align:left;vertical-align:middle;}
+.cm-card table th{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#888;font-weight:600;background:#fafafa;}
+.cm-card table tr:hover td{background:#fafafa;}
+
+/* quotes / contacts status badges */
+.q-status{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.q-new{background:#fff3cd;color:#856404;}
+.q-contacted,.q-replied{background:#d1ecf1;color:#0c5460;}
+.q-completed,.q-closed{background:#d4edda;color:#155724;}
+
+/* notes row in tables */
+.notes-row td{background:#fafafa;color:#888;font-size:12px;font-style:italic;padding:6px 16px !important;border-top:none !important;}
+
+/* kanban board */
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start;}
+@media(max-width:1100px){.kanban{grid-template-columns:repeat(2,1fr);}}
+.kanban-col{background:#fff;border:1px solid #e8e8e8;border-radius:3px;overflow:hidden;}
+.kanban-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#f9f9f9;border-bottom:1px solid #e8e8e8;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#444;}
+.kanban-count{background:#e0e0e0;color:#555;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;}
+.kanban-cards{padding:10px;display:flex;flex-direction:column;gap:8px;min-height:80px;}
+.kanban-empty{text-align:center;color:#ccc;font-size:12px;padding:16px 0;}
+.kanban-card{background:#fff;border:1px solid #e8e8e8;border-radius:3px;padding:12px;transition:box-shadow 0.15s;}
+.kanban-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.07);}
+.kanban-card-id{font-size:10px;color:#aaa;letter-spacing:.5px;margin-bottom:4px;}
+.kanban-card-name{font-weight:600;font-size:13px;color:#111;margin-bottom:4px;}
+.kanban-card-meta{font-size:11px;color:#888;margin-bottom:2px;}
+.kanban-card-notes{font-size:11px;color:#aaa;font-style:italic;margin:6px 0;border-top:1px dashed #eee;padding-top:6px;}
+.kanban-card-foot{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.dtf-due{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:4px;}
+.dtf-due.overdue{background:#fff0f0;color:#c00;border:1px solid #f5a0a0;}
+.dtf-due.due-soon{background:#fff8e0;color:#9a6000;border:1px solid #f5d06a;}
+.dtf-due.on-track{background:#f0faf4;color:#1e7e45;border:1px solid #a3d9b5;}
+.dtf-artwork-link{font-size:11px;color:var(--gold);text-decoration:none;display:inline-flex;align-items:center;gap:3px;font-weight:500;}
+.dtf-artwork-link:hover{text-decoration:underline;}
+.source-badge{font-size:9px;padding:1px 6px;border-radius:3px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;}
+.source-order{background:#e8f0ff;color:#1a56cc;}
+.source-manual{background:#f0f0f0;color:#888;}
 </style>
 </head>
 <body>
@@ -431,6 +598,40 @@ tr:hover td{background:#fafafa;}
       </a>
     </li>
     <li>
+      <a href="dashboard.php?tab=quotes" <?= $activeTab==='quotes' ? 'class="active"' : '' ?>>
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Quotes
+        <?php if ($newQuotes > 0): ?><span class="sb-badge"><?= $newQuotes ?></span><?php endif; ?>
+      </a>
+    </li>
+    <li>
+      <a href="dashboard.php?tab=contacts" <?= $activeTab==='contacts' ? 'class="active"' : '' ?>>
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Contacts
+        <?php if ($newContacts > 0): ?><span class="sb-badge"><?= $newContacts ?></span><?php endif; ?>
+      </a>
+    </li>
+    <li>
+      <a href="dashboard.php?tab=dtf" <?= $activeTab==='dtf' ? 'class="active"' : '' ?>>
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+        DTF Pipeline
+        <?php if ($newDtfOrders > 0): ?><span class="sb-badge"><?= $newDtfOrders ?></span><?php endif; ?>
+      </a>
+    </li>
+  </ul>
+  <div class="sb-label">Integrations</div>
+  <ul class="sb-nav" style="padding-bottom:4px;">
+    <li>
+      <a href="dashboard.php?tab=carolina" <?= $activeTab==='carolina' ? 'class="active"' : '' ?>>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
+        Carolina Made
+        <?php if (!$carolinaHasConfig): ?><span class="sb-badge" style="background:#888;">SET UP</span><?php endif; ?>
+      </a>
+    </li>
+  </ul>
+  <div class="sb-label">Tools</div>
+  <ul class="sb-nav" style="padding-bottom:8px;">
+    <li>
       <a href="../index.html" target="_blank">
         <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         View Website
@@ -448,14 +649,23 @@ tr:hover td{background:#fafafa;}
 <div class="main">
   <div class="topbar">
     <h1><?php
-      if ($activeTab === 'orders') echo 'Orders';
+      if ($activeTab === 'orders')   echo 'Orders';
       elseif ($activeTab === 'decorated') echo 'Decorated Products';
+      elseif ($activeTab === 'quotes')   echo 'Quote Requests';
+      elseif ($activeTab === 'contacts') echo 'Contact Submissions';
+      elseif ($activeTab === 'dtf')      echo 'DTF Pipeline';
+      elseif ($activeTab === 'carolina') echo 'Carolina Made Connector';
       else echo 'Products';
     ?></h1>
     <?php if ($activeTab === 'products'): ?>
     <button class="btn btn-gold" onclick="openModal()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Add Product
+    </button>
+    <?php elseif ($activeTab === 'dtf'): ?>
+    <button class="btn btn-gold" onclick="openDtfModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Order
     </button>
     <?php endif; ?>
   </div>
@@ -770,6 +980,585 @@ tr:hover td{background:#fafafa;}
       </table>
     </div>
     <?php endif; ?>
+
+    <?php elseif ($activeTab === 'quotes'): ?>
+    <!-- ===== QUOTES TAB ===== -->
+    <div class="stats">
+      <div class="stat-card"><div class="num"><?= count($quotes) ?></div><div class="lbl">Total Quotes</div></div>
+      <div class="stat-card"><div class="num"><?= $newQuotes ?></div><div class="lbl">New</div></div>
+      <div class="stat-card"><div class="num"><?= count(array_filter($quotes, fn($q) => ($q['status']??'') === 'contacted')) ?></div><div class="lbl">Contacted</div></div>
+      <div class="stat-card"><div class="num"><?= count(array_filter($quotes, fn($q) => ($q['status']??'') === 'completed')) ?></div><div class="lbl">Completed</div></div>
+    </div>
+    <?php if (empty($quotes)): ?>
+    <div class="empty-state"><p>No quote requests yet. Quotes submitted via the website will appear here.</p></div>
+    <?php else: ?>
+    <div class="table-wrap">
+      <div class="table-header"><h2>Quote Requests</h2></div>
+      <table>
+        <thead><tr><th>Date</th><th>Name</th><th>Contact</th><th>Garment / Details</th><th>Qty</th><th>Estimate</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+        <?php foreach ($quotes as $q):
+          $qs = $q['status'] ?? 'new';
+          $qid = $q['id'] ?? '';
+        ?>
+        <tr>
+          <td style="color:#888;font-size:12px;white-space:nowrap;"><?= date('M j, Y', strtotime($q['date'] ?? 'now')) ?></td>
+          <td><div class="prod-name"><?= htmlspecialchars($q['name'] ?? '—') ?></div><div class="prod-id"><?= htmlspecialchars($qid) ?></div></td>
+          <td style="font-size:12px;color:#555;"><?= htmlspecialchars($q['email'] ?? '') ?><br><?= htmlspecialchars($q['phone'] ?? '') ?></td>
+          <td style="font-size:12px;color:#555;">
+            <?php if (!empty($q['garment_type'])): ?><strong><?= htmlspecialchars($q['garment_type']) ?></strong> — <?= htmlspecialchars($q['print_location'] ?? '') ?> / <?= htmlspecialchars($q['print_method'] ?? '') ?><?php else: ?><?= htmlspecialchars(substr($q['notes'] ?? '—', 0, 60)) ?><?php endif; ?>
+          </td>
+          <td style="text-align:center;"><?= htmlspecialchars($q['qty'] ?? '—') ?></td>
+          <td style="text-align:right;font-weight:600;"><?= isset($q['estimated_price']) ? '$' . number_format((float)$q['estimated_price'], 2) : '—' ?></td>
+          <td><span class="q-status q-<?= htmlspecialchars($qs) ?>"><?= ucfirst($qs) ?></span></td>
+          <td>
+            <form method="POST" style="display:inline-flex;align-items:center;gap:6px;">
+              <input type="hidden" name="action" value="quote_status"/>
+              <input type="hidden" name="quote_id" value="<?= htmlspecialchars($qid) ?>"/>
+              <select name="status" class="status-select">
+                <option value="new"       <?= $qs==='new'       ?'selected':'' ?>>New</option>
+                <option value="contacted" <?= $qs==='contacted' ?'selected':'' ?>>Contacted</option>
+                <option value="completed" <?= $qs==='completed' ?'selected':'' ?>>Completed</option>
+              </select>
+              <button type="submit" class="btn btn-outline btn-sm">Save</button>
+            </form>
+            <form method="POST" onsubmit="return confirm('Delete this quote?')" style="display:inline;margin-left:4px;">
+              <input type="hidden" name="action" value="quote_delete"/>
+              <input type="hidden" name="quote_id" value="<?= htmlspecialchars($qid) ?>"/>
+              <button type="submit" class="btn btn-red btn-sm">Delete</button>
+            </form>
+          </td>
+        </tr>
+        <?php if (!empty($q['notes'])): ?>
+        <tr class="notes-row"><td colspan="8"><em><?= htmlspecialchars($q['notes']) ?></em></td></tr>
+        <?php endif; ?>
+        <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+    <?php endif; ?>
+
+    <?php elseif ($activeTab === 'contacts'): ?>
+    <!-- ===== CONTACTS TAB ===== -->
+    <div class="stats">
+      <div class="stat-card"><div class="num"><?= count($contacts) ?></div><div class="lbl">Total Contacts</div></div>
+      <div class="stat-card"><div class="num"><?= $newContacts ?></div><div class="lbl">New</div></div>
+      <div class="stat-card"><div class="num"><?= count(array_filter($contacts, fn($c) => ($c['status']??'') === 'replied')) ?></div><div class="lbl">Replied</div></div>
+      <div class="stat-card"><div class="num"><?= count(array_filter($contacts, fn($c) => ($c['status']??'') === 'closed')) ?></div><div class="lbl">Closed</div></div>
+    </div>
+    <?php if (empty($contacts)): ?>
+    <div class="empty-state"><p>No contact submissions yet. Messages sent via the Contact page will appear here.</p></div>
+    <?php else: ?>
+    <div class="table-wrap">
+      <div class="table-header"><h2>Contact Submissions</h2></div>
+      <table>
+        <thead><tr><th>Date</th><th>Name</th><th>Contact</th><th>Type</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+        <?php foreach ($contacts as $c):
+          $cs = $c['status'] ?? 'new';
+          $cid = $c['id'] ?? '';
+        ?>
+        <tr>
+          <td style="color:#888;font-size:12px;white-space:nowrap;"><?= date('M j, Y', strtotime($c['date'] ?? 'now')) ?></td>
+          <td><div class="prod-name"><?= htmlspecialchars($c['name'] ?? '—') ?></div><div class="prod-id"><?= htmlspecialchars($cid) ?></div></td>
+          <td style="font-size:12px;color:#555;"><?= htmlspecialchars($c['email'] ?? '') ?><br><?= htmlspecialchars($c['phone'] ?? '') ?></td>
+          <td><span class="cat-badge" style="background:#f0f0f0;color:#555;"><?= htmlspecialchars(ucwords(str_replace('_', ' ', $c['type'] ?? 'general'))) ?></span></td>
+          <td style="font-size:12px;color:#555;max-width:260px;"><?= htmlspecialchars(substr($c['message'] ?? '', 0, 100)) ?><?= strlen($c['message']??'') > 100 ? '…' : '' ?></td>
+          <td><span class="q-status q-<?= htmlspecialchars($cs) ?>"><?= ucfirst($cs) ?></span></td>
+          <td>
+            <form method="POST" style="display:inline-flex;align-items:center;gap:6px;">
+              <input type="hidden" name="action" value="contact_status"/>
+              <input type="hidden" name="contact_id" value="<?= htmlspecialchars($cid) ?>"/>
+              <select name="status" class="status-select">
+                <option value="new"     <?= $cs==='new'     ?'selected':'' ?>>New</option>
+                <option value="replied" <?= $cs==='replied' ?'selected':'' ?>>Replied</option>
+                <option value="closed"  <?= $cs==='closed'  ?'selected':'' ?>>Closed</option>
+              </select>
+              <button type="submit" class="btn btn-outline btn-sm">Save</button>
+            </form>
+            <form method="POST" onsubmit="return confirm('Delete this contact?')" style="display:inline;margin-left:4px;">
+              <input type="hidden" name="action" value="contact_delete"/>
+              <input type="hidden" name="contact_id" value="<?= htmlspecialchars($cid) ?>"/>
+              <button type="submit" class="btn btn-red btn-sm">Delete</button>
+            </form>
+          </td>
+        </tr>
+        <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+    <?php endif; ?>
+
+    <?php elseif ($activeTab === 'dtf'): ?>
+    <!-- ===== DTF PIPELINE TAB ===== -->
+    <?php
+      $dtfOverdue = count(array_filter($dtfOrders, fn($d) =>
+        !empty($d['due_date']) && ($d['stage']??'') !== 'shipped' && strtotime($d['due_date']) < time()
+      ));
+    ?>
+    <div class="stats">
+      <div class="stat-card"><div class="num"><?= count($dtfOrders) ?></div><div class="lbl">Total Orders</div></div>
+      <div class="stat-card"><div class="num"><?= count(array_filter($dtfOrders, fn($d) => ($d['stage']??'') === 'new_order')) ?></div><div class="lbl">New</div></div>
+      <div class="stat-card"><div class="num"><?= count(array_filter($dtfOrders, fn($d) => in_array($d['stage']??'', ['artwork_approval','ready_to_print']))) ?></div><div class="lbl">In Progress</div></div>
+      <div class="stat-card"><div class="num" style="<?= $dtfOverdue > 0 ? 'color:var(--red)' : '' ?>"><?= $dtfOverdue ?></div><div class="lbl">Overdue</div></div>
+    </div>
+
+    <div class="kanban">
+      <?php
+      $stages = [
+        'new_order'        => 'New Order',
+        'artwork_approval' => 'Artwork Approval',
+        'ready_to_print'   => 'Ready to Print',
+        'shipped'          => 'Shipped',
+      ];
+      foreach ($stages as $stageKey => $stageLabel):
+        $stageOrders = array_filter($dtfOrders, fn($d) => ($d['stage']??'new_order') === $stageKey);
+      ?>
+      <div class="kanban-col">
+        <div class="kanban-header">
+          <?= htmlspecialchars($stageLabel) ?>
+          <span class="kanban-count"><?= count($stageOrders) ?></span>
+        </div>
+        <div class="kanban-cards">
+          <?php if (empty($stageOrders)): ?>
+          <div class="kanban-empty">No orders</div>
+          <?php endif; ?>
+          <?php foreach ($stageOrders as $d):
+            $did = $d['id'] ?? '';
+          ?>
+          <?php
+            $dueDate  = $d['due_date'] ?? '';
+            $dueCls   = ''; $dueLabel = '';
+            if ($dueDate && $stageKey !== 'shipped') {
+                $ts   = strtotime($dueDate);
+                $diff = $ts - time();
+                if ($diff < 0)          { $dueCls = 'overdue';  $dueLabel = 'OVERDUE: ' . date('M j', $ts); }
+                elseif ($diff < 172800) { $dueCls = 'due-soon'; $dueLabel = 'Due ' . date('M j', $ts); }
+                else                    { $dueCls = 'on-track';  $dueLabel = 'Due ' . date('M j', $ts); }
+            }
+          ?>
+          <div class="kanban-card">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <div class="kanban-card-id" style="margin:0;"><?= htmlspecialchars($did) ?></div>
+              <span class="source-badge <?= ($d['source']??'manual') !== 'manual' ? 'source-order' : 'source-manual' ?>">
+                <?= ($d['source']??'manual') !== 'manual' ? 'Web' : 'Manual' ?>
+              </span>
+            </div>
+            <?php if ($dueLabel): ?><div class="dtf-due <?= $dueCls ?>"><?= htmlspecialchars($dueLabel) ?></div><?php endif; ?>
+            <div class="kanban-card-name"><?= htmlspecialchars($d['customer_name'] ?? '—') ?></div>
+            <div class="kanban-card-meta">
+              <?= htmlspecialchars($d['garment_type'] ?? '') ?>
+              <?php if (!empty($d['print_type'])): ?> · <?= htmlspecialchars($d['print_type']) ?><?php endif; ?>
+              &nbsp;·&nbsp; Qty <?= intval($d['qty'] ?? 0) ?>
+            </div>
+            <?php if (!empty($d['sizes_breakdown'])): ?>
+            <div class="kanban-card-meta" style="font-size:11px;color:#aaa;"><?= htmlspecialchars($d['sizes_breakdown']) ?></div>
+            <?php endif; ?>
+            <?php if (!empty($d['print_location'])): ?>
+            <div class="kanban-card-meta" style="font-size:11px;"><?= htmlspecialchars($d['print_location']) ?></div>
+            <?php endif; ?>
+            <?php if (!empty($d['customer_email'])): ?>
+            <div class="kanban-card-meta"><?= htmlspecialchars($d['customer_email']) ?></div>
+            <?php endif; ?>
+            <?php if (!empty($d['price_charged'])): ?>
+            <div class="kanban-card-meta" style="font-weight:600;color:var(--gold);">
+              $<?= htmlspecialchars($d['price_charged']) ?>
+              <?php if (!empty($d['production_cost'])): ?>
+              <span style="font-weight:400;color:#aaa;font-size:11px;">&nbsp;(cost $<?= htmlspecialchars($d['production_cost']) ?>)</span>
+              <?php endif; ?>
+            </div>
+            <?php endif; ?>
+            <?php if (!empty($d['artwork'])): ?>
+            <div style="margin:6px 0;">
+              <a href="../<?= htmlspecialchars($d['artwork']) ?>" download class="dtf-artwork-link">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <?= htmlspecialchars($d['artwork_name'] ?? 'Download Artwork') ?>
+              </a>
+            </div>
+            <?php endif; ?>
+            <?php if (!empty($d['notes'])): ?>
+            <div class="kanban-card-notes"><?= htmlspecialchars(substr($d['notes'], 0, 80)) ?></div>
+            <?php endif; ?>
+            <div class="kanban-card-foot">
+              <form method="POST" style="display:inline-flex;align-items:center;gap:4px;">
+                <input type="hidden" name="action" value="dtf_status"/>
+                <input type="hidden" name="order_id" value="<?= htmlspecialchars($did) ?>"/>
+                <select name="stage" class="status-select" style="font-size:11px;padding:3px 6px;">
+                  <?php foreach ($stages as $sk => $sl): ?>
+                  <option value="<?= $sk ?>" <?= $stageKey===$sk?'selected':'' ?>><?= htmlspecialchars($sl) ?></option>
+                  <?php endforeach; ?>
+                </select>
+                <button type="submit" class="btn btn-outline btn-sm">Move</button>
+              </form>
+              <button class="btn btn-outline btn-sm" onclick='openDtfEditModal(<?= htmlspecialchars(json_encode($d), ENT_QUOTES) ?>)'>Edit</button>
+              <form method="POST" onsubmit="return confirm('Delete order?')" style="display:inline;">
+                <input type="hidden" name="action" value="dtf_delete"/>
+                <input type="hidden" name="order_id" value="<?= htmlspecialchars($did) ?>"/>
+                <button type="submit" class="btn btn-red btn-sm">✕</button>
+              </form>
+            </div>
+          </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+
+    <!-- DTF Order Modal (new + edit) -->
+    <div class="modal-overlay" id="dtfModalOverlay">
+      <div class="modal" style="max-width:640px;">
+        <div class="modal-head">
+          <h3 id="dtfModalTitle">New DTF Order</h3>
+          <button class="modal-close" onclick="closeDtfModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form method="POST" id="dtfForm" enctype="multipart/form-data">
+            <input type="hidden" name="action"   id="dtfFormAction" value="dtf_add"/>
+            <input type="hidden" name="order_id" id="dtfOrderId"    value=""/>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Customer Name *</label>
+                <input type="text" name="customer_name" id="dtfCustName" required placeholder="Full name"/>
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input type="text" name="customer_phone" id="dtfCustPhone" placeholder="555-000-0000"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="customer_email" id="dtfCustEmail" placeholder="customer@email.com"/>
+              </div>
+              <div class="form-group">
+                <label>Due Date</label>
+                <input type="date" name="due_date" id="dtfDueDate"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Garment Type</label>
+                <input type="text" name="garment_type" id="dtfGarment" placeholder="T-Shirt, Hoodie…"/>
+              </div>
+              <div class="form-group">
+                <label>Print Type</label>
+                <select name="print_type" id="dtfPrintType" style="width:100%;border:1px solid #ddd;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;border-radius:2px;color:#111;">
+                  <option value="">— Select —</option>
+                  <option value="Full Color">Full Color</option>
+                  <option value="White Ink">White Ink</option>
+                  <option value="Specialty">Specialty</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Total Quantity *</label>
+                <input type="number" name="qty" id="dtfQty" required min="1" value="1"/>
+              </div>
+              <div class="form-group">
+                <label>Print Location</label>
+                <input type="text" name="print_location" id="dtfPrintLocation" placeholder="Full Front, Left Chest…"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Size Breakdown <span style="font-weight:300;text-transform:none;">(e.g. S:2, M:5, L:3)</span></label>
+              <input type="text" name="sizes_breakdown" id="dtfSizes" placeholder="S:2, M:5, L:3, XL:2"/>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Price Charged</label>
+                <input type="text" name="price_charged" id="dtfPriceCharged" placeholder="150.00"/>
+              </div>
+              <div class="form-group">
+                <label>Production Cost</label>
+                <input type="text" name="production_cost" id="dtfProdCost" placeholder="45.00"/>
+              </div>
+            </div>
+            <div class="form-group" id="dtfStageGroup" style="display:none;">
+              <label>Stage</label>
+              <select name="stage" id="dtfStage" style="width:100%;border:1px solid #ddd;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;border-radius:2px;color:#111;">
+                <option value="new_order">New Order</option>
+                <option value="artwork_approval">Artwork Approval</option>
+                <option value="ready_to_print">Ready to Print</option>
+                <option value="shipped">Shipped</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Artwork File <span style="font-weight:300;text-transform:none;">(PNG, JPG, PDF, AI, EPS, SVG)</span></label>
+              <div class="img-upload-area" style="padding:12px;">
+                <input type="file" name="artwork" id="dtfArtworkFile" accept=".png,.jpg,.jpeg,.pdf,.ai,.eps,.svg" onchange="dtfPreviewArtwork(this)"/>
+                <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+                <p style="margin:0;font-size:12px;color:#aaa;">Click to attach artwork file</p>
+              </div>
+              <div id="dtfArtworkPreview" style="display:none;margin-top:8px;padding:8px 12px;background:#f5f5f5;border-radius:3px;font-size:12px;color:#555;align-items:center;gap:8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span id="dtfArtworkName"></span>
+              </div>
+              <div id="dtfExistingArtwork" style="display:none;margin-top:6px;font-size:12px;color:#888;">
+                Current: <a id="dtfExistingArtworkLink" href="#" download class="dtf-artwork-link"></a>
+                <span style="color:#aaa;">&nbsp;(upload new file to replace)</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Notes</label>
+              <textarea name="notes" id="dtfNotes" rows="3" placeholder="Colors, special instructions, deadline details…" style="width:100%;border:1px solid #ddd;padding:8px;border-radius:2px;font-family:'DM Sans',sans-serif;font-size:13px;resize:vertical;"></textarea>
+            </div>
+            <div class="modal-foot" style="padding:0;margin-top:8px;">
+              <button type="button" class="btn btn-outline" onclick="closeDtfModal()">Cancel</button>
+              <button type="submit" class="btn btn-gold" id="dtfSubmitBtn">Create Order</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <?php elseif ($activeTab === 'carolina'): ?>
+    <!-- ===== CAROLINA MADE TAB ===== -->
+    <div class="stats">
+      <div class="stat-card"><div class="num"><?= number_format($carolinaMeta['product_count'] ?? 0) ?></div><div class="lbl">Products Synced</div></div>
+      <div class="stat-card"><div class="num" style="font-size:20px;"><?= $carolinaMeta['last_full_sync'] ? date('M j', strtotime($carolinaMeta['last_full_sync'])) : '—' ?></div><div class="lbl">Last Full Sync</div></div>
+      <div class="stat-card"><div class="num" style="font-size:20px;"><?= $carolinaMeta['last_price_sync'] ? date('M j', strtotime($carolinaMeta['last_price_sync'])) : '—' ?></div><div class="lbl">Last Price Sync</div></div>
+      <div class="stat-card"><div class="num" style="font-size:20px;"><?= $carolinaMeta['last_inventory_sync'] ? date('M j', strtotime($carolinaMeta['last_inventory_sync'])) : '—' ?></div><div class="lbl">Last Inventory Sync</div></div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="cm-card" style="margin-bottom:20px;">
+      <div class="cm-card-head">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83l-.06.06a2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Connection Settings
+      </div>
+      <div class="cm-card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div class="form-group" style="margin:0;">
+            <label>Carolina Made Username</label>
+            <input type="text" id="cmUsername" placeholder="PromoStandards username" style="width:100%;border:1px solid #ddd;padding:8px 10px;border-radius:2px;font-size:13px;"/>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>Password</label>
+            <input type="password" id="cmPassword" placeholder="PromoStandards password" style="width:100%;border:1px solid #ddd;padding:8px 10px;border-radius:2px;font-size:13px;"/>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button class="btn btn-gold" onclick="cmSaveConfig()">Save Credentials</button>
+          <button class="btn btn-outline" onclick="cmTestConnection()">Test Connection</button>
+          <span id="cmTestResult" style="font-size:13px;color:#888;"></span>
+        </div>
+        <div style="margin-top:16px;background:#f9f9f9;border:1px solid #eee;border-radius:2px;padding:12px;">
+          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#888;font-weight:700;margin-bottom:8px;">Live Endpoints</div>
+          <?php foreach ([
+            'productData.php' => 'Product Data',
+            'pricing.php'     => 'Pricing',
+            'mediaContent.php'=> 'Media Content',
+            'inventory.php'   => 'Inventory',
+          ] as $ep => $label): ?>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:11px;color:#aaa;min-width:100px;"><?= $label ?></span>
+            <code style="font-size:11px;color:#555;">https://promostandards.carolinamade.com/cgi-bin/ws/<?= $ep ?></code>
+          </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sync Controls -->
+    <div class="cm-card" style="margin-bottom:20px;">
+      <div class="cm-card-head">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        Sync Controls
+      </div>
+      <div class="cm-card-body">
+        <div id="cmSyncStatus" style="font-size:13px;color:#888;margin-bottom:14px;">
+          <?php if ($carolinaMeta['last_full_sync'] ?? false): ?>
+          Last full sync: <strong><?= date('M j, Y g:i A', strtotime($carolinaMeta['last_full_sync'])) ?></strong> &nbsp;·&nbsp; <?= number_format($carolinaMeta['product_count'] ?? 0) ?> products
+          <?php else: ?>
+          No sync run yet. Click <strong>Full Sync</strong> to pull all Carolina Made products.
+          <?php endif; ?>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <button class="btn btn-gold" onclick="cmSync('sync_full')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+            Full Sync
+          </button>
+          <button class="btn btn-outline" onclick="cmSync('sync_prices')">Update Prices</button>
+          <button class="btn btn-outline" onclick="cmSync('sync_inventory')">Update Inventory</button>
+          <span id="cmSyncResult" style="font-size:13px;color:#888;"></span>
+        </div>
+        <div id="cmProgress" style="display:none;margin-top:12px;">
+          <div style="background:#f0f0f0;border-radius:2px;height:6px;overflow:hidden;">
+            <div id="cmProgressBar" style="height:100%;background:var(--gold);width:0%;transition:width 0.3s;"></div>
+          </div>
+          <div id="cmProgressText" style="font-size:12px;color:#888;margin-top:6px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Catalog Browser — on-demand, no full sync required -->
+    <div class="cm-card">
+      <div class="cm-card-head" style="justify-content:space-between;">
+        <span style="display:flex;align-items:center;gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Product Catalog
+          <span style="font-size:10px;font-weight:400;color:#aaa;text-transform:none;letter-spacing:0;">— click any row to load details</span>
+        </span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="text" id="cmSearch" placeholder="Filter by product ID…" style="border:1px solid #ddd;padding:6px 10px;border-radius:2px;font-size:12px;width:180px;" oninput="cmSearchDebounce()"/>
+          <button class="btn btn-outline btn-sm" onclick="cmLoadIds(1)">Load IDs</button>
+        </div>
+      </div>
+
+      <!-- Detail drawer — shown when a product row is clicked -->
+      <div id="cmDetailDrawer" style="display:none;border-bottom:1px solid #e8e8e8;background:#fafafa;padding:20px 24px;">
+        <div id="cmDetailContent"></div>
+      </div>
+
+      <div id="cmCatalogWrap">
+        <div class="empty-state" style="padding:40px;">
+          <p>Click <strong>Load IDs</strong> to fetch the product list from Carolina Made.<br>
+          <small style="color:#aaa;">This loads only the ID list (~2,689 items) — no bulk download.</small></p>
+        </div>
+      </div>
+      <div id="cmPagination" style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid #eee;font-size:12px;color:#888;"></div>
+    </div>
+
+    <script>
+    (function() {
+      let cmPage = 1, cmQuery = '', cmDebounceTimer = null;
+
+      window.cmSearchDebounce = function() {
+        clearTimeout(cmDebounceTimer);
+        cmDebounceTimer = setTimeout(() => { cmQuery = document.getElementById('cmSearch').value; cmPage = 1; cmLoadIds(1); }, 350);
+      };
+
+      window.cmLoadIds = function(page) {
+        if (page) cmPage = page;
+        const wrap = document.getElementById('cmCatalogWrap');
+        wrap.innerHTML = '<div style="padding:24px;text-align:center;color:#aaa;font-size:13px;">Loading product IDs…</div>';
+        document.getElementById('cmDetailDrawer').style.display = 'none';
+        fetch('../carolina-sync.php?action=ids&page=' + cmPage + '&q=' + encodeURIComponent(cmQuery))
+          .then(r => r.json()).then(data => {
+            if (data.error) { wrap.innerHTML = `<div class="empty-state" style="padding:40px;"><p>Error: ${data.error}</p></div>`; return; }
+            if (!data.ids || data.ids.length === 0) { wrap.innerHTML = '<div class="empty-state" style="padding:40px;"><p>No product IDs found.</p></div>'; return; }
+            let html = '<table style="width:100%;"><thead><tr><th>Product ID</th><th>Name</th><th>Price</th><th>Colors</th><th>Sizes</th><th></th></tr></thead><tbody>';
+            data.ids.forEach(id => {
+              html += `<tr class="cm-id-row" style="cursor:pointer;" onclick="cmLoadProduct('${id}', this)">
+                <td style="font-family:monospace;font-size:12px;color:#555;">${id}</td>
+                <td id="cmName_${id}" style="color:#aaa;font-size:12px;">click to load</td>
+                <td id="cmPrice_${id}" style="font-size:12px;color:#888;">—</td>
+                <td id="cmColors_${id}" style="font-size:11px;color:#888;">—</td>
+                <td id="cmSizes_${id}" style="font-size:11px;color:#888;">—</td>
+                <td><button class="btn btn-outline btn-sm" onclick="event.stopPropagation();cmImportOne('${id}')">Import</button></td>
+              </tr>`;
+            });
+            html += '</tbody></table>';
+            wrap.innerHTML = html;
+            // Pagination
+            let phtml = `<span>${data.total.toLocaleString()} products</span><div style="display:flex;gap:4px;flex-wrap:wrap;">`;
+            for (let i = 1; i <= data.pages; i++) {
+              if (data.pages > 10 && Math.abs(i - cmPage) > 2 && i !== 1 && i !== data.pages) { if (i === 2 || i === data.pages - 1) phtml += '<span style="padding:4px;">…</span>'; continue; }
+              phtml += `<button onclick="cmLoadIds(${i})" style="padding:4px 9px;border:1px solid ${i===cmPage?'var(--gold)':'#ddd'};background:${i===cmPage?'var(--gold)':'#fff'};color:${i===cmPage?'#000':'#555'};border-radius:2px;cursor:pointer;font-size:11px;">${i}</button>`;
+            }
+            phtml += '</div>';
+            document.getElementById('cmPagination').innerHTML = phtml;
+          }).catch(e => { wrap.innerHTML = `<div class="empty-state" style="padding:40px;"><p>Request failed: ${e.message}</p></div>`; });
+      };
+
+      window.cmLoadProduct = function(id, row) {
+        const drawer = document.getElementById('cmDetailDrawer');
+        const content = document.getElementById('cmDetailContent');
+        // Toggle off if already showing this product
+        if (drawer.dataset.id === id && drawer.style.display !== 'none') { drawer.style.display = 'none'; drawer.dataset.id = ''; return; }
+        drawer.dataset.id = id;
+        drawer.style.display = 'block';
+        content.innerHTML = '<div style="color:#aaa;font-size:13px;">Fetching product ' + id + ' from Carolina Made…</div>';
+        fetch('../carolina-sync.php?action=product&id=' + encodeURIComponent(id))
+          .then(r => r.json()).then(data => {
+            if (data.error) { content.innerHTML = `<span style="color:#e05555;">Error: ${data.error}</span>`; return; }
+            const p = data.product;
+            // Populate the row cells too
+            const nameEl = document.getElementById('cmName_' + id);
+            if (nameEl) { nameEl.textContent = p.name || id; nameEl.style.color = '#111'; nameEl.style.fontWeight = '600'; }
+            const priceEl = document.getElementById('cmPrice_' + id);
+            if (priceEl) { priceEl.textContent = p.price || '—'; priceEl.style.color = '#333'; priceEl.style.fontWeight = '600'; }
+            const colorsEl = document.getElementById('cmColors_' + id);
+            if (colorsEl) colorsEl.textContent = (p.colors||[]).slice(0,5).join(', ') + ((p.colors||[]).length>5?'…':'');
+            const sizesEl = document.getElementById('cmSizes_' + id);
+            if (sizesEl) sizesEl.textContent = (p.sizes||[]).join(', ');
+            // Detail view
+            const img = p.image ? `<img src="${p.image}" style="width:80px;height:80px;object-fit:cover;border-radius:3px;border:1px solid #eee;flex-shrink:0;" onerror="this.style.display='none'"/>` : '';
+            content.innerHTML = `
+              <div style="display:flex;gap:20px;align-items:flex-start;">
+                ${img}
+                <div style="flex:1;">
+                  <div style="font-size:16px;font-weight:700;margin-bottom:4px;">${p.name||id}</div>
+                  <div style="font-size:12px;color:#888;margin-bottom:10px;">${p.description||''}</div>
+                  <div style="display:flex;gap:24px;flex-wrap:wrap;font-size:13px;">
+                    <span><strong>Price:</strong> ${p.price||'—'}</span>
+                    <span><strong>Colors:</strong> ${(p.colors||[]).join(', ')||'—'}</span>
+                    <span><strong>Sizes:</strong> ${(p.sizes||[]).join(', ')||'—'}</span>
+                  </div>
+                </div>
+                <button class="btn btn-gold btn-sm" onclick="cmImportOne('${id}')">Import to Shop</button>
+              </div>`;
+          }).catch(e => { content.innerHTML = `<span style="color:#e05555;">Request failed: ${e.message}</span>`; });
+      };
+
+      window.cmImportOne = function(id) {
+        fetch('../carolina-sync.php?action=product&id=' + encodeURIComponent(id))
+          .then(r => r.json()).then(data => {
+            if (data.error || !data.product) { alert('Could not load product data: ' + (data.error||'unknown error')); return; }
+            const fd = new FormData(); fd.append('action', 'import'); fd.append('ids[]', id);
+            return fetch('../carolina-sync.php', { method:'POST', body:fd });
+          }).then(r => r && r.json()).then(d => {
+            if (!d) return;
+            if (d.ok) alert(d.imported > 0 ? 'Product imported to your shop!' : 'Product is already in your shop.');
+            else alert('Import error: ' + (d.error||'unknown'));
+          }).catch(e => alert('Error: ' + e.message));
+      };
+
+      window.cmSaveConfig = function() {
+        const u = document.getElementById('cmUsername').value.trim();
+        const p = document.getElementById('cmPassword').value.trim();
+        if (!u || !p) { alert('Enter username and password'); return; }
+        const fd = new FormData();
+        fd.append('action', 'save_config'); fd.append('username', u); fd.append('password', p);
+        fetch('../carolina-sync.php', { method:'POST', body:fd })
+          .then(r => r.json()).then(d => {
+            document.getElementById('cmTestResult').textContent = d.ok ? '✓ Credentials saved' : '✗ ' + d.error;
+            document.getElementById('cmTestResult').style.color = d.ok ? '#1e7e45' : '#e05555';
+          });
+      };
+
+      window.cmTestConnection = function() {
+        const el = document.getElementById('cmTestResult');
+        el.textContent = 'Testing…'; el.style.color = '#888';
+        fetch('../carolina-sync.php?action=test')
+          .then(r => r.json()).then(d => {
+            if (d.ok) { el.textContent = `✓ Connected — ${d.product_count.toLocaleString()} products available`; el.style.color = '#1e7e45'; }
+            else { el.textContent = '✗ ' + (d.error || 'Connection failed'); el.style.color = '#e05555'; }
+          }).catch(() => { el.textContent = '✗ Request failed'; el.style.color = '#e05555'; });
+      };
+
+      window.cmSync = function(action) {
+        const labels = { sync_full:'Full Sync', sync_prices:'Price Update', sync_inventory:'Inventory Update' };
+        const resultEl = document.getElementById('cmSyncResult');
+        const progress = document.getElementById('cmProgress');
+        resultEl.textContent = labels[action] + ' running…'; resultEl.style.color = '#888';
+        progress.style.display = 'block';
+        document.getElementById('cmProgressBar').style.width = '30%';
+        document.getElementById('cmProgressText').textContent = 'Connecting to Carolina Made…';
+        const fd = new FormData(); fd.append('action', action);
+        fetch('../carolina-sync.php', { method:'POST', body:fd })
+          .then(r => r.json()).then(d => {
+            progress.style.display = 'none';
+            if (d.ok) {
+              const msg = action === 'sync_full' ? `✓ Synced ${d.synced.toLocaleString()} products (${d.errors} errors)` : `✓ Updated ${d.updated.toLocaleString()} products`;
+              resultEl.textContent = msg; resultEl.style.color = '#1e7e45';
+              if (action === 'sync_full') document.getElementById('cmSyncStatus').innerHTML = `Last full sync: <strong>just now</strong> &nbsp;·&nbsp; ${d.total.toLocaleString()} products`;
+            } else { resultEl.textContent = '✗ ' + (d.error || 'Sync failed'); resultEl.style.color = '#e05555'; }
+          }).catch(() => { progress.style.display = 'none'; resultEl.textContent = '✗ Request failed'; resultEl.style.color = '#e05555'; });
+      };
+    })();
+    </script>
 
     <?php else: ?>
     <!-- ===== PRODUCTS TAB ===== -->
@@ -1352,6 +2141,60 @@ document.querySelectorAll('.ftab').forEach(btn => {
 
   initCanvas();
 })();
+
+// DTF modal
+function openDtfModal() {
+  document.getElementById('dtfModalTitle').textContent  = 'New DTF Order';
+  document.getElementById('dtfFormAction').value        = 'dtf_add';
+  document.getElementById('dtfOrderId').value           = '';
+  document.getElementById('dtfSubmitBtn').textContent   = 'Create Order';
+  document.getElementById('dtfStageGroup').style.display = 'none';
+  document.getElementById('dtfForm').reset();
+  document.getElementById('dtfArtworkPreview').style.display  = 'none';
+  document.getElementById('dtfExistingArtwork').style.display = 'none';
+  document.getElementById('dtfModalOverlay').classList.add('open');
+}
+function openDtfEditModal(data) {
+  document.getElementById('dtfModalTitle').textContent   = 'Edit Order — ' + (data.id || '');
+  document.getElementById('dtfFormAction').value         = 'dtf_edit';
+  document.getElementById('dtfOrderId').value            = data.id            || '';
+  document.getElementById('dtfSubmitBtn').textContent    = 'Save Changes';
+  document.getElementById('dtfStageGroup').style.display = '';
+  document.getElementById('dtfCustName').value           = data.customer_name   || '';
+  document.getElementById('dtfCustPhone').value          = data.customer_phone  || '';
+  document.getElementById('dtfCustEmail').value          = data.customer_email  || '';
+  document.getElementById('dtfDueDate').value            = data.due_date        || '';
+  document.getElementById('dtfGarment').value            = data.garment_type    || '';
+  document.getElementById('dtfPrintType').value          = data.print_type      || '';
+  document.getElementById('dtfQty').value                = data.qty             || 1;
+  document.getElementById('dtfPrintLocation').value      = data.print_location  || '';
+  document.getElementById('dtfSizes').value              = data.sizes_breakdown || '';
+  document.getElementById('dtfPriceCharged').value       = data.price_charged   || '';
+  document.getElementById('dtfProdCost').value           = data.production_cost || '';
+  document.getElementById('dtfStage').value              = data.stage           || 'new_order';
+  document.getElementById('dtfNotes').value              = data.notes           || '';
+  document.getElementById('dtfArtworkPreview').style.display  = 'none';
+  document.getElementById('dtfArtworkFile').value        = '';
+  if (data.artwork) {
+    const link = document.getElementById('dtfExistingArtworkLink');
+    link.href        = '../' + data.artwork;
+    link.textContent = data.artwork_name || 'Download current artwork';
+    document.getElementById('dtfExistingArtwork').style.display = 'block';
+  } else {
+    document.getElementById('dtfExistingArtwork').style.display = 'none';
+  }
+  document.getElementById('dtfModalOverlay').classList.add('open');
+}
+function closeDtfModal() {
+  document.getElementById('dtfModalOverlay').classList.remove('open');
+}
+function dtfPreviewArtwork(input) {
+  if (!input.files || !input.files[0]) return;
+  document.getElementById('dtfArtworkName').textContent       = input.files[0].name;
+  document.getElementById('dtfArtworkPreview').style.display  = 'flex';
+}
+const dtfOverlay = document.getElementById('dtfModalOverlay');
+if (dtfOverlay) dtfOverlay.addEventListener('click', function(e){ if(e.target===this) closeDtfModal(); });
 </script>
 </body>
 </html>
