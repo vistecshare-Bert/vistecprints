@@ -128,12 +128,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
 .garment-tab.active,.garment-tab:hover{background:rgba(212,152,72,0.12);border-color:var(--gold-dim);color:var(--gold);}
 
 /* Color swatches */
-.color-swatches{display:flex;flex-wrap:wrap;gap:8px;}
+.color-swatches{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
 .swatch{width:36px;height:36px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 0.2s;position:relative;}
 .swatch.active{border-color:var(--gold);transform:scale(1.1);}
 .swatch:hover{transform:scale(1.05);}
 .swatch-label{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--gray);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.2s;}
 .swatch:hover .swatch-label,.swatch.active .swatch-label{opacity:1;}
+.swatch.extra{display:none;}
+.color-swatches.expanded .swatch.extra{display:block;}
+.swatch-more-btn{background:none;border:1px solid rgba(212,152,72,0.4);color:var(--gold);font-size:11px;padding:4px 10px;border-radius:12px;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:inherit;margin-left:2px;}
+.swatch-more-btn:hover{background:rgba(212,152,72,0.1);border-color:var(--gold);}
 
 /* View toggle */
 .view-toggle{display:flex;background:var(--dark3);border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);}
@@ -965,11 +969,15 @@ function loadProduct(code) {
   currentProduct = window.CATALOG.find(p => p.code === code) || null;
   if (!currentProduct) { updateMockup(); return; }
 
+  const BASIC_COUNT = 8;
   const container = document.getElementById('colorSwatches');
   container.innerHTML = '';
-  currentProduct.colors.forEach((color, i) => {
+  container.classList.remove('expanded');
+  const colors = currentProduct.colors;
+
+  colors.forEach((color, i) => {
     const sw = document.createElement('div');
-    sw.className = 'swatch' + (i === 0 ? ' active' : '');
+    sw.className = 'swatch' + (i === 0 ? ' active' : '') + (i >= BASIC_COUNT ? ' extra' : '');
     sw.title = color.name;
     sw.style.backgroundColor = color.hex || '#888';
     if (!color.hex || color.hex.toLowerCase() === '#ffffff' || color.hex.toLowerCase() === '#f0f0f0') {
@@ -989,6 +997,17 @@ function loadProduct(code) {
     });
     container.appendChild(sw);
   });
+
+  if (colors.length > BASIC_COUNT) {
+    const btn = document.createElement('button');
+    btn.className = 'swatch-more-btn';
+    btn.textContent = `+${colors.length - BASIC_COUNT} more`;
+    btn.addEventListener('click', function() {
+      const expanded = container.classList.toggle('expanded');
+      this.textContent = expanded ? 'Show less' : `+${colors.length - BASIC_COUNT} more`;
+    });
+    container.appendChild(btn);
+  }
 
   currentColorIdx = 0;
   currentColor = currentProduct.colors[0]?.name || 'Black';
