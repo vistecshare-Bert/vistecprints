@@ -254,7 +254,9 @@ function render() {
   document.querySelector('.empty')?.remove();
 
   grid.innerHTML = slice.map(p => {
-    const imgSrc = p.referenceImage || p.composedImage || '';
+    let imgSrc = p.referenceImage || p.composedImage || p.img || '';
+    // Upgrade low-res /4/ thumbnails to /1/ full-size images
+    imgSrc = imgSrc.replace('/4/prod.jpg', '/1/prod.jpg').replace('/4/prod.png', '/1/prod.png');
     const img = imgSrc
       ? `<img src="${imgSrc}" alt="${p.code}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=no-img>No image</div>'">`
       : `<div class="no-img">No image</div>`;

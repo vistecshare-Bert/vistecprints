@@ -11,5 +11,9 @@ jobs:
     steps:
       - name: Trigger deploy via webhook
         run: |
-          curl -v -w "\nHTTP_STATUS:%{http_code}" \
-            "https://rebuild.vistecprints.com/deploy.php?token=${{ secrets.DEPLOY_TOKEN }}"
+          HTTP_STATUS=$(curl -s -o /tmp/deploy_out.txt -w "%{http_code}" \
+            "https://rebuild.vistecprints.com/deploy.php?token=${{ secrets.DEPLOY_TOKEN }}")
+          cat /tmp/deploy_out.txt
+          echo ""
+          echo "HTTP status: $HTTP_STATUS"
+          [ "$HTTP_STATUS" = "200" ] || { echo "Deploy failed"; exit 1; }
