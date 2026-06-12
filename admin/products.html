@@ -58,6 +58,14 @@ a{color:var(--gold);text-decoration:none;}
 .sup-mb{background:rgba(180,130,100,0.15);color:#c8956a;}
 .sup-sm{background:rgba(212,152,72,0.15);color:var(--gold);}
 
+/* SUPPLIER INFO BAR */
+.supplier-info{display:none;background:var(--dark2);border-bottom:1px solid rgba(255,255,255,0.06);padding:14px 32px;}
+.supplier-info.show{display:flex;align-items:center;gap:32px;flex-wrap:wrap;}
+.si-name{font-size:14px;font-weight:600;color:var(--offwhite);}
+.si-field{font-size:12px;color:var(--gray);display:flex;align-items:center;gap:6px;}
+.si-field svg{opacity:0.5;flex-shrink:0;}
+.si-field a{color:var(--gold);}
+
 /* PAGINATION */
 .pagination{display:flex;align-items:center;justify-content:center;gap:8px;padding:32px 0 48px;}
 .page-btn{background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--offwhite);padding:7px 14px;border-radius:4px;cursor:pointer;font-size:12px;transition:all 0.2s;}
@@ -91,6 +99,8 @@ a{color:var(--gold);text-decoration:none;}
   <div class="stab" data-supplier="sanmar" data-file="../suppliers/sanmar.json">SanMar <span class="stab-count">2,985</span></div>
 </div>
 
+<div class="supplier-info" id="supplierInfo"></div>
+
 <div class="toolbar">
   <div class="search-wrap">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -106,6 +116,51 @@ a{color:var(--gold);text-decoration:none;}
 </div>
 
 <script>
+const SUPPLIER_INFO = {
+  'carolina-made': {
+    name: 'Carolina Made',
+    address: '400 Indian Trail Road North, Indian Trail, NC 28079',
+    phone: '(800) 222-1409',
+    email: 'info@carolinamade.com',
+    website: 'https://www.carolinamade.com/',
+  },
+  'as-colour-us': {
+    name: 'AS Colour US',
+    address: '',
+    phone: '',
+    email: '',
+    website: 'https://www.ascolour.com/',
+  },
+  'momentec-brands': {
+    name: 'Momentec Brands',
+    address: '425 Park West Drive, Grovetown, GA 30813',
+    phone: '888-871-0990',
+    email: '',
+    website: 'https://www.momentecbrands.com/',
+  },
+  'sanmar': {
+    name: 'SanMar',
+    address: 'SanMar, Attn: Credit Department, P.O. Box 34060, Seattle, WA 98124-1060',
+    phone: '(800) 426-6399',
+    email: 'sales@sanmar.com',
+    website: 'http://www.sanmar.com',
+  },
+};
+
+function showSupplierInfo(key) {
+  const bar = document.getElementById('supplierInfo');
+  const s = SUPPLIER_INFO[key];
+  if (!s) { bar.classList.remove('show'); bar.innerHTML = ''; return; }
+  bar.innerHTML = `
+    <span class="si-name">${s.name}</span>
+    ${s.address ? `<span class="si-field"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${s.address}</span>` : ''}
+    ${s.phone ? `<span class="si-field"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.63a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.72 16z"/></svg>${s.phone}</span>` : ''}
+    ${s.email ? `<span class="si-field"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><a href="mailto:${s.email}">${s.email}</a></span>` : ''}
+    ${s.website ? `<span class="si-field"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><a href="${s.website}" target="_blank">${s.website}</a></span>` : ''}
+  `;
+  bar.classList.add('show');
+}
+
 const PER_PAGE = 60;
 let allProducts   = [];
 let filtered      = [];
@@ -260,6 +315,7 @@ document.querySelectorAll('.stab').forEach(tab => {
     this.classList.add('active');
     document.getElementById('searchInput').value = '';
     document.getElementById('brandFilter').value = '';
+    showSupplierInfo(this.dataset.supplier);
     loadTab(this.dataset.supplier);
   });
 });
@@ -269,6 +325,7 @@ document.getElementById('searchInput').addEventListener('input', applyFilters);
 document.getElementById('brandFilter').addEventListener('change', applyFilters);
 
 // Load first tab (Carolina Made by default — faster than loading all 4,256)
+showSupplierInfo('carolina-made');
 loadTab('carolina-made');
 document.querySelector('.stab[data-supplier="carolina-made"]').classList.add('active');
 document.querySelector('.stab[data-supplier="all"]').classList.remove('active');
