@@ -5,4 +5,3 @@ deployment:
     - /bin/cp -R . $DEPLOYPATH
     - /bin/rm -rf $DEPLOYPATH/.git
     - /bin/rm -f $DEPLOYPATH/.cpanel.yml
-    - /bin/rm -f $DEPLOYPATH/products.json
