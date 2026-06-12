@@ -9,22 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Pull latest from GitHub into cPanel repo
+      - name: Trigger deploy via webhook
         run: |
-          RESULT=$(curl -k -w "\nHTTP_STATUS:%{http_code}" \
-            -H "Authorization: cpanel ${{ secrets.CPANEL_USERNAME }}:${{ secrets.CPANEL_PASSWORD }}" \
-            "https://gator3045.hostgator.com:2083/execute/VersionControl/update" \
-            --data "repository_root=/home3/vistecpr/vistecprints-git")
+          RESULT=$(curl -sf "https://rebuild.vistecprints.com/deploy.php?token=${{ secrets.DEPLOY_TOKEN }}")
           echo "$RESULT"
-          STATUS=$(echo "$RESULT" | grep "HTTP_STATUS:" | cut -d: -f2)
-          if [ "$STATUS" != "200" ]; then echo "ERROR: Update failed with HTTP $STATUS"; exit 1; fi
-
-      - name: Deploy HEAD commit to public_html
-        run: |
-          RESULT=$(curl -k -w "\nHTTP_STATUS:%{http_code}" \
-            -H "Authorization: cpanel ${{ secrets.CPANEL_USERNAME }}:${{ secrets.CPANEL_PASSWORD }}" \
-            "https://gator3045.hostgator.com:2083/execute/VersionControlDeployment/create" \
-            --data "repository_root=/home3/vistecpr/vistecprints-git")
-          echo "$RESULT"
-          STATUS=$(echo "$RESULT" | grep "HTTP_STATUS:" | cut -d: -f2)
-          if [ "$STATUS" != "200" ]; then echo "ERROR: Deploy failed with HTTP $STATUS"; exit 1; fi
