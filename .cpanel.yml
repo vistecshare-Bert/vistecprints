@@ -1,0 +1,8 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home3/vistecpr/public_html/rebuild/
+    - /bin/cp -R . $DEPLOYPATH
+    - /bin/rm -rf $DEPLOYPATH/.git
+    - /bin/rm -f $DEPLOYPATH/.cpanel.yml
+    - /bin/rm -f $DEPLOYPATH/products.json
