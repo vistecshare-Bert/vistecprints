@@ -12,7 +12,7 @@ jobs:
       - name: Pull latest from GitHub into cPanel repo
         run: |
           RESULT=$(curl -k -w "\nHTTP_STATUS:%{http_code}" \
-            -u "${{ secrets.CPANEL_USERNAME }}:${{ secrets.CPANEL_PASSWORD }}" \
+            -H "Authorization: cpanel ${{ secrets.CPANEL_USERNAME }}:${{ secrets.CPANEL_PASSWORD }}" \
             "https://gator3045.hostgator.com:2083/execute/VersionControl/update" \
             --data "repository_root=/home3/vistecpr/vistecprints-git")
           echo "$RESULT"
@@ -22,7 +22,7 @@ jobs:
       - name: Deploy HEAD commit to public_html
         run: |
           RESULT=$(curl -k -w "\nHTTP_STATUS:%{http_code}" \
-            -u "${{ secrets.CPANEL_USERNAME }}:${{ secrets.CPANEL_PASSWORD }}" \
+            -H "Authorization: cpanel ${{ secrets.CPANEL_USERNAME }}:${{ secrets.CPANEL_PASSWORD }}" \
             "https://gator3045.hostgator.com:2083/execute/VersionControlDeployment/create" \
             --data "repository_root=/home3/vistecpr/vistecprints-git")
           echo "$RESULT"
