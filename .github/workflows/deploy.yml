@@ -9,19 +9,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
-          protocol: ftp
-          server-dir: /public_html/rebuild/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            products.json
-            README.md
+      - name: Trigger cPanel Git Pull + Deploy
+        run: |
+          curl -s -k \
+            -u "${{ secrets.CPANEL_USERNAME }}:${{ secrets.CPANEL_PASSWORD }}" \
+            "https://gator3045.hostgator.com:2083/execute/VersionControl/update" \
+            --data "repository_root=/home3/vistecpr/vistecprints-git"
+          curl -s -k \
+            -u "${{ secrets.CPANEL_USERNAME }}:${{ secrets.CPANEL_PASSWORD }}" \
+            "https://gator3045.hostgator.com:2083/execute/VersionControlDeployment/create" \
+            --data "repository_root=/home3/vistecpr/vistecprints-git"
