@@ -255,8 +255,13 @@ function render() {
 
   grid.innerHTML = slice.map(p => {
     let imgSrc = p.referenceImage || p.composedImage || p.img || '';
-    // Upgrade low-res /4/ thumbnails to /1/ full-size images
-    imgSrc = imgSrc.replace('/4/prod.jpg', '/1/prod.jpg').replace('/4/prod.png', '/1/prod.png');
+    // Upgrade low-res thumbnails to full-size across all three URL patterns
+    imgSrc = imgSrc
+      .replace('/4/prod.jpg', '/1/prod.jpg')           // rshared/pdimages (Carolina Made)
+      .replace('/4/prod.png', '/1/prod.png')
+      .replace(/-50\.jpg/, '-200.jpg')                  // display_image (SanMar, AS Colour, Momentec)
+      .replace(/-50\.png/, '-200.png')
+      .replace('/4/1/FFFFFF/prod.jpg', '/1/1/FFFFFF/prod.jpg');  // pcimages fallback
     const img = imgSrc
       ? `<img src="${imgSrc}" alt="${p.code}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=no-img>No image</div>'">`
       : `<div class="no-img">No image</div>`;
