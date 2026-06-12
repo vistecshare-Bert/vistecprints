@@ -969,6 +969,11 @@ function loadProduct(code) {
   currentProduct = window.CATALOG.find(p => p.code === code) || null;
   if (!currentProduct) { updateMockup(); return; }
 
+  // Preload all mockup images in background so swatch clicks are instant
+  currentProduct.colors.forEach(color => {
+    if (color.mockup) { const p = new Image(); p.src = color.mockup; }
+  });
+
   const BASIC_COUNT = 8;
   const container = document.getElementById('colorSwatches');
   container.innerHTML = '';
