@@ -11,5 +11,5 @@ jobs:
     steps:
       - name: Trigger deploy via webhook
         run: |
-          RESULT=$(curl -sf "https://rebuild.vistecprints.com/deploy.php?token=${{ secrets.DEPLOY_TOKEN }}")
-          echo "$RESULT"
+          curl -v -w "\nHTTP_STATUS:%{http_code}" \
+            "https://rebuild.vistecprints.com/deploy.php?token=${{ secrets.DEPLOY_TOKEN }}"
