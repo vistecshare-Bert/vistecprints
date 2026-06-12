@@ -16,6 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Oswald:wght@400;600&family=Anton&family=Roboto:wght@400;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
 <script src="design-library.js"></script>
+<script src="catalog.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
@@ -133,14 +134,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
 .swatch:hover{transform:scale(1.05);}
 .swatch-label{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--gray);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.2s;}
 .swatch:hover .swatch-label,.swatch.active .swatch-label{opacity:1;}
-.swatch[data-color="gray"]{background:#8c8c8c;box-shadow:0 0 0 1px #555 inset;}
-.swatch[data-color="white"]{background:#f0f0f0;box-shadow:0 0 0 1px #aaa inset;}
-.swatch[data-color="black"]{background:#1a1a1a;box-shadow:0 0 0 1px #444 inset;}
-.swatch[data-color="navy"]{background:#1a2744;}
-.swatch[data-color="red"]{background:#c0392b;}
-.swatch[data-color="royal"]{background:#2850a0;}
-.swatch[data-color="forest"]{background:#1e5e38;}
-.swatch[data-color="maroon"]{background:#6b1a1a;}
 
 /* View toggle */
 .view-toggle{display:flex;background:var(--dark3);border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);}
@@ -440,41 +433,16 @@ input[type=range]{width:100%;accent-color:var(--gold);}
     <div class="panel-section">
       <div class="panel-heading">Garment</div>
       <div class="garment-tabs">
-        <div class="garment-tab active" data-garment="tshirt">T-Shirt</div>
-        <div class="garment-tab" data-garment="tshirt-female">Women's Tee</div>
-        <div class="garment-tab" data-garment="hoodie">Hoodie</div>
-        <div class="garment-tab" data-garment="hoodie-female">Women's Hoodie</div>
+        <div class="garment-tab active" data-garment="tshirt" data-product-code="5000">T-Shirt</div>
+        <div class="garment-tab" data-garment="tshirt-female" data-product-code="5000L">Women's Tee</div>
+        <div class="garment-tab" data-garment="premium" data-product-code="BC3001">Premium Tee</div>
+        <div class="garment-tab" data-garment="hoodie" data-product-code="12500">Hoodie</div>
       </div>
     </div>
 
     <div class="panel-section">
       <div class="panel-heading">Color</div>
-      <div class="color-swatches" id="colorSwatches">
-        <div class="swatch active" data-color="gray" title="Gray">
-          <span class="swatch-label">Gray</span>
-        </div>
-        <div class="swatch" data-color="white" title="White">
-          <span class="swatch-label">White</span>
-        </div>
-        <div class="swatch" data-color="black" title="Black">
-          <span class="swatch-label">Black</span>
-        </div>
-        <div class="swatch" data-color="navy" title="Navy">
-          <span class="swatch-label">Navy</span>
-        </div>
-        <div class="swatch" data-color="red" title="Red">
-          <span class="swatch-label">Red</span>
-        </div>
-        <div class="swatch" data-color="royal" title="Royal Blue">
-          <span class="swatch-label">Royal</span>
-        </div>
-        <div class="swatch" data-color="forest" title="Forest Green">
-          <span class="swatch-label">Forest</span>
-        </div>
-        <div class="swatch" data-color="maroon" title="Maroon">
-          <span class="swatch-label">Maroon</span>
-        </div>
-      </div>
+      <div class="color-swatches" id="colorSwatches"></div>
     </div>
 
     <div class="panel-section">
@@ -891,49 +859,13 @@ input[type=range]{width:100%;accent-color:var(--gold);}
 
 <script>
 // =========================================================
-//  MOCKUP MAP
+//  MOCKUP MAP (fallback for garments without catalog images)
 // =========================================================
 const MOCKUPS = {
-  tshirt: {
-    gray:   { front: 'mockups/tshirt-gray-front.png',   back: 'mockups/tshirt-gray-back.png'   },
-    white:  { front: 'mockups/tshirt-white-front.png',  back: 'mockups/tshirt-white-back.png'  },
-    black:  { front: 'mockups/tshirt-black-front.png',  back: 'mockups/tshirt-black-back.png'  },
-    navy:   { front: 'mockups/tshirt-navy-front.png',   back: 'mockups/tshirt-navy-back.png'   },
-    red:    { front: 'mockups/tshirt-red-front.png',    back: 'mockups/tshirt-red-back.png'    },
-    royal:  { front: 'mockups/tshirt-royal-front.png',  back: 'mockups/tshirt-royal-back.png'  },
-    forest: { front: 'mockups/tshirt-forest-front.png', back: 'mockups/tshirt-forest-back.png' },
-    maroon: { front: 'mockups/tshirt-maroon-front.png', back: 'mockups/tshirt-maroon-back.png' },
-  },
-  'tshirt-female': {
-    gray:   { front: 'mockups/tshirt-female-gray-front.png',   back: 'mockups/tshirt-female-gray-back.png'   },
-    white:  { front: 'mockups/tshirt-female-white-front.png',  back: 'mockups/tshirt-female-white-back.png'  },
-    black:  { front: 'mockups/tshirt-female-black-front.png',  back: 'mockups/tshirt-female-black-back.png'  },
-    navy:   { front: 'mockups/tshirt-female-navy-front.png',   back: 'mockups/tshirt-female-navy-back.png'   },
-    red:    { front: 'mockups/tshirt-female-red-front.png',    back: 'mockups/tshirt-female-red-back.png'    },
-    royal:  { front: 'mockups/tshirt-female-royal-front.png',  back: 'mockups/tshirt-female-royal-back.png'  },
-    forest: { front: 'mockups/tshirt-female-forest-front.png', back: 'mockups/tshirt-female-forest-back.png' },
-    maroon: { front: 'mockups/tshirt-female-maroon-front.png', back: 'mockups/tshirt-female-maroon-back.png' },
-  },
   hoodie: {
-    gray:   { front: 'mockups/hoodie-gray-front.png',   back: 'mockups/hoodie-gray-back.png'   },
-    white:  { front: 'mockups/hoodie-white-front.png',  back: 'mockups/hoodie-white-back.png'  },
-    black:  { front: 'mockups/hoodie-black-front.png',  back: 'mockups/hoodie-black-back.png'  },
-    navy:   { front: 'mockups/hoodie-navy-front.png',   back: 'mockups/hoodie-navy-back.png'   },
-    red:    { front: 'mockups/hoodie-red-front.png',    back: 'mockups/hoodie-red-back.png'    },
-    royal:  { front: 'mockups/hoodie-royal-front.png',  back: 'mockups/hoodie-royal-back.png'  },
-    forest: { front: 'mockups/hoodie-forest-front.png', back: 'mockups/hoodie-forest-back.png' },
-    maroon: { front: 'mockups/hoodie-maroon-front.png', back: 'mockups/hoodie-maroon-back.png' },
+    gray:  { front: 'mockups/hoodie-gray-front.png',  back: 'mockups/hoodie-gray-back.png'  },
+    white: { front: 'mockups/hoodie-white-front.png', back: 'mockups/hoodie-white-back.png' },
   },
-  'hoodie-female': {
-    gray:   { front: 'mockups/hoodie-female-gray-front.png',   back: 'mockups/hoodie-female-gray-back.png'   },
-    white:  { front: 'mockups/hoodie-female-white-front.png',  back: 'mockups/hoodie-female-white-back.png'  },
-    black:  { front: 'mockups/hoodie-female-black-front.png',  back: 'mockups/hoodie-female-black-back.png'  },
-    navy:   { front: 'mockups/hoodie-female-navy-front.png',   back: 'mockups/hoodie-female-navy-back.png'   },
-    red:    { front: 'mockups/hoodie-female-red-front.png',    back: 'mockups/hoodie-female-red-back.png'    },
-    royal:  { front: 'mockups/hoodie-female-royal-front.png',  back: 'mockups/hoodie-female-royal-back.png'  },
-    forest: { front: 'mockups/hoodie-female-forest-front.png', back: 'mockups/hoodie-female-forest-back.png' },
-    maroon: { front: 'mockups/hoodie-female-maroon-front.png', back: 'mockups/hoodie-female-maroon-back.png' },
-  }
 };
 
 // Print zone as % of canvas (front chest / back print area)
@@ -945,13 +877,14 @@ const PRINT_ZONES = {
 // =========================================================
 //  STATE
 // =========================================================
-// Pre-select garment/color from URL params (e.g. ?garment=tshirt-female&color=black)
 const _urlParams = new URLSearchParams(location.search);
-let currentGarment = MOCKUPS[_urlParams.get('garment')] ? _urlParams.get('garment') : 'tshirt';
-let currentColor   = _urlParams.get('color') || 'gray';
-let currentView    = 'front';
-let selectedObject = null;
-let suppressProps  = false;
+let currentGarment  = _urlParams.get('garment') || 'tshirt';
+let currentColor    = _urlParams.get('color') || 'gray';
+let currentView     = 'front';
+let selectedObject  = null;
+let suppressProps   = false;
+let currentProduct  = null;   // catalog product currently loaded
+let currentColorIdx = 0;      // index into currentProduct.colors
 
 // History
 let history = [];
@@ -1002,41 +935,23 @@ document.getElementById('showZone').addEventListener('change', function() {
 // =========================================================
 //  MOCKUP SWITCHER
 // =========================================================
-const COLOR_HEX = {
-  gray:   '#8c8c8c',
-  white:  null,        // no overlay — white base shows through
-  black:  '#1e1e1e',
-  navy:   '#1a2744',
-  red:    '#c0392b',
-  royal:  '#2850a0',
-  forest: '#1e5e38',
-  maroon: '#6b1a1a',
-};
 
-const GARMENT_LABELS = {
-  tshirt: 'T-Shirt', 'tshirt-female': "Women's Tee",
-  hoodie: 'Hoodie',  'hoodie-female': "Women's Hoodie",
-};
-
-// Draw white mockup on offscreen canvas, multiply-blend the shirt color,
-// then restore alpha so transparent areas stay transparent.
-function applyColorToMockup(src, cb) {
-  const hex = COLOR_HEX[currentColor];
-  if (!hex) { cb(src); return; }          // white → show raw image
+// Hoodie fallback: multiply-blend a color onto the white hoodie mockup
+function applyColorToHoodie(src, hex, cb) {
+  if (!hex) { cb(src); return; }
   const tmp = new Image();
   tmp.crossOrigin = 'anonymous';
   tmp.onload = () => {
     try {
       const c = document.createElement('canvas');
-      c.width = tmp.naturalWidth;
-      c.height = tmp.naturalHeight;
+      c.width = tmp.naturalWidth; c.height = tmp.naturalHeight;
       const ctx = c.getContext('2d');
-      ctx.drawImage(tmp, 0, 0);           // white shirt
+      ctx.drawImage(tmp, 0, 0);
       ctx.globalCompositeOperation = 'multiply';
       ctx.fillStyle = hex;
-      ctx.fillRect(0, 0, c.width, c.height); // tint
+      ctx.fillRect(0, 0, c.width, c.height);
       ctx.globalCompositeOperation = 'destination-in';
-      ctx.drawImage(tmp, 0, 0);           // restore alpha mask
+      ctx.drawImage(tmp, 0, 0);
       cb(c.toDataURL('image/png'));
     } catch(e) { cb(src); }
   };
@@ -1044,48 +959,85 @@ function applyColorToMockup(src, cb) {
   tmp.src = src;
 }
 
+// Rebuild color swatches from a catalog product and wire up click handlers
+function loadProduct(code) {
+  if (!window.CATALOG) return;
+  currentProduct = window.CATALOG.find(p => p.code === code) || null;
+  if (!currentProduct) { updateMockup(); return; }
+
+  const container = document.getElementById('colorSwatches');
+  container.innerHTML = '';
+  currentProduct.colors.forEach((color, i) => {
+    const sw = document.createElement('div');
+    sw.className = 'swatch' + (i === 0 ? ' active' : '');
+    sw.title = color.name;
+    sw.style.backgroundColor = color.hex || '#888';
+    if (!color.hex || color.hex.toLowerCase() === '#ffffff' || color.hex.toLowerCase() === '#f0f0f0') {
+      sw.style.boxShadow = '0 0 0 1px #aaa inset';
+    }
+    const label = document.createElement('span');
+    label.className = 'swatch-label';
+    label.textContent = color.name;
+    sw.appendChild(label);
+    sw.addEventListener('click', function() {
+      container.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+      this.classList.add('active');
+      currentColorIdx = i;
+      currentColor = color.name;
+      document.getElementById('quoteColor').value = color.name;
+      updateMockup();
+    });
+    container.appendChild(sw);
+  });
+
+  currentColorIdx = 0;
+  currentColor = currentProduct.colors[0]?.name || 'Black';
+  document.getElementById('quoteColor').value = currentColor;
+  updateMockup();
+}
+
 function updateMockup() {
-  const map      = MOCKUPS[currentGarment];
-  const base     = map.white || map.gray;
-  const src      = base[currentView] || base.front;
-  const fallback = src.replace('-female-', '-');
   const img         = document.getElementById('mockupImg');
   const placeholder = document.getElementById('mockupPlaceholder');
   img.style.opacity = '1';
   placeholder.classList.remove('show');
 
-  applyColorToMockup(src, result => {
-    img.onerror = () => {
-      img.onerror = null;
-      applyColorToMockup(fallback, fb => { img.src = fb; });
-    };
+  // Catalog product with a real mockup URL
+  if (currentProduct) {
+    const color = currentProduct.colors[currentColorIdx];
+    if (color?.mockup) {
+      img.onerror = () => { img.onerror = null; };
+      img.src = color.mockup;
+      updatePrintZone();
+      return;
+    }
+    // Product in catalog but mockup is null (e.g. hoodie) — fall through to blend
+  }
+
+  // Fallback: blend color onto white hoodie mockup
+  const map  = MOCKUPS[currentGarment] || MOCKUPS.hoodie;
+  const base = map.white || map.gray;
+  const src  = (base[currentView] || base.front);
+  const hex  = currentProduct?.colors[currentColorIdx]?.hex || null;
+  applyColorToHoodie(src, hex, result => {
+    img.onerror = null;
     img.src = result;
   });
   updatePrintZone();
 }
 
-// Garment type
+// Garment type tabs
 document.querySelectorAll('.garment-tab').forEach(tab => {
   tab.addEventListener('click', function() {
     document.querySelectorAll('.garment-tab').forEach(t => t.classList.remove('active'));
     this.classList.add('active');
     currentGarment = this.dataset.garment;
-    updateMockup();
+    const code = this.dataset.productCode;
+    if (code) loadProduct(code);
+    else updateMockup();
   });
-  // Sync active state to URL param on load
   if (tab.dataset.garment === currentGarment) tab.classList.add('active');
   else tab.classList.remove('active');
-});
-
-// Color
-document.querySelectorAll('.swatch').forEach(sw => {
-  sw.addEventListener('click', function() {
-    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
-    this.classList.add('active');
-    currentColor = this.dataset.color;
-    document.getElementById('quoteColor').value = this.title || currentColor;
-    updateMockup();
-  });
 });
 
 // View toggle
@@ -1097,6 +1049,14 @@ document.querySelectorAll('.view-btn').forEach(btn => {
     updateMockup();
   });
 });
+
+// Initialize: load the active garment tab's product on page load
+(function initCatalog() {
+  const activeTab = document.querySelector('.garment-tab.active');
+  const code = activeTab?.dataset.productCode;
+  if (code && window.CATALOG) loadProduct(code);
+  else updateMockup();
+})();
 
 // =========================================================
 //  HISTORY
@@ -1336,13 +1296,7 @@ function captureDesign(size = 520) {
   const mockImg = document.getElementById('mockupImg');
   try { ctx.drawImage(mockImg, 0, 0, size, size); } catch(e) {}
 
-  // Apply shirt color via multiply (matches CSS mix-blend-mode:multiply)
-  if (COLOR_HEX[currentColor]) {
-    ctx.globalCompositeOperation = 'multiply';
-    ctx.fillStyle = COLOR_HEX[currentColor];
-    ctx.fillRect(0, 0, size, size);
-    ctx.globalCompositeOperation = 'source-over';
-  }
+  // Catalog mockup images are pre-colored — no blend needed
 
   // Draw the design
   ctx.drawImage(canvas.getElement(), 0, 0);
@@ -1749,8 +1703,8 @@ document.getElementById('btnAddToCart').addEventListener('click', () => {
   document.getElementById('dcAddBtn').disabled = true;
   document.getElementById('dcAddBtn').textContent = 'Select a Size';
 
-  const garmentLabel = GARMENT_LABELS[currentGarment] || 'T-Shirt';
-  const colorLabel   = document.querySelector(`.swatch[data-color="${currentColor}"]`)?.title || currentColor;
+  const garmentLabel = currentProduct?.name || document.querySelector('.garment-tab.active')?.textContent || 'T-Shirt';
+  const colorLabel   = currentColor;
   document.getElementById('dcInfo').innerHTML =
     `<strong>${garmentLabel}</strong> &nbsp;·&nbsp; ${colorLabel}`;
   document.getElementById('dcPreview').src = captureDesign(220);
@@ -1775,8 +1729,8 @@ function closeDcModal() {
 
 function dcConfirmAdd() {
   if (!dcSelectedSize) return;
-  const garmentLabel = GARMENT_LABELS[currentGarment] || 'T-Shirt';
-  const colorLabel   = document.querySelector(`.swatch[data-color="${currentColor}"]`)?.title || currentColor;
+  const garmentLabel = currentProduct?.name || document.querySelector('.garment-tab.active')?.textContent || 'T-Shirt';
+  const colorLabel   = currentColor;
 
   const isPreset = presetDesign && presetDesign.price > 0;
   const item = {
