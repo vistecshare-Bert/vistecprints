@@ -632,6 +632,12 @@ tr:hover td{background:#fafafa;}
   <div class="sb-label">Tools</div>
   <ul class="sb-nav" style="padding-bottom:8px;">
     <li>
+      <a href="products.html">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        Supplier Catalog
+      </a>
+    </li>
+    <li>
       <a href="../index.html" target="_blank">
         <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         View Website
