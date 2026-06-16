@@ -627,7 +627,7 @@ function renderProducts(cat) {
       </div>
       <div class="product-info">
         <div class="product-name">${p.name}</div>
-        <div class="product-brand">${p.garment ? p.garment + ' &middot; ' : ''}DTF Print</div>
+        <div class="product-brand">${p.garment || ''}</div>
         <div class="product-action">
           <button class="add-btn" onclick="event.stopPropagation();openSizeModal('${p.id}')">Add to Cart</button>
           ${p.price ? `<span class="product-price">${p.price}</span>` : ''}
@@ -767,7 +767,7 @@ function openSizeModal(productId) {
   smProduct = p; smQty = 1; smSize = null;
   document.getElementById('smImg').src = p.img || '';
   document.getElementById('smName').textContent = p.name;
-  document.getElementById('smGarment').textContent = (p.garment || '') + ' · DTF Print';
+  document.getElementById('smGarment').textContent = (p.garment || '');
   document.getElementById('smPrice').textContent = p.price || 'Contact for price';
   document.getElementById('smQtyVal').textContent = 1;
   document.getElementById('smSizeErr').classList.remove('show');
@@ -852,7 +852,7 @@ function openZoom(productId) {
   zlProduct = p; zlScale = 1; zlOffX = 0; zlOffY = 0;
   document.getElementById('zlImg').src = p.img || '';
   document.getElementById('zlName').textContent = p.name;
-  document.getElementById('zlGarment').textContent = (p.garment || '') + ' · DTF Print';
+  document.getElementById('zlGarment').textContent = (p.garment || '');
   document.getElementById('zlPrice').textContent = p.price || '';
   applyZl();
   const hint = document.getElementById('zlHint');
