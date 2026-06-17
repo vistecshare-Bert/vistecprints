@@ -1029,12 +1029,9 @@ function loadProduct(code) {
   const allowed = CM_ALLOWED[code];
   const colors = allowed ? allColors.filter(c => allowed.has(c.name)) : allColors;
 
-  // Progressive preload: first color immediately, rest on idle so page stays fast
-  if (colors[0]?.mockup) new Image().src = colors[0].mockup;
-  const lazyPreload = () => colors.slice(1).forEach(c => { if (c.mockup) new Image().src = c.mockup; });
-  window.requestIdleCallback
-    ? requestIdleCallback(lazyPreload, { timeout: 3000 })
-    : setTimeout(lazyPreload, 1500);
+  // Preload all mockup images now — new Image() is non-blocking so this doesn't slow the page
+  // but ensures swatch clicks are instant with no network delay
+  colors.forEach(c => { if (c.mockup) { const p = new Image(); p.src = c.mockup; } });
 
   const container = document.getElementById('colorSwatches');
   container.innerHTML = '';
@@ -1294,48 +1291,18 @@ document.getElementById('artworkInput').addEventListener('change', function() {
         const z   = PRINT_ZONES[currentView];
         const sz  = 520;
         const max = z.width * sz * 0.9;
-        const scale = (img.width > max ? max / img.width : 1);
+        const scale = img.width > max ? max / img.width : 1;
         img.scale(scale);
-        // Place at center initially (hidden until first mouse move)
-        img.set({
-          originX: 'center', originY: 'center',
-          left: sz / 2, top: sz / 2,
-          opacity: 0.75,
-          selectable: false, hasControls: false, hasBorders: false,
-          evented: false,
-        });
+        img.set({ selectable: true, hasControls: true, hasBorders: true });
         img.id = 'img_' + Date.now();
+        centerInZone(img);
         canvas.add(img);
+        canvas.setActiveObject(img);
         canvas.renderAll();
-        showToast('Move mouse over shirt, click to place artwork.', '');
-
-        // Artwork follows mouse until user clicks to drop it
-        function onMove(opt) {
-          const p = canvas.getPointer(opt.e);
-          img.set({ left: p.x, top: p.y });
-          canvas.renderAll();
-        }
-        function onDrop(opt) {
-          const p = canvas.getPointer(opt.e);
-          img.set({
-            left: p.x - img.getScaledWidth()  / 2,
-            top:  p.y - img.getScaledHeight() / 2,
-            originX: 'left', originY: 'top',
-            opacity: 1,
-            selectable: true, hasControls: true, hasBorders: true,
-            evented: true,
-          });
-          canvas.off('mouse:move', onMove);
-          canvas.off('mouse:up', onDrop);
-          canvas.setActiveObject(img);
-          canvas.renderAll();
-          switchTab('text');
-          saveState();
-          updateLayersPanel();
-          showToast('Placed! Drag to reposition, corner handles to resize.', 'success');
-        }
-        canvas.on('mouse:move', onMove);
-        canvas.on('mouse:up', onDrop);
+        switchTab('text');
+        saveState();
+        updateLayersPanel();
+        showToast('Artwork added! Click and drag to reposition.', 'success');
       });
     };
     reader.readAsDataURL(file);
