@@ -1326,7 +1326,7 @@ document.getElementById('artworkInput').addEventListener('change', function() {
             evented: true,
           });
           canvas.off('mouse:move', onMove);
-          canvas.off('mouse:down', onDrop);
+          canvas.off('mouse:up', onDrop);
           canvas.setActiveObject(img);
           canvas.renderAll();
           switchTab('text');
@@ -1335,7 +1335,7 @@ document.getElementById('artworkInput').addEventListener('change', function() {
           showToast('Placed! Drag to reposition, corner handles to resize.', 'success');
         }
         canvas.on('mouse:move', onMove);
-        canvas.on('mouse:down', onDrop);
+        canvas.on('mouse:up', onDrop);
       });
     };
     reader.readAsDataURL(file);
