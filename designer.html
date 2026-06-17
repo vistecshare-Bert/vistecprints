@@ -1386,14 +1386,18 @@ function captureDesign(size = 520) {
 
   // Catalog mockup images are pre-colored — no blend needed
 
-  // Draw the design
-  ctx.drawImage(canvas.getElement(), 0, 0);
+  // Draw the design (may throw SecurityError if canvas is tainted by cross-origin images)
+  try { ctx.drawImage(canvas.getElement(), 0, 0); } catch(e) {}
 
   // Restore
   pz.style.display = pzWas;
   if (prevActive) { canvas.setActiveObject(prevActive); canvas.renderAll(); }
 
-  return off.toDataURL('image/png');
+  try {
+    return off.toDataURL('image/png');
+  } catch(e) {
+    return ''; // tainted canvas — cross-origin image without CORS headers
+  }
 }
 
 document.getElementById('btnDownload').addEventListener('click', () => {
@@ -1794,13 +1798,18 @@ document.getElementById('btnAddToCart').addEventListener('click', () => {
   dcSelectedSize = null;
   document.querySelectorAll('.dc-sz').forEach(b => b.classList.remove('active'));
   document.getElementById('dcAddBtn').disabled = true;
-  document.getElementById('dcAddBtn').textContent = 'Select a Size';
+  document.getElementById('dcAddBtn').textContent = 'Select a Size First';
 
   const garmentLabel = currentProduct?.name || document.querySelector('.garment-tab.active')?.textContent || 'T-Shirt';
   const colorLabel   = currentColor;
   document.getElementById('dcInfo').innerHTML =
     `<strong>${garmentLabel}</strong> &nbsp;·&nbsp; ${colorLabel}`;
-  document.getElementById('dcPreview').src = captureDesign(220);
+
+  const previewUrl = captureDesign(220); // never throws now
+  const previewEl  = document.getElementById('dcPreview');
+  previewEl.style.display = previewUrl ? 'block' : 'none';
+  if (previewUrl) previewEl.src = previewUrl;
+
   document.getElementById('dcModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 });
@@ -1811,7 +1820,7 @@ document.querySelectorAll('.dc-sz').forEach(btn => {
     this.classList.add('active');
     dcSelectedSize = this.dataset.size;
     document.getElementById('dcAddBtn').disabled = false;
-    document.getElementById('dcAddBtn').textContent = `Add Size ${dcSelectedSize} to Cart`;
+    document.getElementById('dcAddBtn').textContent = `Add Size ${dcSelectedSize} — Go to Checkout →`;
   });
 });
 
@@ -1840,9 +1849,8 @@ function dcConfirmAdd() {
   cart.push(item);
   localStorage.setItem('vp_cart', JSON.stringify(cart));
   closeDcModal();
-  showToast(isPreset ? `Added to cart — $${presetDesign.price.toFixed(2)}` : 'Added to cart! Proceed to checkout for a quote.', 'success');
-  const badge = document.getElementById('cartBadge');
-  if (badge) badge.textContent = cart.reduce((s, i) => s + i.qty, 0) || '';
+  // Go straight to checkout so customer can enter details and get email receipt
+  window.location.href = 'checkout.html';
 }
 
 // =========================================================
@@ -2118,8 +2126,7 @@ if (_presetId && _presetName) {
 }
 fetch('track.php?page=designer&ref='+encodeURIComponent(document.referrer),{keepalive:true}).catch(()=>{});
 
-// Cart stub — designer page doesn't have a cart drawer; link to shop
-function openCart() { window.location.href = 'products.html'; }
+function openCart() { window.location.href = 'checkout.html'; }
 </script>
 </body>
 </html>

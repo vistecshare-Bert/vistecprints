@@ -202,17 +202,31 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.97);backdrop-fi
 const SHIPPING = 4.99;
 let cart = JSON.parse(localStorage.getItem('vp_cart') || '[]');
 
+// True when every item needs a quote (custom designer orders)
+function isQuoteOrder() {
+  return cart.length > 0 && cart.every(i => i.price === 0 || i.priceStr === 'Quote Required');
+}
+
 function init() {
   const params = new URLSearchParams(location.search);
-  if (params.get('cancelled') === '1') {
-    showCancelBanner();
-  }
+  if (params.get('cancelled') === '1') showCancelBanner();
   if (!cart.length) {
     document.getElementById('emptyWrap').style.display = 'block';
     return;
   }
   document.getElementById('checkoutWrap').style.display = 'grid';
   renderSummary();
+  if (isQuoteOrder()) applyQuoteMode();
+}
+
+function applyQuoteMode() {
+  const btn = document.getElementById('submitBtn');
+  btn.innerHTML = 'Submit Order Request';
+  document.querySelector('.secure-note').style.display = 'none';
+  document.querySelector('.payment-note').innerHTML =
+    '<strong>Custom Design Order</strong> — We\'ll review your design and contact you within ' +
+    '<strong>1 business day</strong> with final pricing. Payment is collected after you approve the quote. ' +
+    'Questions? Call <strong>+1 704-377-6626</strong>.';
 }
 
 function showCancelBanner() {
@@ -224,9 +238,10 @@ function showCancelBanner() {
 }
 
 function renderSummary() {
-  const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  document.getElementById('sSubtotal').textContent = '$' + sub.toFixed(2);
-  document.getElementById('sTotal').textContent    = '$' + (sub + SHIPPING).toFixed(2);
+  const sub   = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const quote = isQuoteOrder();
+  document.getElementById('sSubtotal').textContent = quote ? 'Quote Required' : '$' + sub.toFixed(2);
+  document.getElementById('sTotal').textContent    = quote ? 'TBD'            : '$' + (sub + SHIPPING).toFixed(2);
   document.getElementById('summaryItems').innerHTML = cart.map(item => `
     <div class="s-item">
       <div class="s-item-img">
@@ -248,12 +263,24 @@ function showError(msg) {
   el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
+function showSuccess(orderId) {
+  document.getElementById('checkoutWrap').style.display = 'none';
+  const wrap = document.getElementById('successWrap');
+  wrap.style.display = 'block';
+  const email = document.getElementById('fEmail').value.trim();
+  document.getElementById('successDetails').innerHTML =
+    `<p>Order # <strong>${orderId}</strong></p>
+     <p>A receipt has been sent to <strong>${email}</strong>.</p>
+     <p>We'll follow up within 1 business day with pricing and payment options.</p>`;
+  localStorage.removeItem('vp_cart');
+}
+
 async function submitOrder(e) {
   e.preventDefault();
   document.getElementById('errorMsg').style.display = 'none';
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.innerHTML = '<svg style="display:inline;vertical-align:middle;margin-right:8px;animation:spin 1s linear infinite;" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Preparing checkout…';
+  btn.innerHTML = '<svg style="display:inline;vertical-align:middle;margin-right:8px;animation:spin 1s linear infinite;" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Sending…';
 
   const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const payload = {
@@ -269,15 +296,39 @@ async function submitOrder(e) {
       }
     },
     notes:    document.getElementById('fNotes').value.trim(),
-    items:    cart.map(i => ({ name: i.name, size: i.size, price: i.price, qty: i.qty, garment: i.garment })),
+    // Strip base64 img to keep payload small — design preview isn't needed server-side
+    items:    cart.map(i => ({ name: i.name, size: i.size, price: i.price, priceStr: i.priceStr, qty: i.qty, garment: i.garment })),
     subtotal: sub,
   };
 
+  // Quote Required orders bypass Stripe — go directly to process-order.php for email receipt
+  if (isQuoteOrder()) {
+    try {
+      const res  = await fetch('process-order.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showSuccess(data.orderId);
+      } else {
+        throw new Error(data.error || 'Could not submit order. Please call us at 704-377-6626.');
+      }
+    } catch(err) {
+      showError(err.message);
+      btn.disabled = false;
+      btn.innerHTML = 'Submit Order Request';
+    }
+    return;
+  }
+
+  // Priced items → Stripe
   try {
     const res  = await fetch('create-checkout-session.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
     if (data.url) {
