@@ -1044,7 +1044,7 @@ function loadProduct(code) {
     }
     // Preload this color's mockup on hover so it's cached by the time the user clicks
     sw.addEventListener('mouseenter', function() {
-      if (color.mockup) { const p = new Image(); p.src = color.mockup; }
+      if (color.mockup) { const p = new Image(); p.crossOrigin = 'anonymous'; p.src = proxyUrl(color.mockup); }
     });
     sw.addEventListener('click', function() {
       container.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
@@ -1063,6 +1063,14 @@ function loadProduct(code) {
   updateMockup();
 }
 
+// Route vistecprints.com image URLs through imgproxy.php so they carry
+// CORS headers and the canvas stays untainted for toDataURL() export.
+function proxyUrl(url) {
+  if (!url) return url;
+  if (url.includes('vistecprints.com')) return 'imgproxy.php?url=' + encodeURIComponent(url);
+  return url;
+}
+
 function updateMockup() {
   const img         = document.getElementById('mockupImg');
   const placeholder = document.getElementById('mockupPlaceholder');
@@ -1074,7 +1082,8 @@ function updateMockup() {
     const color = currentProduct.colors[currentColorIdx];
     if (color?.mockup) {
       img.onerror = () => { img.onerror = null; };
-      img.src = color.mockup;
+      img.crossOrigin = 'anonymous'; // must be set before src for CORS to apply
+      img.src = proxyUrl(color.mockup);
       updatePrintZone();
       return;
     }
@@ -1103,7 +1112,7 @@ document.querySelectorAll('.garment-tab').forEach(tab => {
     if (!prod) return;
     const allowed = CM_ALLOWED[code];
     const colors = allowed ? prod.colors.filter(c => allowed.has(c.name)) : prod.colors;
-    if (colors[0]?.mockup) { const p = new Image(); p.src = colors[0].mockup; }
+    if (colors[0]?.mockup) { const p = new Image(); p.crossOrigin = 'anonymous'; p.src = proxyUrl(colors[0].mockup); }
   });
   tab.addEventListener('click', function() {
     document.querySelectorAll('.garment-tab').forEach(t => t.classList.remove('active'));
@@ -1380,13 +1389,11 @@ function captureDesign(size = 520) {
   off.width = off.height = size;
   const ctx = off.getContext('2d');
 
-  // Draw the white shirt base
+  // Mockup is loaded via imgproxy.php with crossOrigin='anonymous' — canvas stays clean
   const mockImg = document.getElementById('mockupImg');
   try { ctx.drawImage(mockImg, 0, 0, size, size); } catch(e) {}
 
-  // Catalog mockup images are pre-colored — no blend needed
-
-  // Draw the design (may throw SecurityError if canvas is tainted by cross-origin images)
+  // Design layer from Fabric canvas
   try { ctx.drawImage(canvas.getElement(), 0, 0); } catch(e) {}
 
   // Restore
@@ -1396,14 +1403,19 @@ function captureDesign(size = 520) {
   try {
     return off.toDataURL('image/png');
   } catch(e) {
-    return ''; // tainted canvas — cross-origin image without CORS headers
+    return ''; // safety net — should not happen with proxied images
   }
 }
 
 document.getElementById('btnDownload').addEventListener('click', () => {
+  const dataUrl = captureDesign();
+  if (!dataUrl) {
+    showToast('Export failed — try reloading and adding your design again.', 'error');
+    return;
+  }
   const link    = document.createElement('a');
   link.download = 'vistec-design.png';
-  link.href     = captureDesign();
+  link.href     = dataUrl;
   link.click();
   showToast('Design downloaded!', 'success');
 });
@@ -2048,16 +2060,17 @@ function addLibDesign(id, name, cat) {
   const localSrc  = designImgUrl(id);
   const remoteSrc = designImgFallback(id);
 
-  // Try local PNG first; fall back to remote JPG if local doesn't exist
+  // Try local PNG first; fall back to remote JPG via proxy (proxy adds CORS headers
+  // so design images can be drawn on the export canvas without tainting it)
   fabric.Image.fromURL(localSrc, function(img, isError) {
     if (isError || !img || img.width === 0) {
-      fabric.Image.fromURL(remoteSrc, function(img2, isError2) {
+      fabric.Image.fromURL(proxyUrl(remoteSrc), function(img2, isError2) {
         if (isError2 || !img2 || img2.width === 0) {
           showToast('Could not load design image.', 'error');
           return;
         }
         placeDesignImg(img2);
-      });
+      }, { crossOrigin: 'anonymous' });
     } else {
       placeDesignImg(img);
     }
