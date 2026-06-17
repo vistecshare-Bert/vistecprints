@@ -132,6 +132,10 @@ section{padding:100px 5%;}
 .cat-tab{background:transparent;border:1px solid var(--dark3);color:var(--gray);padding:9px 20px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;border-radius:2px;transition:all 0.2s;}
 .cat-tab.active,.cat-tab:hover{background:var(--gold);border-color:var(--gold);color:var(--black);}
 .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+.product-card.shop-hidden{display:none;}
+#shopViewMoreWrap{text-align:center;margin-top:40px;display:none;}
+.shop-more-btn{background:transparent;border:1px solid rgba(212,152,72,0.5);color:var(--gold);padding:12px 44px;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:2px;transition:all 0.2s;}
+.shop-more-btn:hover{background:var(--gold);color:var(--black);}
 .product-card{background:var(--dark);border:1px solid var(--dark3);border-radius:2px;overflow:hidden;position:relative;cursor:pointer;transition:all 0.3s;}
 .product-card:hover{border-color:rgba(212,152,72,0.4);transform:translateY(-4px);}
 .product-img{width:100%;aspect-ratio:1;background:var(--dark2);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
@@ -624,6 +628,9 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
     <button class="cat-tab" data-cat="jesus">Jesus Christ</button>
   </div>
   <div class="products-grid" id="productsGrid" style="margin-top:40px;"></div>
+  <div id="shopViewMoreWrap">
+    <button class="shop-more-btn" id="shopViewMoreBtn" onclick="toggleShopMore()">View More</button>
+  </div>
 </section>
 
 <!-- CANVAS -->
@@ -778,12 +785,61 @@ let products = [];
 let productMap = {};
 let activecat = 'all';
 
+// ── SHOP VIEW MORE ────────────────────────────────────
+const SHOP_VISIBLE_ROWS = 4;
+let shopExpanded = false;
+let shopCutoffIdx = -1;
+
+function applyShopRowLimit() {
+  shopExpanded = false;
+  const grid  = document.getElementById('productsGrid');
+  const wrap  = document.getElementById('shopViewMoreWrap');
+  const btn   = document.getElementById('shopViewMoreBtn');
+  const cards = [...grid.querySelectorAll('.product-card')];
+  if (!cards.length) { wrap.style.display = 'none'; return; }
+
+  // Count rows by tracking offsetTop changes
+  let rowCount = 0, lastTop = -1;
+  shopCutoffIdx = -1;
+  cards.forEach((card, i) => {
+    const t = card.offsetTop;
+    if (t > lastTop + 2) { rowCount++; lastTop = t; }
+    if (rowCount > SHOP_VISIBLE_ROWS && shopCutoffIdx === -1) shopCutoffIdx = i;
+  });
+
+  if (shopCutoffIdx === -1) {
+    cards.forEach(c => c.classList.remove('shop-hidden'));
+    wrap.style.display = 'none';
+    return;
+  }
+
+  cards.forEach((c, i) => c.classList.toggle('shop-hidden', i >= shopCutoffIdx));
+  btn.textContent = `View More (+${cards.length - shopCutoffIdx})`;
+  wrap.style.display = 'block';
+}
+
+function toggleShopMore() {
+  shopExpanded = !shopExpanded;
+  const grid  = document.getElementById('productsGrid');
+  const btn   = document.getElementById('shopViewMoreBtn');
+  const cards = [...grid.querySelectorAll('.product-card')];
+  if (shopExpanded) {
+    cards.forEach(c => c.classList.remove('shop-hidden'));
+    btn.textContent = 'Show Less ↑';
+  } else {
+    cards.forEach((c, i) => c.classList.toggle('shop-hidden', shopCutoffIdx !== -1 && i >= shopCutoffIdx));
+    btn.textContent = `View More (+${cards.length - shopCutoffIdx})`;
+    document.getElementById('productsGrid').closest('section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
 function renderProducts(cat) {
   activecat = cat;
   const grid = document.getElementById('productsGrid');
   const filtered = cat === 'all' ? products : products.filter(p => p.cat === cat);
   if (!filtered.length) {
     grid.innerHTML = '<p style="color:var(--gray);padding:40px 0;">No products in this category yet.</p>';
+    document.getElementById('shopViewMoreWrap').style.display = 'none';
     return;
   }
   grid.innerHTML = filtered.map(p => `
@@ -805,6 +861,9 @@ function renderProducts(cat) {
       </div>
     </div>
   `).join('');
+
+  // Apply 4-row limit after layout is calculated
+  requestAnimationFrame(applyShopRowLimit);
 }
 
 document.getElementById('catTabs').addEventListener('click', e => {
