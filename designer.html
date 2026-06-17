@@ -1027,10 +1027,6 @@ function loadProduct(code) {
   const allowed = CM_ALLOWED[code];
   const colors = allowed ? allColors.filter(c => allowed.has(c.name)) : allColors;
 
-  // Preload all mockup images now — new Image() is non-blocking so this doesn't slow the page
-  // but ensures swatch clicks are instant with no network delay
-  colors.forEach(c => { if (c.mockup) { const p = new Image(); p.src = c.mockup; } });
-
   const container = document.getElementById('colorSwatches');
   container.innerHTML = '';
   container.classList.remove('expanded');
@@ -1046,6 +1042,10 @@ function loadProduct(code) {
     if (!hexLow || ['#ffffff','#f0f0f0','#eaeef2','#cccccc','#e5d8c8','#eae9ed','#f1d6a7'].includes(hexLow)) {
       sw.style.outline = '1px solid rgba(180,180,180,0.4)';
     }
+    // Preload this color's mockup on hover so it's cached by the time the user clicks
+    sw.addEventListener('mouseenter', function() {
+      if (color.mockup) { const p = new Image(); p.src = color.mockup; }
+    });
     sw.addEventListener('click', function() {
       container.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
       this.classList.add('active');
@@ -1095,6 +1095,16 @@ function updateMockup() {
 
 // Garment type tabs
 document.querySelectorAll('.garment-tab').forEach(tab => {
+  // Preload first color mockup on hover so it's cached by click time
+  tab.addEventListener('mouseenter', function() {
+    const code = this.dataset.productCode;
+    if (!code || !window.CATALOG) return;
+    const prod = window.CATALOG.find(p => p.code === code);
+    if (!prod) return;
+    const allowed = CM_ALLOWED[code];
+    const colors = allowed ? prod.colors.filter(c => allowed.has(c.name)) : prod.colors;
+    if (colors[0]?.mockup) { const p = new Image(); p.src = colors[0].mockup; }
+  });
   tab.addEventListener('click', function() {
     document.querySelectorAll('.garment-tab').forEach(t => t.classList.remove('active'));
     this.classList.add('active');
