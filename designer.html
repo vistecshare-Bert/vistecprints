@@ -250,8 +250,6 @@ input[type=checkbox].tgl:checked + label.tgl-btn::after{left:19px;background:var
   display:block;
 }
 #designer-canvas{
-  position:relative;
-  z-index:2;
   display:block;
 }
 .print-zone-overlay{
@@ -2012,14 +2010,14 @@ function addLibDesign(id, name, cat) {
   `;
   document.body.appendChild(banner);
 
-  const imgSrc = designImgUrl(id);
-  fabric.Image.fromURL(imgSrc, function(img) {
+  function placeDesignImg(img) {
     const maxSize = 220;
-    const scale   = Math.min(maxSize / img.width, maxSize / img.height);
+    const scale   = Math.min(maxSize / img.width, maxSize / img.height, 1);
     img.set({
       left: canvas.width / 2, top: canvas.height / 2,
       originX: 'center', originY: 'center',
       scaleX: scale, scaleY: scale,
+      selectable: true, hasControls: true, hasBorders: true,
     });
     canvas.add(img);
     canvas.setActiveObject(img);
@@ -2027,6 +2025,24 @@ function addLibDesign(id, name, cat) {
     updateLayersPanel();
     saveState();
     showToast(`"${name}" added — $20.00`, 'success');
+  }
+
+  const localSrc  = designImgUrl(id);
+  const remoteSrc = designImgFallback(id);
+
+  // Try local PNG first; fall back to remote JPG if local doesn't exist
+  fabric.Image.fromURL(localSrc, function(img, isError) {
+    if (isError || !img || img.width === 0) {
+      fabric.Image.fromURL(remoteSrc, function(img2, isError2) {
+        if (isError2 || !img2 || img2.width === 0) {
+          showToast('Could not load design image.', 'error');
+          return;
+        }
+        placeDesignImg(img2);
+      });
+    } else {
+      placeDesignImg(img);
+    }
   }, { crossOrigin: 'anonymous' });
 }
 
