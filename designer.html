@@ -127,17 +127,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
 .garment-tab{flex:1;padding:8px 4px;background:var(--dark3);border:1px solid rgba(255,255,255,0.08);border-radius:4px;cursor:pointer;text-align:center;font-size:11px;color:var(--gray);transition:all 0.2s;letter-spacing:0.5px;}
 .garment-tab.active,.garment-tab:hover{background:rgba(212,152,72,0.12);border-color:var(--gold-dim);color:var(--gold);}
 
-/* Color swatches */
-.color-swatches{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
-.swatch{width:36px;height:36px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 0.2s;position:relative;}
-.swatch.active{border-color:var(--gold);transform:scale(1.1);}
-.swatch:hover{transform:scale(1.05);}
-.swatch-label{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--gray);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.2s;}
-.swatch:hover .swatch-label,.swatch.active .swatch-label{opacity:1;}
-.swatch.extra{display:none;}
-.color-swatches.expanded .swatch.extra{display:block;}
-.swatch-more-btn{background:none;border:1px solid rgba(212,152,72,0.4);color:var(--gold);font-size:11px;padding:4px 10px;border-radius:12px;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:inherit;margin-left:2px;}
-.swatch-more-btn:hover{background:rgba(212,152,72,0.1);border-color:var(--gold);}
+/* Color swatches — compact Deco-style */
+.color-swatches{display:flex;flex-wrap:wrap;gap:3px;align-items:flex-start;padding-top:2px;}
+.swatch{width:16px;height:16px;border-radius:3px;cursor:pointer;border:1.5px solid transparent;transition:border-color 0.1s,box-shadow 0.1s;position:relative;flex-shrink:0;}
+.swatch.active{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
+.swatch:hover{border-color:rgba(255,255,255,0.55);}
+.swatch::after{content:attr(data-name);position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:#111;border:1px solid rgba(255,255,255,0.15);color:var(--offwhite);font-size:10px;line-height:1.3;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.12s;z-index:200;font-family:'DM Sans',sans-serif;font-weight:400;}
+.swatch:hover::after{opacity:1;}
+.swatch.extra{display:block;}
+.swatch-more-btn{display:none;}
 
 /* View toggle */
 .view-toggle{display:flex;background:var(--dark3);border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);}
@@ -206,6 +204,33 @@ input[type=checkbox].tgl:checked + label.tgl-btn::after{left:19px;background:var
   overflow:hidden;
   position:relative;
   background:var(--black);
+}
+/* Text edit mode hint */
+.edit-hint{
+  position:absolute;
+  bottom:14px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(212,152,72,0.15);
+  border:1px solid rgba(212,152,72,0.5);
+  color:var(--gold);
+  padding:5px 16px;
+  border-radius:3px;
+  font-size:11px;
+  letter-spacing:0.5px;
+  pointer-events:none;
+  z-index:20;
+  white-space:nowrap;
+  display:none;
+}
+/* Instruction bar below canvas */
+.canvas-tip{
+  text-align:center;
+  font-size:10px;
+  color:var(--gray2);
+  letter-spacing:0.5px;
+  padding:6px 0 2px;
+  flex-shrink:0;
 }
 #canvasContainer{
   position:relative;
@@ -538,7 +563,8 @@ input[type=range]{width:100%;accent-color:var(--gold);}
 
     <!-- CANVAS WRAP -->
     <div class="canvas-wrap" id="canvasWrap">
-      <div class="canvas-container" id="canvasContainer" style="width:520px;height:520px;">
+      <div class="edit-hint" id="editHint">&#x270F; Editing text &mdash; drag to reposition after pressing Escape</div>
+      <div class="design-stage" id="canvasContainer" style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:520px;height:520px;isolation:isolate;">
         <img class="mockup-img" id="mockupImg" src="mockups/tshirt-white-front.png" alt="T-shirt mockup"
              onerror="this.style.opacity='0.1'; document.getElementById('mockupPlaceholder').classList.add('show')"/>
         <canvas id="designer-canvas" width="520" height="520"></canvas>
@@ -549,6 +575,7 @@ input[type=range]{width:100%;accent-color:var(--gold);}
         </div>
       </div>
     </div>
+    <div class="canvas-tip">Click to select &nbsp;&middot;&nbsp; Drag to move &nbsp;&middot;&nbsp; Double-click text to type &nbsp;&middot;&nbsp; Corner handles to resize</div>
 
   </main>
 
@@ -611,7 +638,7 @@ input[type=range]{width:100%;accent-color:var(--gold);}
     <!-- TEXT TAB -->
     <div class="tab-pane" id="tab-text">
       <div id="textPropsWrap">
-        <div class="no-selection" id="noSelectionMsg">Click any element on the canvas<br/>to select &amp; edit it.<br/><br/><span style="font-size:11px;color:var(--gray2);">Drag to move &nbsp;·&nbsp; Corner handles to resize<br/>Double-click text to type</span></div>
+        <div class="no-selection" id="noSelectionMsg">Click any element on the canvas<br/>to select &amp; edit it.<br/><br/><span style="font-size:11px;color:var(--gray2);">&#x2460; <strong style="color:var(--offwhite);">Click once</strong> — select &amp; drag to move<br/>&#x2461; <strong style="color:var(--offwhite);">Double-click</strong> — type directly on shirt<br/>&#x2462; <strong style="color:var(--offwhite);">Escape</strong> — exit typing mode to drag again</span></div>
         <div id="textProps" style="display:none;flex-direction:column;gap:14px;">
 
           <div class="prop-group">
@@ -633,8 +660,8 @@ input[type=range]{width:100%;accent-color:var(--gold);}
 
           <div class="prop-row">
             <div class="prop-group">
-              <div class="prop-label">Size</div>
-              <input type="number" class="prop-input" id="propFontSize" value="36" min="6" max="300"/>
+              <div class="prop-label">Size (in)</div>
+              <input type="number" class="prop-input" id="propFontSize" value="0.75" min="0.1" max="8" step="0.05"/>
             </div>
             <div class="prop-group">
               <div class="prop-label">Line Ht.</div>
@@ -963,39 +990,71 @@ function applyColorToHoodie(src, hex, cb) {
   tmp.src = src;
 }
 
+// =========================================================
+//  CAROLINA MADE — available colors per product code
+//  Update this list when stock changes at carolinamade.com
+// =========================================================
+const CM_ALLOWED = {
+  '5000': new Set([
+    'Ash','Azalea','Black','Cardinal Red','Carolina Blue','Charcoal',
+    'Daisy','Dark Chocolate','Dark Heather','Forest','Gold','Graphite Heather',
+    'Heather Military Green','Heather Navy','Heliconia','Irish Green',
+    'Light Blue','Light Pink','Lime','Maroon','Military Green','Natural',
+    'Navy','Old Gold','Orange','Purple','Red','Royal','S Orange',
+    'Safety Green','Sand','Sapphire','Sport Grey','Tennessee Orange','White'
+  ]),
+  '5000L': new Set([
+    'Ash','Azalea','Black','Cardinal Red','Carolina Blue','Charcoal',
+    'Daisy','Dark Heather','Forest','Gold','Heliconia','Irish Green',
+    'Light Blue','Light Pink','Lime','Maroon','Military Green','Natural',
+    'Navy','Orange','Purple','Red','Royal','Safety Green','Sand',
+    'Sapphire','Sport Grey','White'
+  ]),
+  // BC3001 and 12500: no filter (show all catalog colors)
+};
+
+// Pixels per inch on the canvas (based on design height field)
+function canvasPPI() {
+  const h = parseFloat(document.getElementById('designH').value) || 14;
+  return 520 / h;
+}
+
 // Rebuild color swatches from a catalog product and wire up click handlers
 function loadProduct(code) {
   if (!window.CATALOG) return;
   currentProduct = window.CATALOG.find(p => p.code === code) || null;
   if (!currentProduct) { updateMockup(); return; }
 
-  // Preload all mockup images in background so swatch clicks are instant
-  currentProduct.colors.forEach(color => {
-    if (color.mockup) { const p = new Image(); p.src = color.mockup; }
-  });
+  const allColors = currentProduct.colors;
+  const allowed = CM_ALLOWED[code];
+  const colors = allowed ? allColors.filter(c => allowed.has(c.name)) : allColors;
 
-  const BASIC_COUNT = 8;
+  // Progressive preload: first color immediately, rest on idle so page stays fast
+  if (colors[0]?.mockup) new Image().src = colors[0].mockup;
+  const lazyPreload = () => colors.slice(1).forEach(c => { if (c.mockup) new Image().src = c.mockup; });
+  window.requestIdleCallback
+    ? requestIdleCallback(lazyPreload, { timeout: 3000 })
+    : setTimeout(lazyPreload, 1500);
+
   const container = document.getElementById('colorSwatches');
   container.innerHTML = '';
   container.classList.remove('expanded');
-  const colors = currentProduct.colors;
 
   colors.forEach((color, i) => {
     const sw = document.createElement('div');
-    sw.className = 'swatch' + (i === 0 ? ' active' : '') + (i >= BASIC_COUNT ? ' extra' : '');
+    sw.className = 'swatch' + (i === 0 ? ' active' : '');
+    sw.setAttribute('data-name', color.name);
     sw.title = color.name;
     sw.style.backgroundColor = color.hex || '#888';
-    if (!color.hex || color.hex.toLowerCase() === '#ffffff' || color.hex.toLowerCase() === '#f0f0f0') {
-      sw.style.boxShadow = '0 0 0 1px #aaa inset';
+    const hexLow = (color.hex || '').toLowerCase();
+    // Outline very light colors so they're visible on the dark panel
+    if (!hexLow || ['#ffffff','#f0f0f0','#eaeef2','#cccccc','#e5d8c8','#eae9ed','#f1d6a7'].includes(hexLow)) {
+      sw.style.outline = '1px solid rgba(180,180,180,0.4)';
     }
-    const label = document.createElement('span');
-    label.className = 'swatch-label';
-    label.textContent = color.name;
-    sw.appendChild(label);
     sw.addEventListener('click', function() {
       container.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
       this.classList.add('active');
-      currentColorIdx = i;
+      currentColorIdx = allColors.indexOf(color);
       currentColor = color.name;
       document.getElementById('quoteColor').value = color.name;
       updateMockup();
@@ -1003,19 +1062,8 @@ function loadProduct(code) {
     container.appendChild(sw);
   });
 
-  if (colors.length > BASIC_COUNT) {
-    const btn = document.createElement('button');
-    btn.className = 'swatch-more-btn';
-    btn.textContent = `+${colors.length - BASIC_COUNT} more`;
-    btn.addEventListener('click', function() {
-      const expanded = container.classList.toggle('expanded');
-      this.textContent = expanded ? 'Show less' : `+${colors.length - BASIC_COUNT} more`;
-    });
-    container.appendChild(btn);
-  }
-
-  currentColorIdx = 0;
-  currentColor = currentProduct.colors[0]?.name || 'Black';
+  currentColorIdx = allColors.indexOf(colors[0]);
+  currentColor = colors[0]?.name || 'Black';
   document.getElementById('quoteColor').value = currentColor;
   updateMockup();
 }
@@ -1131,6 +1179,14 @@ canvas.on('object:modified', () => { saveState(); updateLayersPanel(); });
 canvas.on('selection:created', e  => { selectedObject = e.selected[0]; onSelectObject(); });
 canvas.on('selection:updated', e  => { selectedObject = e.selected[0]; onSelectObject(); });
 canvas.on('selection:cleared', () => { selectedObject = null; onSelectObject(); updateLayersPanel(); });
+
+// Text editing mode: show/hide hint bar
+canvas.on('text:editing:entered', () => {
+  document.getElementById('editHint').style.display = 'block';
+});
+canvas.on('text:editing:exited', () => {
+  document.getElementById('editHint').style.display = 'none';
+});
 
 // =========================================================
 //  ADD ELEMENTS
@@ -1344,6 +1400,11 @@ document.getElementById('btnDownload').addEventListener('click', () => {
 //  KEYBOARD SHORTCUTS
 // =========================================================
 document.addEventListener('keydown', e => {
+  // Escape: exit text editing mode first
+  if (e.key === 'Escape') {
+    const obj = canvas.getActiveObject();
+    if (obj && obj.isEditing) { obj.exitEditing(); canvas.renderAll(); return; }
+  }
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
   if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
   if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); redo(); }
@@ -1373,7 +1434,7 @@ function onSelectObject() {
   if (isText) {
     suppressProps = true;
     document.getElementById('propFontFamily').value    = obj.fontFamily || 'DM Sans';
-    document.getElementById('propFontSize').value      = Math.round(obj.fontSize) || 36;
+    document.getElementById('propFontSize').value      = ((obj.fontSize || 36) / canvasPPI()).toFixed(2);
     document.getElementById('propLineHeight').value    = obj.lineHeight || 1.2;
     document.getElementById('propTextContent').value   = obj.text || '';
     document.getElementById('propOpacity').value       = Math.round((obj.opacity || 1) * 100);
@@ -1428,7 +1489,7 @@ document.getElementById('propFontFamily').addEventListener('change', function() 
   saveState();
 });
 document.getElementById('propFontSize').addEventListener('input', function() {
-  applyProp('fontSize', parseInt(this.value) || 36);
+  applyProp('fontSize', Math.max(6, Math.round(parseFloat(this.value) * canvasPPI())) || 36);
 });
 document.getElementById('propFontSize').addEventListener('change', saveState);
 document.getElementById('propLineHeight').addEventListener('input', function() {
