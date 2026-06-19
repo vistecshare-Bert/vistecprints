@@ -122,6 +122,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
 .lib-more:hover{border-color:var(--gold-dim);color:var(--gold);}
 .lib-count{font-size:10px;color:var(--gray2);margin-bottom:6px;}
 
+/* Product picks */
+.product-picks{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.product-pick{padding:10px 8px;background:var(--dark3);border:1.5px solid rgba(255,255,255,0.08);border-radius:6px;cursor:pointer;text-align:center;transition:all 0.2s;user-select:none;}
+.product-pick:hover{border-color:var(--gold-dim);}
+.product-pick.active{background:rgba(212,152,72,0.10);border-color:var(--gold);}
+.pick-name{display:block;font-size:12px;font-weight:600;color:var(--offwhite);line-height:1.2;margin-bottom:2px;}
+.pick-desc{display:block;font-size:10px;color:var(--gray);margin-bottom:5px;}
+.pick-price{display:block;font-size:15px;font-weight:700;color:var(--gold);letter-spacing:-0.3px;}
+.ship-badge{margin-top:8px;padding:7px 10px;background:rgba(30,70,30,0.45);border:1px solid rgba(80,180,80,0.2);border-radius:4px;font-size:10px;color:#7dc97d;letter-spacing:0.4px;text-align:center;}
+
 /* Garment type tabs */
 .garment-tabs{display:flex;gap:6px;flex-wrap:wrap;}
 .garment-tab{flex:1;padding:8px 4px;background:var(--dark3);border:1px solid rgba(255,255,255,0.08);border-radius:4px;cursor:pointer;text-align:center;font-size:11px;color:var(--gray);transition:all 0.2s;letter-spacing:0.5px;}
@@ -456,6 +466,23 @@ input[type=range]{width:100%;accent-color:var(--gold);}
 
   <!-- ======== LEFT PANEL ======== -->
   <aside class="panel-left">
+
+    <div class="panel-section">
+      <div class="panel-heading">Product</div>
+      <div class="product-picks">
+        <div class="product-pick active" data-code="5000">
+          <span class="pick-name">Gildan 5000</span>
+          <span class="pick-desc">Heavy Cotton 100%</span>
+          <span class="pick-price">$5.75/shirt</span>
+        </div>
+        <div class="product-pick" data-code="64000">
+          <span class="pick-name">Gildan 6400</span>
+          <span class="pick-desc">SoftStyle 100%</span>
+          <span class="pick-price">$7.75/shirt</span>
+        </div>
+      </div>
+      <div class="ship-badge">&#10003;&nbsp; Free shipping on orders of 20+ shirts</div>
+    </div>
 
     <div class="panel-section">
       <div class="panel-heading">Garment</div>
@@ -826,7 +853,7 @@ input[type=range]{width:100%;accent-color:var(--gold);}
       <button class="dc-sz" data-size="2XL">2XL</button>
       <button class="dc-sz" data-size="3XL">3XL</button>
     </div>
-    <div class="dc-note">Pricing for custom designs is quoted after our team reviews your artwork.</div>
+    <div class="dc-note" id="dcNote">Pricing for custom designs is quoted after our team reviews your artwork.</div>
     <button class="dc-add" id="dcAddBtn" disabled onclick="dcConfirmAdd()">Select a Size</button>
   </div>
 </div>
@@ -1102,6 +1129,26 @@ function updateMockup() {
   updatePrintZone();
 }
 
+// =========================================================
+//  PRODUCT PICKS (pricing)
+// =========================================================
+const PRODUCT_PRICES = { '5000': 5.75, '5000L': 5.75, '64000': 7.75 };
+let selectedProductCode = '5000';
+
+document.querySelectorAll('.product-pick').forEach(card => {
+  card.addEventListener('click', function() {
+    document.querySelectorAll('.product-pick').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    selectedProductCode = this.dataset.code;
+    // Both 5000 and 64000 are T-shirts — keep T-Shirt garment tab active
+    currentGarment = 'tshirt';
+    document.querySelectorAll('.garment-tab').forEach(t => t.classList.remove('active'));
+    const tshirtTab = document.querySelector('.garment-tab[data-garment="tshirt"]');
+    if (tshirtTab) tshirtTab.classList.add('active');
+    loadProduct(selectedProductCode);
+  });
+});
+
 // Garment type tabs
 document.querySelectorAll('.garment-tab').forEach(tab => {
   // Preload first color mockup on hover so it's cached by click time
@@ -1119,6 +1166,11 @@ document.querySelectorAll('.garment-tab').forEach(tab => {
     this.classList.add('active');
     currentGarment = this.dataset.garment;
     const code = this.dataset.productCode;
+    selectedProductCode = code || null;
+    // Sync product pick selection
+    document.querySelectorAll('.product-pick').forEach(c => c.classList.remove('active'));
+    const matchPick = document.querySelector(`.product-pick[data-code="${code}"]`);
+    if (matchPick) matchPick.classList.add('active');
     if (code) loadProduct(code);
     else updateMockup();
   });
@@ -1814,8 +1866,15 @@ document.getElementById('btnAddToCart').addEventListener('click', () => {
 
   const garmentLabel = currentProduct?.name || document.querySelector('.garment-tab.active')?.textContent || 'T-Shirt';
   const colorLabel   = currentColor;
+  const gPrice       = PRODUCT_PRICES[selectedProductCode];
+  const priceHtml    = gPrice
+    ? `<br><span style="color:var(--gold);font-size:12px;font-weight:600;">From $${gPrice.toFixed(2)}/shirt + print</span>`
+    : '';
   document.getElementById('dcInfo').innerHTML =
-    `<strong>${garmentLabel}</strong> &nbsp;·&nbsp; ${colorLabel}`;
+    `<strong>${garmentLabel}</strong> &nbsp;·&nbsp; ${colorLabel}${priceHtml}`;
+  document.getElementById('dcNote').textContent = gPrice
+    ? `Shirt price: $${gPrice.toFixed(2)}/shirt. Print cost is confirmed within 1 business day after we review your design.`
+    : 'Pricing for custom designs is quoted after our team reviews your artwork.';
 
   const previewUrl = captureDesign(220); // never throws now
   const previewEl  = document.getElementById('dcPreview');
