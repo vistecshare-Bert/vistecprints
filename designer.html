@@ -249,6 +249,8 @@ input[type=checkbox].tgl:checked + label.tgl-btn::after{left:19px;background:var
   justify-content:center;
   user-select:none;
   isolation:isolate;
+  background:#f0f0f0;
+  border-radius:6px;
 }
 .mockup-img{
   position:absolute;
@@ -258,6 +260,7 @@ input[type=checkbox].tgl:checked + label.tgl-btn::after{left:19px;background:var
   object-fit:contain;
   pointer-events:none;
   display:block;
+  mix-blend-mode:multiply; /* removes solid white bg from catalog images; transparent PNGs unaffected */
 }
 #designer-canvas{
   display:block;
@@ -1440,6 +1443,10 @@ function captureDesign(size = 520) {
   const off = document.createElement('canvas');
   off.width = off.height = size;
   const ctx = off.getContext('2d');
+
+  // White base so download PNG always has a clean background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, size, size);
 
   // Mockup is loaded via imgproxy.php with crossOrigin='anonymous' — canvas stays clean
   const mockImg = document.getElementById('mockupImg');
