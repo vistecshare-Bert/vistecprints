@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://rebuild.vistecprints.com/designer.html"/>
 <meta property="og:image" content="https://rebuild.vistecprints.com/vistecprints-logo.png"/>
 <meta name="twitter:card" content="summary_large_image"/>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Oswald:wght@400;600&family=Anton&family=Roboto:wght@400;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Oswald:wght@400;600&family=Anton&family=Roboto:wght@400;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&family=Inter:wght@400;700&family=Poppins:wght@400;700&family=Raleway:wght@400;700&family=Lato:wght@400;700&family=Open+Sans:wght@400;700&family=Dancing+Script:wght@400;700&family=Pacifico&family=Lobster&family=Permanent+Marker&family=Orbitron:wght@400;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
 <script src="design-library.js"></script>
 <script src="catalog.js"></script>
@@ -259,6 +259,26 @@ input[type=checkbox].tgl:checked + label.tgl-btn::after{left:19px;background:var
   display:block;
   mix-blend-mode:multiply; /* removes solid white bg from catalog images; transparent PNGs unaffected */
 }
+/* ─── FONT PICKER ──────────────────────────────────────────── */
+.fp-trigger{width:100%;padding:8px 10px;background:var(--dark3);border:1.5px solid rgba(255,255,255,0.1);border-radius:4px;color:var(--offwhite);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:6px;transition:border-color 0.2s;font-family:'DM Sans',sans-serif;text-align:left;}
+.fp-trigger:hover,.fp-trigger.open{border-color:var(--gold);}
+.fp-trigger-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fp-trigger-arrow{color:var(--gray);font-size:10px;flex-shrink:0;}
+.font-picker{position:fixed;z-index:9999;background:#1c1c1c;border:1px solid rgba(255,255,255,0.15);border-radius:6px;box-shadow:0 8px 40px rgba(0,0,0,0.7);width:260px;max-height:400px;display:none;flex-direction:column;overflow:hidden;}
+.font-picker.open{display:flex;}
+.fp-search-wrap{padding:10px 10px 0;}
+.fp-search{width:100%;background:#111;border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:var(--offwhite);padding:7px 10px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;}
+.fp-search:focus{border-color:var(--gold);}
+.fp-tabs{display:flex;gap:4px;padding:8px 10px 6px;flex-wrap:wrap;}
+.fp-tab{padding:3px 8px;font-size:10px;letter-spacing:0.4px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:2px;color:var(--gray);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.fp-tab.active{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:700;}
+.fp-list{flex:1;overflow-y:auto;padding:4px 0 8px;}
+.fp-list::-webkit-scrollbar{width:4px;}.fp-list::-webkit-scrollbar-track{background:transparent;}.fp-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:2px;}
+.fp-section-label{font-size:9px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;padding:10px 12px 4px;}
+.fp-item{padding:9px 14px;cursor:pointer;font-size:20px;line-height:1.2;color:var(--offwhite);transition:background 0.1s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fp-item:hover{background:rgba(255,255,255,0.07);}
+.fp-item.fp-active{color:var(--gold);}
+/* ─────────────────────────────────────────────────────────── */
 #designer-canvas{
   display:block;
 }
@@ -663,20 +683,13 @@ input[type=range]{width:100%;accent-color:var(--gold);}
 
           <div class="prop-group">
             <div class="prop-label">Font Family</div>
-            <select class="prop-select" id="propFontFamily">
-              <option value="DM Sans">DM Sans</option>
-              <option value="Bebas Neue">Bebas Neue</option>
-              <option value="Oswald">Oswald</option>
-              <option value="Anton">Anton</option>
-              <option value="Montserrat">Montserrat</option>
-              <option value="Roboto">Roboto</option>
-              <option value="Playfair Display">Playfair Display</option>
-              <option value="Arial">Arial</option>
-              <option value="Georgia">Georgia</option>
-              <option value="Times New Roman">Times New Roman</option>
-              <option value="Impact">Impact</option>
-            </select>
+            <button class="fp-trigger" id="fpTrigger" type="button">
+              <span class="fp-trigger-name" id="fpTriggerName" style="font-family:'DM Sans',sans-serif;">DM Sans</span>
+              <span class="fp-trigger-arrow">&#9660;</span>
+            </button>
           </div>
+          <!-- floating font picker panel, appended to body via JS -->
+
 
           <div class="prop-row">
             <div class="prop-group">
@@ -1543,7 +1556,10 @@ function onSelectObject() {
 
   if (isText) {
     suppressProps = true;
-    document.getElementById('propFontFamily').value    = obj.fontFamily || 'DM Sans';
+    const _ff = obj.fontFamily || 'DM Sans';
+    fpCurrentFont = _ff;
+    const _fpn = document.getElementById('fpTriggerName');
+    if (_fpn) { _fpn.textContent = _ff; _fpn.style.fontFamily = `'${_ff}',sans-serif`; }
     document.getElementById('propFontSize').value      = ((obj.fontSize || 36) / canvasPPI()).toFixed(2);
     document.getElementById('propLineHeight').value    = obj.lineHeight || 1.2;
     document.getElementById('propTextContent').value   = obj.text || '';
@@ -1594,10 +1610,164 @@ function applyProp(prop, value) {
   canvas.renderAll();
 }
 
-document.getElementById('propFontFamily').addEventListener('change', function() {
-  applyProp('fontFamily', this.value);
+// ─── FONT PICKER ────────────────────────────────────────────────────────────
+const FONT_LIST = [
+  // Sans Serif
+  {n:'DM Sans',c:'sans'},{n:'Inter',c:'sans'},{n:'Roboto',c:'sans'},
+  {n:'Open Sans',c:'sans'},{n:'Lato',c:'sans'},{n:'Montserrat',c:'sans'},
+  {n:'Poppins',c:'sans'},{n:'Raleway',c:'sans'},{n:'Nunito',c:'sans'},
+  {n:'Oswald',c:'sans'},{n:'Josefin Sans',c:'sans'},{n:'Barlow',c:'sans'},
+  {n:'Cabin',c:'sans'},{n:'Exo 2',c:'sans'},{n:'Quicksand',c:'sans'},
+  {n:'Rubik',c:'sans'},{n:'Work Sans',c:'sans'},{n:'Mulish',c:'sans'},
+  {n:'Outfit',c:'sans'},{n:'Karla',c:'sans'},{n:'Jost',c:'sans'},
+  {n:'Plus Jakarta Sans',c:'sans'},{n:'Ubuntu',c:'sans'},{n:'Oxanium',c:'sans'},
+  // Serif
+  {n:'Playfair Display',c:'serif'},{n:'Merriweather',c:'serif'},
+  {n:'EB Garamond',c:'serif'},{n:'Lora',c:'serif'},{n:'Libre Baskerville',c:'serif'},
+  {n:'Cormorant Garamond',c:'serif'},{n:'Crimson Text',c:'serif'},
+  {n:'Vollkorn',c:'serif'},{n:'Fraunces',c:'serif'},{n:'Source Serif 4',c:'serif'},
+  {n:'Georgia',c:'serif'},
+  // Display
+  {n:'Bebas Neue',c:'display'},{n:'Anton',c:'display'},{n:'Teko',c:'display'},
+  {n:'Orbitron',c:'display'},{n:'Black Ops One',c:'display'},{n:'Bungee',c:'display'},
+  {n:'Chakra Petch',c:'display'},{n:'Graduate',c:'display'},{n:'Lilita One',c:'display'},
+  {n:'Russo One',c:'display'},{n:'Squada One',c:'display'},{n:'Staatliches',c:'display'},
+  {n:'Alfa Slab One',c:'display'},{n:'Archivo Black',c:'display'},{n:'Impact',c:'display'},
+  // Script / Handmade
+  {n:'Dancing Script',c:'script'},{n:'Pacifico',c:'script'},{n:'Caveat',c:'script'},
+  {n:'Sacramento',c:'script'},{n:'Satisfy',c:'script'},{n:'Kaushan Script',c:'script'},
+  {n:'Great Vibes',c:'script'},{n:'Lobster',c:'script'},{n:'Shadows Into Light',c:'script'},
+  {n:'Yellowtail',c:'script'},{n:'Permanent Marker',c:'script'},
+];
+
+const _fpLoadedFonts = new Set([
+  'DM Sans','Bebas Neue','Oswald','Anton','Roboto','Playfair Display','Montserrat',
+  'Inter','Poppins','Raleway','Lato','Open Sans','Dancing Script','Pacifico','Lobster',
+  'Permanent Marker','Orbitron','Georgia','Impact','Arial','Times New Roman',
+]);
+let fpCurrentCat = 'all';
+let fpCurrentFont = 'DM Sans';
+
+function _fpGetRecents() {
+  try { return JSON.parse(localStorage.getItem('vp_recent_fonts') || '[]'); } catch(e) { return []; }
+}
+function _fpSaveRecent(name) {
+  const r = [name, ..._fpGetRecents().filter(f => f !== name)].slice(0, 8);
+  try { localStorage.setItem('vp_recent_fonts', JSON.stringify(r)); } catch(e) {}
+}
+function _fpEnsureFont(name) {
+  if (_fpLoadedFonts.has(name)) return;
+  _fpLoadedFonts.add(name);
+  const encoded = name.replace(/ /g, '+');
+  const lnk = document.createElement('link');
+  lnk.rel = 'stylesheet';
+  lnk.href = `https://fonts.googleapis.com/css2?family=${encoded}:wght@400;700&display=swap`;
+  document.head.appendChild(lnk);
+}
+
+// Build & inject picker panel once into body
+(function() {
+  const panel = document.createElement('div');
+  panel.className = 'font-picker';
+  panel.id = 'fontPicker';
+  panel.innerHTML = `
+    <div class="fp-search-wrap"><input class="fp-search" id="fpSearch" placeholder="Search fonts..." autocomplete="off"/></div>
+    <div class="fp-tabs">
+      <button class="fp-tab active" data-cat="all" type="button">All</button>
+      <button class="fp-tab" data-cat="sans" type="button">Sans Serif</button>
+      <button class="fp-tab" data-cat="serif" type="button">Serif</button>
+      <button class="fp-tab" data-cat="display" type="button">Display</button>
+      <button class="fp-tab" data-cat="script" type="button">Script</button>
+    </div>
+    <div class="fp-list" id="fpList"></div>`;
+  document.body.appendChild(panel);
+})();
+
+function _fpRender() {
+  const query = (document.getElementById('fpSearch').value || '').toLowerCase();
+  const listEl = document.getElementById('fpList');
+  const filtered = FONT_LIST.filter(f => {
+    if (fpCurrentCat !== 'all' && f.c !== fpCurrentCat) return false;
+    if (query && !f.n.toLowerCase().includes(query)) return false;
+    return true;
+  });
+  const recents = _fpGetRecents();
+  let html = '';
+  if (!query && fpCurrentCat === 'all' && recents.length) {
+    html += '<div class="fp-section-label">Recently Used</div>';
+    recents.forEach(name => {
+      html += `<div class="fp-item${name===fpCurrentFont?' fp-active':''}" data-font="${name}" style="font-family:'${name}',sans-serif;">${name}</div>`;
+    });
+    html += '<div class="fp-section-label">All Fonts</div>';
+  }
+  filtered.forEach(f => {
+    html += `<div class="fp-item${f.n===fpCurrentFont?' fp-active':''}" data-font="${f.n}" style="font-family:'${f.n}',sans-serif;">${f.n}</div>`;
+  });
+  if (!html) html = '<div style="padding:16px 12px;font-size:12px;color:var(--gray);">No fonts found</div>';
+  listEl.innerHTML = html;
+  // Load visible fonts
+  filtered.slice(0, 25).forEach(f => _fpEnsureFont(f.n));
+  recents.forEach(_fpEnsureFont);
+  listEl.querySelectorAll('.fp-item').forEach(el => {
+    el.addEventListener('click', () => _fpSelectFont(el.dataset.font));
+  });
+}
+
+function _fpSelectFont(name) {
+  fpCurrentFont = name;
+  _fpEnsureFont(name);
+  _fpSaveRecent(name);
+  const tn = document.getElementById('fpTriggerName');
+  if (tn) { tn.textContent = name; tn.style.fontFamily = `'${name}',sans-serif`; }
+  applyProp('fontFamily', name);
   saveState();
+  _fpClose();
+}
+
+function _fpOpen() {
+  const trigger = document.getElementById('fpTrigger');
+  const picker  = document.getElementById('fontPicker');
+  const rect = trigger.getBoundingClientRect();
+  let left = rect.left;
+  if (left + 260 > window.innerWidth) left = window.innerWidth - 268;
+  let top = rect.bottom + 4;
+  if (top + 400 > window.innerHeight) top = rect.top - 404;
+  picker.style.top  = top + 'px';
+  picker.style.left = left + 'px';
+  picker.classList.add('open');
+  trigger.classList.add('open');
+  document.getElementById('fpSearch').value = '';
+  fpCurrentCat = 'all';
+  document.querySelectorAll('.fp-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === 'all'));
+  _fpRender();
+  setTimeout(() => document.getElementById('fpSearch').focus(), 60);
+}
+function _fpClose() {
+  document.getElementById('fontPicker').classList.remove('open');
+  document.getElementById('fpTrigger').classList.remove('open');
+}
+
+document.getElementById('fpTrigger').addEventListener('click', function(e) {
+  e.stopPropagation();
+  document.getElementById('fontPicker').classList.contains('open') ? _fpClose() : _fpOpen();
 });
+document.addEventListener('click', function(e) {
+  const picker = document.getElementById('fontPicker');
+  if (picker && !picker.contains(e.target) && e.target.id !== 'fpTrigger') _fpClose();
+});
+document.getElementById('fpSearch').addEventListener('input', _fpRender);
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('fp-tab')) {
+    document.querySelectorAll('.fp-tab').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+    fpCurrentCat = e.target.dataset.cat || 'all';
+    _fpRender();
+  }
+});
+document.getElementById('fpList').addEventListener('scroll', function() {
+  this.querySelectorAll('.fp-item').forEach(el => _fpEnsureFont(el.dataset.font));
+});
+// ────────────────────────────────────────────────────────────────────────────
 document.getElementById('propFontSize').addEventListener('input', function() {
   applyProp('fontSize', Math.max(6, Math.round(parseFloat(this.value) * canvasPPI())) || 36);
 });
