@@ -483,6 +483,16 @@ input[type=range]{width:100%;accent-color:var(--gold);}
           <span class="pick-desc">SoftStyle 100%</span>
           <span class="pick-price">$7.75/shirt</span>
         </div>
+        <div class="product-pick" data-code="75000">
+          <span class="pick-name">Gildan 75000</span>
+          <span class="pick-desc">Heavy Blend Crew</span>
+          <span class="pick-price">$10.00/shirt</span>
+        </div>
+        <div class="product-pick" data-code="12500">
+          <span class="pick-name">Hoodie</span>
+          <span class="pick-desc">Heavy Blend 50/50</span>
+          <span class="pick-price">$35.00/shirt</span>
+        </div>
       </div>
       <div class="ship-badge">&#10003;&nbsp; Free shipping on orders of 20+ shirts</div>
     </div>
@@ -1110,10 +1120,26 @@ function updateMockup() {
   // Catalog product with a real mockup URL
   if (currentProduct) {
     const color = currentProduct.colors[currentColorIdx];
-    if (color?.mockup) {
+    let mockupUrl = color?.mockup;
+
+    // Remap: use a different product's mockup images for better quality.
+    // 6400 has solid-bg catalog images; 5000 has clean transparent PNGs.
+    const remapCode = MOCKUP_REMAP[selectedProductCode] || MOCKUP_REMAP[currentProduct.code];
+    if (remapCode && window.CATALOG) {
+      const refProd = window.CATALOG.find(p => p.code === remapCode);
+      if (refProd) {
+        // Exact color-name match → matching 5000 color; else fall back to Black
+        const refColor = refProd.colors.find(c => c.name === color?.name)
+          || refProd.colors.find(c => c.name === 'Black')
+          || refProd.colors[0];
+        if (refColor?.mockup) mockupUrl = refColor.mockup;
+      }
+    }
+
+    if (mockupUrl) {
       img.onerror = () => { img.onerror = null; };
       img.crossOrigin = 'anonymous'; // must be set before src for CORS to apply
-      img.src = proxyUrl(color.mockup);
+      img.src = proxyUrl(mockupUrl);
       updatePrintZone();
       return;
     }
@@ -1135,20 +1161,36 @@ function updateMockup() {
 // =========================================================
 //  PRODUCT PICKS (pricing)
 // =========================================================
-const PRODUCT_PRICES = { '5000': 5.75, '5000L': 5.75, '64000': 7.75 };
+const PRODUCT_PRICES = { '5000': 5.75, '5000L': 5.75, '64000': 7.75, '75000': 10.00, '12500': 35.00 };
 let selectedProductCode = '5000';
+
+// 64000 has its own color list but bad mockup images — swap to 5000 mockup URLs.
+// 75000 isn't in the catalog at all — just use 5000's catalog data entirely.
+const MOCKUP_REMAP = { '64000': '5000' };     // load own colors, swap mockup URL
+const CATALOG_REMAP = { '75000': '5000' };    // no catalog entry — load 5000 fully
 
 document.querySelectorAll('.product-pick').forEach(card => {
   card.addEventListener('click', function() {
     document.querySelectorAll('.product-pick').forEach(c => c.classList.remove('active'));
     this.classList.add('active');
     selectedProductCode = this.dataset.code;
-    // Both 5000 and 64000 are T-shirts — keep T-Shirt garment tab active
-    currentGarment = 'tshirt';
-    document.querySelectorAll('.garment-tab').forEach(t => t.classList.remove('active'));
-    const tshirtTab = document.querySelector('.garment-tab[data-garment="tshirt"]');
-    if (tshirtTab) tshirtTab.classList.add('active');
-    loadProduct(selectedProductCode);
+
+    if (selectedProductCode === '12500') {
+      // Hoodie — uses its own blend-color mockup system; loadProduct populates swatches
+      currentGarment = 'hoodie';
+      document.querySelectorAll('.garment-tab').forEach(t => t.classList.remove('active'));
+      const hoodieTab = document.querySelector('.garment-tab[data-garment="hoodie"]');
+      if (hoodieTab) hoodieTab.classList.add('active');
+      loadProduct('12500');
+    } else {
+      // T-shirt / crewneck — load catalog product (remapped if needed)
+      currentGarment = 'tshirt';
+      document.querySelectorAll('.garment-tab').forEach(t => t.classList.remove('active'));
+      const tshirtTab = document.querySelector('.garment-tab[data-garment="tshirt"]');
+      if (tshirtTab) tshirtTab.classList.add('active');
+      const loadCode = CATALOG_REMAP[selectedProductCode] || selectedProductCode;
+      loadProduct(loadCode);
+    }
   });
 });
 
