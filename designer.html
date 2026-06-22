@@ -373,10 +373,19 @@ input[type=color]{width:36px;height:36px;padding:2px;background:var(--dark3);bor
 .dc-preview{width:110px;height:110px;object-fit:contain;border-radius:4px;background:var(--dark3);margin:0 auto 12px;display:block;}
 .dc-info{font-size:12px;color:var(--gray);margin-bottom:20px;letter-spacing:0.5px;}
 .dc-info strong{color:var(--offwhite);}
-.dc-sizes{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:18px;}
-.dc-sz{background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--gray);padding:8px 14px;border-radius:3px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px;font-family:'DM Sans',sans-serif;}
-.dc-sz:hover{border-color:var(--gold-dim);color:var(--offwhite);}
-.dc-sz.active{background:rgba(212,152,72,0.12);border-color:var(--gold);color:var(--gold);}
+.dcq-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.dcq-cell{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.dcq-lbl{font-size:10px;letter-spacing:1.5px;color:var(--gray);text-transform:uppercase;font-weight:600;}
+.dcq-ctrl{display:flex;align-items:center;}
+.dcq-btn{width:22px;height:28px;background:var(--dark4);border:1px solid rgba(255,255,255,0.1);color:var(--offwhite);cursor:pointer;font-size:15px;line-height:1;transition:all 0.15s;padding:0;font-family:'DM Sans',sans-serif;}
+.dcq-btn:first-child{border-radius:3px 0 0 3px;}
+.dcq-btn:last-child{border-radius:0 3px 3px 0;}
+.dcq-btn:hover{background:rgba(212,152,72,0.18);border-color:var(--gold-dim);color:var(--gold);}
+.dcq-input{width:30px;height:28px;text-align:center;background:var(--dark3);border:1px solid rgba(255,255,255,0.1);border-left:none;border-right:none;color:var(--offwhite);font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;outline:none;}
+.dcq-input::-webkit-outer-spin-button,.dcq-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.dcq-input[type=number]{-moz-appearance:textfield;}
+.dcq-input.has-qty{color:var(--gold);background:rgba(212,152,72,0.08);}
+.dcq-total{text-align:center;font-size:12px;color:var(--gold);font-weight:600;margin-bottom:12px;min-height:16px;letter-spacing:0.5px;}
 .dc-note{font-size:11px;color:var(--gray);margin-bottom:16px;line-height:1.5;}
 .dc-add{width:100%;background:var(--gold);color:var(--black);border:none;padding:13px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:3px;font-family:'DM Sans',sans-serif;transition:background 0.2s;}
 .dc-add:hover{background:var(--gold-light);}
@@ -853,16 +862,10 @@ input[type=range]{width:100%;accent-color:var(--gold);}
     <div class="dc-sub">Your custom design will be added for quoting.</div>
     <img class="dc-preview" id="dcPreview" src="" alt="Design preview"/>
     <div class="dc-info" id="dcInfo"></div>
-    <div class="dc-sizes" id="dcSizes">
-      <button class="dc-sz" data-size="S">S</button>
-      <button class="dc-sz" data-size="M">M</button>
-      <button class="dc-sz" data-size="L">L</button>
-      <button class="dc-sz" data-size="XL">XL</button>
-      <button class="dc-sz" data-size="2XL">2XL</button>
-      <button class="dc-sz" data-size="3XL">3XL</button>
-    </div>
+    <div class="dcq-grid" id="dcSizesQty"></div>
+    <div class="dcq-total" id="dcqTotal"></div>
     <div class="dc-note" id="dcNote">Pricing for custom designs is quoted after our team reviews your artwork.</div>
-    <button class="dc-add" id="dcAddBtn" disabled onclick="dcConfirmAdd()">Select a Size</button>
+    <button class="dc-add" id="dcAddBtn" disabled onclick="dcConfirmAdd()">Enter quantities above</button>
   </div>
 </div>
 
@@ -2060,13 +2063,57 @@ document.querySelectorAll('.dscrub').forEach(wrap => {
 // =========================================================
 //  ADD TO CART (DESIGNER)
 // =========================================================
-let dcSelectedSize = null;
+const DC_SIZES = ['S','M','L','XL','2XL','3XL','4XL','5XL'];
+
+function dcBuildSizeGrid() {
+  const grid = document.getElementById('dcSizesQty');
+  grid.innerHTML = DC_SIZES.map(sz => `
+    <div class="dcq-cell">
+      <span class="dcq-lbl">${sz}</span>
+      <div class="dcq-ctrl">
+        <button class="dcq-btn" data-action="minus" data-size="${sz}" type="button">−</button>
+        <input class="dcq-input" type="number" min="0" max="999" value="0" data-size="${sz}" id="dcq-${sz}"/>
+        <button class="dcq-btn" data-action="plus" data-size="${sz}" type="button">+</button>
+      </div>
+    </div>`).join('');
+
+  grid.querySelectorAll('.dcq-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const input = document.getElementById('dcq-' + this.dataset.size);
+      let v = parseInt(input.value) || 0;
+      v = this.dataset.action === 'plus' ? v + 1 : Math.max(0, v - 1);
+      input.value = v;
+      input.classList.toggle('has-qty', v > 0);
+      dcUpdateQtyTotal();
+    });
+  });
+  grid.querySelectorAll('.dcq-input').forEach(input => {
+    input.addEventListener('input', function() {
+      this.value = Math.max(0, parseInt(this.value) || 0);
+      this.classList.toggle('has-qty', parseInt(this.value) > 0);
+      dcUpdateQtyTotal();
+    });
+  });
+}
+
+function dcUpdateQtyTotal() {
+  const total = DC_SIZES.reduce((s, sz) => s + (parseInt(document.getElementById('dcq-' + sz)?.value) || 0), 0);
+  const totalEl = document.getElementById('dcqTotal');
+  const btn = document.getElementById('dcAddBtn');
+  if (total > 0) {
+    totalEl.textContent = `${total} shirt${total !== 1 ? 's' : ''} total`;
+    btn.disabled = false;
+    btn.textContent = `Add ${total} Shirt${total !== 1 ? 's' : ''} — Go to Checkout →`;
+  } else {
+    totalEl.textContent = '';
+    btn.disabled = true;
+    btn.textContent = 'Enter quantities above';
+  }
+}
 
 document.getElementById('btnAddToCart').addEventListener('click', () => {
-  dcSelectedSize = null;
-  document.querySelectorAll('.dc-sz').forEach(b => b.classList.remove('active'));
-  document.getElementById('dcAddBtn').disabled = true;
-  document.getElementById('dcAddBtn').textContent = 'Select a Size First';
+  dcBuildSizeGrid();
+  dcUpdateQtyTotal();
 
   const garmentLabel = currentProduct?.name || document.querySelector('.garment-tab.active')?.textContent || 'T-Shirt';
   const colorLabel   = currentColor;
@@ -2080,7 +2127,7 @@ document.getElementById('btnAddToCart').addEventListener('click', () => {
     ? `Shirt price: $${gPrice.toFixed(2)}/shirt. Print cost is confirmed within 1 business day after we review your design.`
     : 'Pricing for custom designs is quoted after our team reviews your artwork.';
 
-  const previewUrl = captureDesign(220); // never throws now
+  const previewUrl = captureDesign(220);
   const previewEl  = document.getElementById('dcPreview');
   previewEl.style.display = previewUrl ? 'block' : 'none';
   if (previewUrl) previewEl.src = previewUrl;
@@ -2089,42 +2136,39 @@ document.getElementById('btnAddToCart').addEventListener('click', () => {
   document.body.style.overflow = 'hidden';
 });
 
-document.querySelectorAll('.dc-sz').forEach(btn => {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.dc-sz').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
-    dcSelectedSize = this.dataset.size;
-    document.getElementById('dcAddBtn').disabled = false;
-    document.getElementById('dcAddBtn').textContent = `Add Size ${dcSelectedSize} — Go to Checkout →`;
-  });
-});
-
 function closeDcModal() {
   document.getElementById('dcModal').classList.remove('open');
   document.body.style.overflow = '';
 }
 
 function dcConfirmAdd() {
-  if (!dcSelectedSize) return;
   const garmentLabel = currentProduct?.name || document.querySelector('.garment-tab.active')?.textContent || 'T-Shirt';
   const colorLabel   = currentColor;
-
   const isPreset = presetDesign && presetDesign.price > 0;
-  const item = {
-    id:       (isPreset ? 'design-' + presetDesign.id : 'custom') + '-' + Date.now(),
-    name:     isPreset ? presetDesign.name + ' — ' + garmentLabel : 'Custom Design — ' + garmentLabel,
-    garment:  garmentLabel + ' (' + colorLabel + ')',
-    size:     dcSelectedSize,
-    price:    isPreset ? presetDesign.price : 0,
-    priceStr: isPreset ? '$' + presetDesign.price.toFixed(2) : 'Quote Required',
-    qty:      1,
-    img:      captureDesign(220),
-  };
+  const previewImg = captureDesign(220);
+  const ts = Date.now();
+
+  const sizesWithQty = DC_SIZES.map(sz => ({
+    sz, qty: parseInt(document.getElementById('dcq-' + sz)?.value) || 0
+  })).filter(x => x.qty > 0);
+
+  if (!sizesWithQty.length) return;
+
   const cart = JSON.parse(localStorage.getItem('vp_cart') || '[]');
-  cart.push(item);
+  sizesWithQty.forEach(({sz, qty}) => {
+    cart.push({
+      id:       (isPreset ? 'design-' + presetDesign.id : 'custom') + '-' + sz + '-' + ts,
+      name:     isPreset ? presetDesign.name + ' — ' + garmentLabel : 'Custom Design — ' + garmentLabel,
+      garment:  garmentLabel + ' (' + colorLabel + ')',
+      size:     sz,
+      price:    isPreset ? presetDesign.price : 0,
+      priceStr: isPreset ? '$' + presetDesign.price.toFixed(2) : 'Quote Required',
+      qty,
+      img:      previewImg,
+    });
+  });
   localStorage.setItem('vp_cart', JSON.stringify(cart));
   closeDcModal();
-  // Go straight to checkout so customer can enter details and get email receipt
   window.location.href = 'checkout.html';
 }
 
