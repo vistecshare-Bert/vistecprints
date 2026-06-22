@@ -122,14 +122,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
 .lib-more:hover{border-color:var(--gold-dim);color:var(--gold);}
 .lib-count{font-size:10px;color:var(--gray2);margin-bottom:6px;}
 
-/* Product picks */
-.product-picks{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.product-pick{padding:10px 8px;background:var(--dark3);border:1.5px solid rgba(255,255,255,0.08);border-radius:6px;cursor:pointer;text-align:center;transition:all 0.2s;user-select:none;}
-.product-pick:hover{border-color:var(--gold-dim);}
-.product-pick.active{background:rgba(212,152,72,0.10);border-color:var(--gold);}
-.pick-name{display:block;font-size:12px;font-weight:600;color:var(--offwhite);line-height:1.2;margin-bottom:2px;}
-.pick-desc{display:block;font-size:10px;color:var(--gray);margin-bottom:5px;}
-.pick-price{display:block;font-size:15px;font-weight:700;color:var(--gold);letter-spacing:-0.3px;}
+/* Product dropdown */
+.product-select{width:100%;padding:9px 10px;background:var(--dark3);border:1.5px solid rgba(255,255,255,0.12);border-radius:6px;color:var(--offwhite);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23D49848' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color 0.2s;}
+.product-select:hover,.product-select:focus{border-color:var(--gold);outline:none;}
+.product-select option{background:#1a1a1a;color:var(--offwhite);}
+.product-price-tag{margin-top:6px;font-size:16px;font-weight:700;color:var(--gold);letter-spacing:-0.3px;}
 .ship-badge{margin-top:8px;padding:7px 10px;background:rgba(30,70,30,0.45);border:1px solid rgba(80,180,80,0.2);border-radius:4px;font-size:10px;color:#7dc97d;letter-spacing:0.4px;text-align:center;}
 
 /* Garment type tabs */
@@ -472,28 +469,13 @@ input[type=range]{width:100%;accent-color:var(--gold);}
 
     <div class="panel-section">
       <div class="panel-heading">Product</div>
-      <div class="product-picks">
-        <div class="product-pick active" data-code="5000">
-          <span class="pick-name">Gildan 5000</span>
-          <span class="pick-desc">Heavy Cotton 100%</span>
-          <span class="pick-price">$5.75/shirt</span>
-        </div>
-        <div class="product-pick" data-code="64000">
-          <span class="pick-name">Gildan 6400</span>
-          <span class="pick-desc">SoftStyle 100%</span>
-          <span class="pick-price">$7.75/shirt</span>
-        </div>
-        <div class="product-pick" data-code="75000">
-          <span class="pick-name">Gildan 75000</span>
-          <span class="pick-desc">Heavy Blend Crew</span>
-          <span class="pick-price">$10.00/shirt</span>
-        </div>
-        <div class="product-pick" data-code="12500">
-          <span class="pick-name">Hoodie</span>
-          <span class="pick-desc">Heavy Blend 50/50</span>
-          <span class="pick-price">$35.00/shirt</span>
-        </div>
-      </div>
+      <select class="product-select" id="productSelect">
+        <option value="5000">Gildan 5000 — Heavy Cotton 100% — $5.75/shirt</option>
+        <option value="64000">Gildan 6400 — SoftStyle 100% — $7.75/shirt</option>
+        <option value="75000">Gildan 75000 — Heavy Blend Crew — $10.00/shirt</option>
+        <option value="12500">Hoodie — Heavy Blend 50/50 — $35.00/shirt</option>
+      </select>
+      <div class="product-price-tag" id="productPriceTag">$5.75/shirt</div>
       <div class="ship-badge">&#10003;&nbsp; Free shipping on orders of 20+ shirts</div>
     </div>
 
@@ -1169,29 +1151,29 @@ let selectedProductCode = '5000';
 const MOCKUP_REMAP = { '64000': '5000' };     // load own colors, swap mockup URL
 const CATALOG_REMAP = { '75000': '5000' };    // no catalog entry — load 5000 fully
 
-document.querySelectorAll('.product-pick').forEach(card => {
-  card.addEventListener('click', function() {
-    document.querySelectorAll('.product-pick').forEach(c => c.classList.remove('active'));
-    this.classList.add('active');
-    selectedProductCode = this.dataset.code;
+function applyProductSelection(code) {
+  selectedProductCode = code;
+  const price = PRODUCT_PRICES[code];
+  document.getElementById('productPriceTag').textContent = price ? `$${price.toFixed(2)}/shirt` : '';
 
-    if (selectedProductCode === '12500') {
-      // Hoodie — uses its own blend-color mockup system; loadProduct populates swatches
-      currentGarment = 'hoodie';
-      document.querySelectorAll('.garment-tab').forEach(t => t.classList.remove('active'));
-      const hoodieTab = document.querySelector('.garment-tab[data-garment="hoodie"]');
-      if (hoodieTab) hoodieTab.classList.add('active');
-      loadProduct('12500');
-    } else {
-      // T-shirt / crewneck — load catalog product (remapped if needed)
-      currentGarment = 'tshirt';
-      document.querySelectorAll('.garment-tab').forEach(t => t.classList.remove('active'));
-      const tshirtTab = document.querySelector('.garment-tab[data-garment="tshirt"]');
-      if (tshirtTab) tshirtTab.classList.add('active');
-      const loadCode = CATALOG_REMAP[selectedProductCode] || selectedProductCode;
-      loadProduct(loadCode);
-    }
-  });
+  if (code === '12500') {
+    currentGarment = 'hoodie';
+    document.querySelectorAll('.garment-tab').forEach(t => t.classList.remove('active'));
+    const hoodieTab = document.querySelector('.garment-tab[data-garment="hoodie"]');
+    if (hoodieTab) hoodieTab.classList.add('active');
+    loadProduct('12500');
+  } else {
+    currentGarment = 'tshirt';
+    document.querySelectorAll('.garment-tab').forEach(t => t.classList.remove('active'));
+    const tshirtTab = document.querySelector('.garment-tab[data-garment="tshirt"]');
+    if (tshirtTab) tshirtTab.classList.add('active');
+    const loadCode = CATALOG_REMAP[code] || code;
+    loadProduct(loadCode);
+  }
+}
+
+document.getElementById('productSelect').addEventListener('change', function() {
+  applyProductSelection(this.value);
 });
 
 // Garment type tabs
@@ -1212,10 +1194,13 @@ document.querySelectorAll('.garment-tab').forEach(tab => {
     currentGarment = this.dataset.garment;
     const code = this.dataset.productCode;
     selectedProductCode = code || null;
-    // Sync product pick selection
-    document.querySelectorAll('.product-pick').forEach(c => c.classList.remove('active'));
-    const matchPick = document.querySelector(`.product-pick[data-code="${code}"]`);
-    if (matchPick) matchPick.classList.add('active');
+    // Sync dropdown to the active garment tab
+    const sel = document.getElementById('productSelect');
+    if (sel && code && [...sel.options].some(o => o.value === code)) {
+      sel.value = code;
+      const price = PRODUCT_PRICES[code];
+      document.getElementById('productPriceTag').textContent = price ? `$${price.toFixed(2)}/shirt` : '';
+    }
     if (code) loadProduct(code);
     else updateMockup();
   });
