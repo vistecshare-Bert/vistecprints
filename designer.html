@@ -516,6 +516,7 @@ input[type=range]{width:100%;accent-color:var(--gold);}
         <option value="5000">Gildan 5000 — Heavy Cotton 100% — $5.75/shirt</option>
         <option value="64000">Gildan 6400 — SoftStyle 100% — $7.75/shirt</option>
         <option value="75000">Gildan 75000 — Heavy Blend Crew — $10.00/shirt</option>
+        <option value="790">Augusta 790 — Youth Wicking 100% Poly — $7.75/shirt</option>
         <option value="12500">Hoodie — Heavy Blend 50/50 — $35.00/shirt</option>
       </select>
       <div class="product-price-tag" id="productPriceTag">$5.75/shirt</div>
@@ -1197,13 +1198,13 @@ function updateMockup() {
 // =========================================================
 //  PRODUCT PICKS (pricing)
 // =========================================================
-const PRODUCT_PRICES = { '5000': 5.75, '5000L': 5.75, '64000': 7.75, '75000': 10.00, '12500': 35.00 };
+const PRODUCT_PRICES = { '5000': 5.75, '5000L': 5.75, '64000': 7.75, '75000': 10.00, '790': 7.75, '12500': 35.00 };
 let selectedProductCode = '5000';
 
 // 64000 has its own color list but bad mockup images — swap to 5000 mockup URLs.
 // 75000 isn't in the catalog at all — just use 5000's catalog data entirely.
 const MOCKUP_REMAP = { '64000': '5000' };     // load own colors, swap mockup URL
-const CATALOG_REMAP = { '75000': '5000' };    // no catalog entry — load 5000 fully
+const CATALOG_REMAP = { '75000': '5000', '790': '5000' };    // no catalog entry — load 5000 fully
 
 function applyProductSelection(code) {
   selectedProductCode = code;
