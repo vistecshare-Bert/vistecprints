@@ -387,6 +387,20 @@ input[type=color]{width:36px;height:36px;padding:2px;background:var(--dark3);bor
 .dcq-input.has-qty{color:var(--gold);background:rgba(212,152,72,0.08);}
 .dcq-total{text-align:center;font-size:12px;color:var(--gold);font-weight:600;margin-bottom:12px;min-height:16px;letter-spacing:0.5px;}
 .dc-note{font-size:11px;color:var(--gray);margin-bottom:16px;line-height:1.5;}
+/* Print location selector */
+.dc-areas{margin-bottom:14px;text-align:left;}
+.dc-areas-lbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:7px;font-weight:600;}
+.dc-area-btns{display:flex;gap:6px;}
+.dc-area-btn{flex:1;padding:8px 4px;background:var(--dark3);border:1px solid rgba(255,255,255,0.1);border-radius:3px;color:var(--gray);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.3px;transition:all 0.15s;}
+.dc-area-btn:hover{border-color:var(--gold-dim);color:var(--offwhite);}
+.dc-area-btn.active{background:rgba(212,152,72,0.12);border-color:var(--gold);color:var(--gold);font-weight:700;}
+/* Price estimate panel */
+.dc-estimate{background:var(--dark3);border:1px solid rgba(212,152,72,0.2);border-radius:4px;padding:12px 14px;margin-bottom:14px;text-align:left;display:none;}
+.dc-est-row{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--gray);margin-bottom:5px;}
+.dc-est-row:last-of-type{margin-bottom:0;}
+.dc-est-total{font-size:13px;font-weight:700;color:var(--offwhite);border-top:1px solid rgba(255,255,255,0.08);padding-top:8px;margin-top:4px;margin-bottom:0;}
+.dc-est-total span:last-child{color:var(--gold);font-size:15px;}
+.dc-est-tier{font-size:10px;color:var(--gray2);text-align:center;margin-top:8px;}
 .dc-add{width:100%;background:var(--gold);color:var(--black);border:none;padding:13px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:3px;font-family:'DM Sans',sans-serif;transition:background 0.2s;}
 .dc-add:hover{background:var(--gold-light);}
 .dc-add:disabled{opacity:0.4;cursor:not-allowed;}
@@ -859,12 +873,28 @@ input[type=range]{width:100%;accent-color:var(--gold);}
   <div class="dc-box">
     <button class="dc-close" onclick="closeDcModal()">&#215;</button>
     <div class="dc-title">Add to Cart</div>
-    <div class="dc-sub">Your custom design will be added for quoting.</div>
+    <div class="dc-sub">Enter quantities and print location for your order.</div>
     <img class="dc-preview" id="dcPreview" src="" alt="Design preview"/>
     <div class="dc-info" id="dcInfo"></div>
     <div class="dcq-grid" id="dcSizesQty"></div>
     <div class="dcq-total" id="dcqTotal"></div>
-    <div class="dc-note" id="dcNote">Pricing for custom designs is quoted after our team reviews your artwork.</div>
+    <!-- Print location -->
+    <div class="dc-areas">
+      <div class="dc-areas-lbl">Print Location</div>
+      <div class="dc-area-btns">
+        <button class="dc-area-btn active" data-areas="1" data-loc="Front" type="button">Front Only</button>
+        <button class="dc-area-btn" data-areas="1" data-loc="Back" type="button">Back Only</button>
+        <button class="dc-area-btn" data-areas="2" data-loc="Front + Back" type="button">Front + Back</button>
+      </div>
+    </div>
+    <!-- Live price estimate -->
+    <div class="dc-estimate" id="dcEstimate">
+      <div class="dc-est-row"><span>Garment (<span id="dcEstQty">0</span> shirts)</span><span id="dcEstGarment">—</span></div>
+      <div class="dc-est-row"><span>Print · <span id="dcEstLoc">Front</span></span><span id="dcEstPrint">—</span></div>
+      <div class="dc-est-row dc-est-total"><span>Est. Total</span><span id="dcEstTotal">—</span></div>
+      <div class="dc-est-tier" id="dcEstTier"></div>
+    </div>
+    <div class="dc-note" id="dcNote">Estimated price shown. Final price confirmed when we review your artwork.</div>
     <button class="dc-add" id="dcAddBtn" disabled onclick="dcConfirmAdd()">Enter quantities above</button>
   </div>
 </div>
@@ -2063,6 +2093,23 @@ document.querySelectorAll('.dscrub').forEach(wrap => {
 // =========================================================
 //  ADD TO CART (DESIGNER)
 // =========================================================
+// ─── DTF PRINT PRICING (per shirt by quantity tier) ─────────────────────────
+const DTF_TIERS = [
+  { from:1,   to:4,          area1:14, addl:8 },
+  { from:5,   to:9,          area1:12, addl:8 },
+  { from:10,  to:24,         area1:11, addl:8 },
+  { from:25,  to:49,         area1:10, addl:7 },
+  { from:50,  to:99,         area1:8,  addl:6 },
+  { from:100, to:249,        area1:6,  addl:6 },
+  { from:250, to:499,        area1:5,  addl:5 },
+  { from:500, to:Infinity,   area1:4,  addl:4 },
+];
+function getDtfTier(qty) {
+  return DTF_TIERS.find(t => qty >= t.from && qty <= t.to) || DTF_TIERS[DTF_TIERS.length - 1];
+}
+let dcPrintAreas = 1;
+let dcPrintLoc   = 'Front';
+// ─────────────────────────────────────────────────────────────────────────────
 const DC_SIZES = ['S','M','L','XL','2XL','3XL','4XL','5XL'];
 
 function dcBuildSizeGrid() {
@@ -2109,23 +2156,39 @@ function dcUpdateQtyTotal() {
     btn.disabled = true;
     btn.textContent = 'Enter quantities above';
   }
+  dcUpdateEstimate(total);
+}
+
+function dcUpdateEstimate(totalQty) {
+  const estEl = document.getElementById('dcEstimate');
+  if (!totalQty) { estEl.style.display = 'none'; return; }
+  const tier      = getDtfTier(totalQty);
+  const gPrice    = PRODUCT_PRICES[selectedProductCode] || 0;
+  const printCost = tier.area1 + (dcPrintAreas === 2 ? tier.addl : 0);
+  const perShirt  = gPrice + printCost;
+  const grandTotal = perShirt * totalQty;
+  const tierLabel  = tier.to === Infinity ? `${tier.from}+` : `${tier.from}–${tier.to}`;
+  document.getElementById('dcEstQty').textContent      = totalQty;
+  document.getElementById('dcEstLoc').textContent      = dcPrintLoc;
+  document.getElementById('dcEstGarment').textContent  = `$${(gPrice * totalQty).toFixed(2)}`;
+  document.getElementById('dcEstPrint').textContent    = `$${(printCost * totalQty).toFixed(2)}`;
+  document.getElementById('dcEstTotal').textContent    = `$${grandTotal.toFixed(2)}`;
+  document.getElementById('dcEstTier').textContent     = `$${perShirt.toFixed(2)}/shirt · ${tierLabel} shirt pricing tier`;
+  estEl.style.display = 'block';
 }
 
 document.getElementById('btnAddToCart').addEventListener('click', () => {
+  // Reset print area to Front Only
+  dcPrintAreas = 1; dcPrintLoc = 'Front';
+  document.querySelectorAll('.dc-area-btn').forEach(b => b.classList.toggle('active', b.dataset.loc === 'Front'));
+
   dcBuildSizeGrid();
   dcUpdateQtyTotal();
 
   const garmentLabel = currentProduct?.name || document.querySelector('.garment-tab.active')?.textContent || 'T-Shirt';
   const colorLabel   = currentColor;
-  const gPrice       = PRODUCT_PRICES[selectedProductCode];
-  const priceHtml    = gPrice
-    ? `<br><span style="color:var(--gold);font-size:12px;font-weight:600;">From $${gPrice.toFixed(2)}/shirt + print</span>`
-    : '';
   document.getElementById('dcInfo').innerHTML =
-    `<strong>${garmentLabel}</strong> &nbsp;·&nbsp; ${colorLabel}${priceHtml}`;
-  document.getElementById('dcNote').textContent = gPrice
-    ? `Shirt price: $${gPrice.toFixed(2)}/shirt. Print cost is confirmed within 1 business day after we review your design.`
-    : 'Pricing for custom designs is quoted after our team reviews your artwork.';
+    `<strong>${garmentLabel}</strong> &nbsp;·&nbsp; ${colorLabel}`;
 
   const previewUrl = captureDesign(220);
   const previewEl  = document.getElementById('dcPreview');
@@ -2136,6 +2199,18 @@ document.getElementById('btnAddToCart').addEventListener('click', () => {
   document.body.style.overflow = 'hidden';
 });
 
+// Print location buttons
+document.querySelectorAll('.dc-area-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.dc-area-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    dcPrintAreas = parseInt(this.dataset.areas);
+    dcPrintLoc   = this.dataset.loc;
+    const total  = DC_SIZES.reduce((s, sz) => s + (parseInt(document.getElementById('dcq-' + sz)?.value) || 0), 0);
+    dcUpdateEstimate(total);
+  });
+});
+
 function closeDcModal() {
   document.getElementById('dcModal').classList.remove('open');
   document.body.style.overflow = '';
@@ -2144,27 +2219,32 @@ function closeDcModal() {
 function dcConfirmAdd() {
   const garmentLabel = currentProduct?.name || document.querySelector('.garment-tab.active')?.textContent || 'T-Shirt';
   const colorLabel   = currentColor;
-  const isPreset = presetDesign && presetDesign.price > 0;
-  const previewImg = captureDesign(220);
+  const previewImg   = captureDesign(220);
   const ts = Date.now();
 
   const sizesWithQty = DC_SIZES.map(sz => ({
     sz, qty: parseInt(document.getElementById('dcq-' + sz)?.value) || 0
   })).filter(x => x.qty > 0);
-
   if (!sizesWithQty.length) return;
+
+  const totalQty   = sizesWithQty.reduce((s, x) => s + x.qty, 0);
+  const tier       = getDtfTier(totalQty);
+  const gPrice     = PRODUCT_PRICES[selectedProductCode] || 0;
+  const printCost  = tier.area1 + (dcPrintAreas === 2 ? tier.addl : 0);
+  const perShirt   = gPrice + printCost;
 
   const cart = JSON.parse(localStorage.getItem('vp_cart') || '[]');
   sizesWithQty.forEach(({sz, qty}) => {
     cart.push({
-      id:       (isPreset ? 'design-' + presetDesign.id : 'custom') + '-' + sz + '-' + ts,
-      name:     isPreset ? presetDesign.name + ' — ' + garmentLabel : 'Custom Design — ' + garmentLabel,
-      garment:  garmentLabel + ' (' + colorLabel + ')',
-      size:     sz,
-      price:    isPreset ? presetDesign.price : 0,
-      priceStr: isPreset ? '$' + presetDesign.price.toFixed(2) : 'Quote Required',
+      id:            'custom-' + sz + '-' + ts,
+      name:          'Custom Design — ' + garmentLabel,
+      garment:       garmentLabel + ' (' + colorLabel + ') · ' + dcPrintLoc,
+      size:          sz,
+      price:         perShirt,
+      priceStr:      '$' + perShirt.toFixed(2) + '/shirt (est.)',
+      isCustomDesign: true,
       qty,
-      img:      previewImg,
+      img:           previewImg,
     });
   });
   localStorage.setItem('vp_cart', JSON.stringify(cart));

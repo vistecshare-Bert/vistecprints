@@ -204,9 +204,9 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.97);backdrop-fi
 const SHIPPING = 4.99;
 let cart = JSON.parse(localStorage.getItem('vp_cart') || '[]');
 
-// True when every item needs a quote (custom designer orders)
+// True when all items are custom designer orders (priced estimates, not direct checkout)
 function isQuoteOrder() {
-  return cart.length > 0 && cart.every(i => i.price === 0 || i.priceStr === 'Quote Required');
+  return cart.length > 0 && cart.every(i => i.isCustomDesign === true || i.price === 0);
 }
 
 function init() {
@@ -226,9 +226,9 @@ function applyQuoteMode() {
   btn.innerHTML = 'Submit Order Request';
   document.querySelector('.secure-note').style.display = 'none';
   document.querySelector('.payment-note').innerHTML =
-    '<strong>Custom Design Order</strong> — We\'ll review your design and contact you within ' +
-    '<strong>1 business day</strong> with final pricing. Payment is collected after you approve the quote. ' +
-    'Questions? Call <strong>+1 704-377-6626</strong>.';
+    '<strong>Custom Design Order</strong> — Pricing shown above is an estimate based on your quantities and print locations. ' +
+    'We\'ll review your artwork and confirm the final price within <strong>1 business day</strong>. ' +
+    'Payment is collected after you approve. Questions? Call <strong>+1 704-377-6626</strong>.';
 }
 
 function showCancelBanner() {
