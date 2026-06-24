@@ -96,6 +96,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
 .cc.kelly{background:#1E8A1E;}
 .cc.cardinal{background:#8C1A1A;}
 .cc.silver{background:#B8B8B8;border-color:#999;}
+.cc.graphite{background:#4A4A4A;}
+.cc.slate{background:#708090;}
+.cc.scarlet{background:#CC1A2A;}
+.cc.vegasgold{background:#C9A84C;}
+.cc.columbia{background:#9FC5D8;}
 .card-foot{padding:12px 16px;border-top:1px solid rgba(255,255,255,0.06);}
 .btn-design{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;background:var(--gold);color:#000;border:none;border-radius:3px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;letter-spacing:1px;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:background .2s;}
 .btn-design:hover{background:var(--gold-light);}
@@ -424,32 +429,37 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
       </div>
     </div>
 
-    <!-- 9: Augusta Sportswear 790 Youth Wicking Tee -->
-    <div class="card" data-category="youth" data-product="augusta-790" onclick="openProductModal('augusta-790')">
+    <!-- 9: Augusta Sportswear 790 Nexgen Performance T-Shirt (Unisex) -->
+    <div class="card" data-category="mens" data-product="augusta-790" onclick="openProductModal('augusta-790')">
       <div class="card-img">
-        <img src="mockups/tshirt-white-front.png" alt="Augusta 790 Youth Wicking T-Shirt" onerror="this.src='mockups/tshirt-white-front.png'"/>
-        <span class="card-badge youth">Youth</span>
+        <img src="mockups/tshirt-white-front.png" alt="Augusta 790 Nexgen Performance T-Shirt" onerror="this.src='mockups/tshirt-white-front.png'"/>
       </div>
       <div class="card-body">
         <div class="card-brand">Augusta Sportswear</div>
-        <div class="card-name">Youth Wicking T-Shirt</div>
+        <div class="card-name">Nexgen Performance T-Shirt</div>
         <div class="card-sku">SKU: 790</div>
-        <div class="card-sizes"><strong>Sizes:</strong> YXS · YS · YM · YL · YXL</div>
+        <div class="card-sizes"><strong>Sizes:</strong> S · M · L · XL · 2XL · 3XL</div>
         <div class="card-colors">
           <div class="cc white" title="White"></div>
           <div class="cc black" title="Black"></div>
           <div class="cc navy" title="Navy"></div>
           <div class="cc royal" title="Royal"></div>
           <div class="cc red" title="Red"></div>
+          <div class="cc scarlet" title="Scarlet"></div>
           <div class="cc cardinal" title="Cardinal"></div>
+          <div class="cc maroon" title="Maroon"></div>
           <div class="cc gold" title="Athletic Gold"></div>
+          <div class="cc vegasgold" title="Vegas Gold"></div>
+          <div class="cc orange" title="Orange"></div>
           <div class="cc kelly" title="Kelly Green"></div>
           <div class="cc forest" title="Dark Green"></div>
-          <div class="cc orange" title="Orange"></div>
           <div class="cc purple" title="Purple"></div>
           <div class="cc pink" title="Pink"></div>
           <div class="cc lightblue" title="Light Blue"></div>
+          <div class="cc columbia" title="Columbia Blue"></div>
           <div class="cc silver" title="Silver"></div>
+          <div class="cc graphite" title="Graphite"></div>
+          <div class="cc slate" title="Slate"></div>
         </div>
       </div>
       <div class="card-foot">
@@ -667,19 +677,19 @@ const PRODUCT_DATA = {
     mockup:'mockups/tshirt-white-front.png', garment:'tshirt',
   },
   'augusta-790': {
-    brand:'Augusta Sportswear', name:'Youth Wicking T-Shirt', sku:'SKU: 790',
-    desc:'High-performance 100% polyester youth tee with moisture-wicking technology. Keeps kids cool, dry, and comfortable during any activity.',
+    brand:'Augusta Sportswear', name:'Nexgen Performance T-Shirt', sku:'SKU: 790',
+    desc:'Unisex 100% polyester performance tee with advanced moisture-wicking technology. Lightweight, breathable, and built for movement — perfect for sports teams, uniforms, and custom activewear.',
     weight:'3.8 oz.', material:'100% Polyester — moisture-wicking performance fabric',
     care:'Machine wash cold · Tumble dry low · Do not bleach · Do not iron decoration',
     features:[
       '100% polyester moisture-wicking fabric',
-      'Keeps athletes cool and dry',
+      'Keeps wearers cool and dry during activity',
       'Set-in sleeves for a clean athletic fit',
-      'Double-needle bottom hem',
-      'Available in 14+ colors',
-      'Great for sports teams, events, and activewear',
+      'Double-needle bottom hem for durability',
+      'Available in 20 colors',
+      'Ideal for sports teams, events, and custom activewear',
     ],
-    sizes:[['YXS','22–24"'],['YS','24–26"'],['YM','26–28"'],['YL','28–30"'],['YXL','30–32"']],
+    sizes:[['S','34–36"'],['M','38–40"'],['L','42–44"'],['XL','46–48"'],['2XL','50–52"'],['3XL','54–56"']],
     mockup:'mockups/tshirt-white-front.png', garment:'tshirt',
   },
 };

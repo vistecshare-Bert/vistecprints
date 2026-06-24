@@ -516,7 +516,7 @@ input[type=range]{width:100%;accent-color:var(--gold);}
         <option value="5000">Gildan 5000 — Heavy Cotton 100% — $5.75/shirt</option>
         <option value="64000">Gildan 6400 — SoftStyle 100% — $7.75/shirt</option>
         <option value="75000">Gildan 75000 — Heavy Blend Crew — $10.00/shirt</option>
-        <option value="790">Augusta 790 — Youth Wicking 100% Poly — $7.75/shirt</option>
+        <option value="790">Augusta 790 — Nexgen Performance Tee (Unisex) — $7.75/shirt</option>
         <option value="12500">Hoodie — Heavy Blend 50/50 — $35.00/shirt</option>
       </select>
       <div class="product-price-tag" id="productPriceTag">$5.75/shirt</div>
@@ -987,6 +987,7 @@ const _urlParams = new URLSearchParams(location.search);
 let currentGarment  = _urlParams.get('garment') || 'tshirt';
 let currentColor    = _urlParams.get('color') || 'gray';
 let currentView     = 'front';
+let _manualColorHex = null;   // hex for manual-catalog products (no catalog mockup URL)
 let selectedObject  = null;
 let suppressProps   = false;
 let currentProduct  = null;   // catalog product currently loaded
@@ -1094,8 +1095,42 @@ function canvasPPI() {
   return 520 / h;
 }
 
+// Load a manually-defined product (not in catalog.js)
+function loadManualProduct(product) {
+  currentProduct = null;
+  _manualColorHex = product.colors[0]?.hex || null;
+  const container = document.getElementById('colorSwatches');
+  container.innerHTML = '';
+  container.classList.remove('expanded');
+  product.colors.forEach((color, i) => {
+    const sw = document.createElement('div');
+    sw.className = 'swatch' + (i === 0 ? ' active' : '');
+    sw.setAttribute('data-name', color.name);
+    sw.title = color.name;
+    sw.style.backgroundColor = color.hex || '#888';
+    if (['#f5f5f5','#ffffff','#f0f0f0'].includes((color.hex||'').toLowerCase()))
+      sw.style.outline = '1px solid rgba(180,180,180,0.4)';
+    sw.addEventListener('click', function() {
+      container.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+      this.classList.add('active');
+      currentColorIdx = i;
+      currentColor = color.name;
+      _manualColorHex = color.hex;
+      document.getElementById('quoteColor').value = color.name;
+      updateMockup();
+    });
+    container.appendChild(sw);
+  });
+  currentColorIdx = 0;
+  currentColor = product.colors[0]?.name || '';
+  document.getElementById('quoteColor').value = currentColor;
+  updateMockup();
+}
+
 // Rebuild color swatches from a catalog product and wire up click handlers
 function loadProduct(code) {
+  // Manual catalog takes priority
+  if (MANUAL_CATALOGS[code]) { loadManualProduct(MANUAL_CATALOGS[code]); return; }
   if (!window.CATALOG) return;
   currentProduct = window.CATALOG.find(p => p.code === code) || null;
   if (!currentProduct) { updateMockup(); return; }
@@ -1183,11 +1218,11 @@ function updateMockup() {
     // Back view or no mockup URL — fall through to color-blend with local back image
   }
 
-  // Fallback: blend color onto white hoodie mockup
-  const map  = MOCKUPS[currentGarment] || MOCKUPS.hoodie;
+  // Fallback: blend color onto local mockup image (used for back view + manual-catalog products)
+  const map  = MOCKUPS[currentGarment] || MOCKUPS.tshirt;
   const base = map.white || map.gray;
   const src  = (base[currentView] || base.front);
-  const hex  = currentProduct?.colors[currentColorIdx]?.hex || null;
+  const hex  = currentProduct?.colors[currentColorIdx]?.hex || _manualColorHex || null;
   applyColorToHoodie(src, hex, result => {
     img.onerror = null;
     img.src = result;
@@ -1204,7 +1239,36 @@ let selectedProductCode = '5000';
 // 64000 has its own color list but bad mockup images — swap to 5000 mockup URLs.
 // 75000 isn't in the catalog at all — just use 5000's catalog data entirely.
 const MOCKUP_REMAP = { '64000': '5000' };     // load own colors, swap mockup URL
-const CATALOG_REMAP = { '75000': '5000', '790': '5000' };    // no catalog entry — load 5000 fully
+const CATALOG_REMAP = { '75000': '5000' };    // no catalog entry — load 5000 fully
+
+// Manual color catalog for products not scraped from vistecprints.com
+const MANUAL_CATALOGS = {
+  '790': {
+    code:'790', name:'Nexgen Performance T-Shirt', brand:'Augusta Sportswear',
+    colors:[
+      {name:'White',          hex:'#F5F5F5'},
+      {name:'Black',          hex:'#1C1C1C'},
+      {name:'Navy',           hex:'#1A2744'},
+      {name:'Royal',          hex:'#2850A0'},
+      {name:'Red',            hex:'#CC1100'},
+      {name:'Scarlet',        hex:'#CC1A2A'},
+      {name:'Cardinal',       hex:'#8C1A1A'},
+      {name:'Maroon',         hex:'#6B0000'},
+      {name:'Athletic Gold',  hex:'#F0A500'},
+      {name:'Vegas Gold',     hex:'#C9A84C'},
+      {name:'Orange',         hex:'#E8560A'},
+      {name:'Kelly Green',    hex:'#1E8A1E'},
+      {name:'Dark Green',     hex:'#1B4332'},
+      {name:'Purple',         hex:'#4B0082'},
+      {name:'Pink',           hex:'#E87EA0'},
+      {name:'Light Blue',     hex:'#9FC5D8'},
+      {name:'Columbia Blue',  hex:'#6BAED6'},
+      {name:'Silver',         hex:'#B8B8B8'},
+      {name:'Graphite',       hex:'#4A4A4A'},
+      {name:'Slate',          hex:'#708090'},
+    ]
+  }
+};
 
 function applyProductSelection(code) {
   selectedProductCode = code;
@@ -1279,6 +1343,21 @@ document.querySelectorAll('.view-btn').forEach(btn => {
   const code = activeTab?.dataset.productCode;
   if (code && window.CATALOG) loadProduct(code);
   else updateMockup();
+})();
+
+// Auto-select product from ?product= URL param (e.g. from create.html "Start Designing" links)
+(function applyUrlProduct() {
+  const urlCode = _urlParams.get('product');
+  if (!urlCode) return;
+  const sel = document.getElementById('productSelect');
+  if (!sel) return;
+  const opt = [...sel.options].find(o => o.value === urlCode);
+  if (!opt) return;
+  sel.value = urlCode;
+  const price = PRODUCT_PRICES[urlCode];
+  document.getElementById('productPriceTag').textContent = price ? `$${price.toFixed(2)}/shirt` : '';
+  const loadCode = CATALOG_REMAP[urlCode] || urlCode;
+  loadProduct(loadCode);
 })();
 
 // =========================================================
