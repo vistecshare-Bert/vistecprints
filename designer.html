@@ -963,6 +963,14 @@ const MOCKUPS = {
     gray:  { front: 'mockups/hoodie-gray-front.png',  back: 'mockups/hoodie-gray-back.png'  },
     white: { front: 'mockups/hoodie-white-front.png', back: 'mockups/hoodie-white-back.png' },
   },
+  tshirt: {
+    gray:  { front: 'mockups/tshirt-gray-front.png',  back: 'mockups/tshirt-gray-back.png'  },
+    white: { front: 'mockups/tshirt-white-front.png', back: 'mockups/tshirt-white-back.png' },
+  },
+  womens: {
+    gray:  { front: 'mockups/tshirt-gray-front.png',  back: 'mockups/tshirt-gray-back.png'  },
+    white: { front: 'mockups/tshirt-white-front.png', back: 'mockups/tshirt-white-back.png' },
+  },
 };
 
 // Print zone as % of canvas (front chest / back print area)
@@ -1164,14 +1172,14 @@ function updateMockup() {
       }
     }
 
-    if (mockupUrl) {
+    if (mockupUrl && currentView === 'front') {
       img.onerror = () => { img.onerror = null; };
       img.crossOrigin = 'anonymous'; // must be set before src for CORS to apply
       img.src = proxyUrl(mockupUrl);
       updatePrintZone();
       return;
     }
-    // Product in catalog but mockup is null (e.g. hoodie) — fall through to blend
+    // Back view or no mockup URL — fall through to color-blend with local back image
   }
 
   // Fallback: blend color onto white hoodie mockup
