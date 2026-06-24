@@ -517,6 +517,7 @@ input[type=range]{width:100%;accent-color:var(--gold);}
         <option value="64000">Gildan 6400 — SoftStyle 100% — $7.75/shirt</option>
         <option value="75000">Gildan 75000 — Heavy Blend Crew — $10.00/shirt</option>
         <option value="790">Augusta 790 — Nexgen Performance Tee (Unisex) — $7.75/shirt</option>
+        <option value="1790">Augusta 1790 — Ladies NexGen Wicking Tee — $7.75/shirt</option>
         <option value="12500">Hoodie — Heavy Blend 50/50 — $35.00/shirt</option>
       </select>
       <div class="product-price-tag" id="productPriceTag">$5.75/shirt</div>
@@ -1233,7 +1234,7 @@ function updateMockup() {
 // =========================================================
 //  PRODUCT PICKS (pricing)
 // =========================================================
-const PRODUCT_PRICES = { '5000': 5.75, '5000L': 5.75, '64000': 7.75, '75000': 10.00, '790': 7.75, '12500': 35.00 };
+const PRODUCT_PRICES = { '5000': 5.75, '5000L': 5.75, '64000': 7.75, '75000': 10.00, '790': 7.75, '1790': 7.75, '12500': 35.00 };
 let selectedProductCode = '5000';
 
 // 64000 has its own color list but bad mockup images — swap to 5000 mockup URLs.
@@ -1267,6 +1268,29 @@ const MANUAL_CATALOGS = {
       {name:'Graphite',       hex:'#4A4A4A'},
       {name:'Slate',          hex:'#708090'},
     ]
+  },
+  '1790': {
+    code:'1790', name:'Ladies NexGen Wicking T-Shirt', brand:'Augusta Sportswear',
+    colors:[
+      {name:'White',          hex:'#F5F5F5'},
+      {name:'Black',          hex:'#1C1C1C'},
+      {name:'Navy',           hex:'#1A2744'},
+      {name:'Royal',          hex:'#2850A0'},
+      {name:'Red',            hex:'#CC1100'},
+      {name:'Scarlet',        hex:'#CC1A2A'},
+      {name:'Cardinal',       hex:'#8C1A1A'},
+      {name:'Maroon',         hex:'#6B0000'},
+      {name:'Athletic Gold',  hex:'#F0A500'},
+      {name:'Orange',         hex:'#E8560A'},
+      {name:'Kelly Green',    hex:'#1E8A1E'},
+      {name:'Dark Green',     hex:'#1B4332'},
+      {name:'Purple',         hex:'#4B0082'},
+      {name:'Pink',           hex:'#E87EA0'},
+      {name:'Light Blue',     hex:'#9FC5D8'},
+      {name:'Columbia Blue',  hex:'#6BAED6'},
+      {name:'Silver',         hex:'#B8B8B8'},
+      {name:'Graphite',       hex:'#4A4A4A'},
+    ]
   }
 };
 
@@ -1281,6 +1305,12 @@ function applyProductSelection(code) {
     const hoodieTab = document.querySelector('.garment-tab[data-garment="hoodie"]');
     if (hoodieTab) hoodieTab.classList.add('active');
     loadProduct('12500');
+  } else if (code === '1790') {
+    currentGarment = 'tshirt-female';
+    document.querySelectorAll('.garment-tab').forEach(t => t.classList.remove('active'));
+    const femTab = document.querySelector('.garment-tab[data-garment="tshirt-female"]');
+    if (femTab) femTab.classList.add('active');
+    loadProduct('1790');
   } else {
     currentGarment = 'tshirt';
     document.querySelectorAll('.garment-tab').forEach(t => t.classList.remove('active'));
