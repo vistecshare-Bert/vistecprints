@@ -241,9 +241,9 @@ function showCancelBanner() {
 
 function renderSummary() {
   const sub   = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  const quote = isQuoteOrder();
-  document.getElementById('sSubtotal').textContent = quote ? 'Quote Required' : '$' + sub.toFixed(2);
-  document.getElementById('sTotal').textContent    = quote ? 'TBD'            : '$' + (sub + SHIPPING).toFixed(2);
+  const hasUnknownPrice = cart.some(i => !i.price || i.price === 0);
+  document.getElementById('sSubtotal').textContent = hasUnknownPrice ? 'Quote Required' : '$' + sub.toFixed(2);
+  document.getElementById('sTotal').textContent    = hasUnknownPrice ? 'TBD'            : '$' + (sub + SHIPPING).toFixed(2);
   document.getElementById('summaryItems').innerHTML = cart.map((item, idx) => `
     <div class="s-item">
       <div class="s-item-img">
