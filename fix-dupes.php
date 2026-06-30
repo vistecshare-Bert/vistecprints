@@ -1,19 +1,37 @@
 <?php
-// One-time script: remove duplicate products (same name, keep first occurrence)
+// Diagnostic + fix: remove duplicates by name AND by img (same image = same product)
 // DELETE THIS FILE after running.
-$file = __DIR__ . '/products.json';
+$file     = __DIR__ . '/products.json';
 $products = json_decode(file_get_contents($file), true);
 
-$seen    = [];
-$cleaned = [];
+// Find dupes by img path (same image used twice = duplicate listing)
+$seenImg  = [];
+$seenName = [];
+$dupes    = [];
+$cleaned  = [];
+
 foreach ($products as $p) {
-    $key = strtolower(trim($p['name']));
-    if (!isset($seen[$key])) {
-        $seen[$key] = true;
-        $cleaned[]  = $p;
+    $nameKey = strtolower(trim($p['name'] ?? ''));
+    $imgKey  = strtolower(trim($p['img']  ?? ''));
+
+    if ($imgKey && isset($seenImg[$imgKey])) {
+        $dupes[] = "DUPE IMG  id={$p['id']} name={$p['name']}";
+        continue;
     }
+    if ($nameKey && isset($seenName[$nameKey])) {
+        $dupes[] = "DUPE NAME id={$p['id']} name={$p['name']}";
+        continue;
+    }
+    if ($imgKey)  $seenImg[$imgKey]   = true;
+    if ($nameKey) $seenName[$nameKey] = true;
+    $cleaned[] = $p;
 }
 
 $removed = count($products) - count($cleaned);
-file_put_contents($file, json_encode($cleaned, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-echo "Done. Removed $removed duplicate(s). Total now: " . count($cleaned);
+if ($removed > 0) {
+    file_put_contents($file, json_encode($cleaned, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+}
+
+echo "Before: " . count($products) . "  After: " . count($cleaned) . "  Removed: $removed\n\n";
+echo "Duplicates found:\n";
+echo implode("\n", $dupes) ?: 'None';
