@@ -1182,6 +1182,28 @@ function loadProduct(code) {
   updateMockup();
 }
 
+// Derive a back-view mockup from the front catalog photo by flipping it
+// horizontally — guarantees identical color + fabric texture between front
+// and back (catalog has no real back photos; a generic blended PNG never
+// matched the heathered/textured front photo exactly).
+function flipImageHorizontal(src, cb) {
+  const tmp = new Image();
+  tmp.crossOrigin = 'anonymous';
+  tmp.onload = () => {
+    try {
+      const c = document.createElement('canvas');
+      c.width = tmp.naturalWidth; c.height = tmp.naturalHeight;
+      const ctx = c.getContext('2d');
+      ctx.translate(c.width, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(tmp, 0, 0);
+      cb(c.toDataURL('image/png'));
+    } catch(e) { cb(null); }
+  };
+  tmp.onerror = () => cb(null);
+  tmp.src = src;
+}
+
 // Route vistecprints.com image URLs through imgproxy.php so they carry
 // CORS headers and the canvas stays untainted for toDataURL() export.
 function proxyUrl(url) {
@@ -1222,7 +1244,24 @@ function updateMockup() {
       updatePrintZone();
       return;
     }
-    // Back view or no mockup URL — fall through to color-blend with local back image
+
+    if (mockupUrl && currentView === 'back') {
+      flipImageHorizontal(proxyUrl(mockupUrl), result => {
+        if (result) {
+          img.onerror = null;
+          img.src = result;
+        } else {
+          // Flip failed (e.g. CORS taint) — fall back to color-blended local mockup
+          const map  = MOCKUPS[currentGarment] || MOCKUPS.tshirt;
+          const base = map.white || map.gray;
+          const src  = (base.back || base.front);
+          applyColorToHoodie(src, color?.hex || null, r => { img.onerror = null; img.src = r; });
+        }
+      });
+      updatePrintZone();
+      return;
+    }
+    // No mockup URL — fall through to color-blend with local back image
   }
 
   // Fallback: blend color onto local mockup image (used for back view + manual-catalog products)
