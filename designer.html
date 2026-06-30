@@ -634,6 +634,7 @@ input[type=range]{width:100%;accent-color:var(--gold);}
              onerror="this.style.opacity='0.1'; document.getElementById('mockupPlaceholder').classList.add('show')"/>
         <canvas id="designer-canvas" width="520" height="520"></canvas>
         <div class="print-zone-overlay" id="printZone"></div>
+        <div id="viewBadge" style="position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(212,152,72,0.92);color:#000;font-size:10px;font-weight:800;letter-spacing:2px;padding:3px 12px;border-radius:2px;z-index:10;pointer-events:none;transition:opacity 0.2s;">FRONT</div>
         <div class="mockup-placeholder" id="mockupPlaceholder">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(212,152,72,0.4)" stroke-width="1.5"><path d="M6 2L2 6v2l4-4h12l4 4V6l-4-4H6zM2 8v14h20V8"/><path d="M9 2v6M15 2v6"/></svg>
           <p>Mockup image not found.<br/>Save images to<br/><strong>mockups/</strong> folder.</p>
@@ -989,6 +990,11 @@ let currentGarment  = _urlParams.get('garment') || 'tshirt';
 let currentColor    = _urlParams.get('color') || 'gray';
 let currentView     = 'front';
 let _manualColorHex = null;   // hex for manual-catalog products (no catalog mockup URL)
+
+// Per-view independent canvas states (front & back are completely separate designs)
+let canvasStates = { front: null, back: null };
+let _viewHist    = { front: [], back: [] };
+let _viewHistIdx = { front: -1, back: -1 };
 let selectedObject  = null;
 let suppressProps   = false;
 let currentProduct  = null;   // catalog product currently loaded
@@ -1358,13 +1364,47 @@ document.querySelectorAll('.garment-tab').forEach(tab => {
 });
 
 // View toggle
+function switchView(newView) {
+  if (newView === currentView) return;
+
+  // Save current view's canvas state + undo history
+  canvasStates[currentView] = canvas.toJSON(['id','name']);
+  _viewHist[currentView]    = [...history];
+  _viewHistIdx[currentView] = histIdx;
+
+  // Switch view
+  currentView = newView;
+  document.querySelectorAll('.view-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.view === newView));
+  updateMockup();
+
+  // Restore undo history for the new view
+  history = [...(_viewHist[newView] || [])];
+  histIdx = _viewHistIdx[newView] ?? -1;
+  updateUndoRedoBtns();
+
+  // Update badge label
+  const badge = document.getElementById('viewBadge');
+  if (badge) badge.textContent = newView.toUpperCase();
+
+  // Load saved canvas state for new view (or clear for a fresh blank canvas)
+  canvas.discardActiveObject();
+  const saved = canvasStates[newView];
+  if (saved && saved.objects && saved.objects.length) {
+    canvas.loadFromJSON(saved, () => {
+      canvas.renderAll();
+      updateLayersPanel?.();
+    });
+  } else {
+    canvas.clear();
+    canvas.backgroundColor = 'transparent';
+    canvas.renderAll();
+    updateLayersPanel?.();
+  }
+}
+
 document.querySelectorAll('.view-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
-    currentView = this.dataset.view;
-    updateMockup();
-  });
+  btn.addEventListener('click', function() { switchView(this.dataset.view); });
 });
 
 // Initialize: load the active garment tab's product on page load
@@ -1394,6 +1434,7 @@ document.querySelectorAll('.view-btn').forEach(btn => {
 //  HISTORY
 // =========================================================
 function saveState() {
+  canvasStates[currentView] = canvas.toJSON(['id','name']); // keep per-view snapshot in sync
   if (histIdx < history.length - 1) history.splice(histIdx + 1);
   history.push(JSON.stringify(canvas.toJSON(['id','name'])));
   histIdx = history.length - 1;
@@ -2335,10 +2376,20 @@ function closeDcModal() {
 }
 
 function dcConfirmAdd() {
+  // Flush current view's canvas state before capturing
+  canvasStates[currentView] = canvas.toJSON(['id','name']);
+
   const garmentLabel = currentProduct?.name || document.querySelector('.garment-tab.active')?.textContent || 'T-Shirt';
   const colorLabel   = currentColor;
-  const previewImg   = captureDesign(220);
+  const previewImg   = captureDesign(220);  // captures whatever is currently visible (front or back)
   const ts = Date.now();
+
+  // Determine which sides have artwork
+  const hasFront = canvasStates.front?.objects?.length > 0;
+  const hasBack  = canvasStates.back?.objects?.length  > 0;
+  const sidesLabel = (hasFront && hasBack) ? 'FRONT + BACK'
+                   : hasBack               ? 'BACK'
+                   : 'FRONT';
 
   const sizesWithQty = DC_SIZES.map(sz => ({
     sz, qty: parseInt(document.getElementById('dcq-' + sz)?.value) || 0
@@ -2356,13 +2407,15 @@ function dcConfirmAdd() {
     cart.push({
       id:            'custom-' + sz + '-' + ts,
       name:          'Custom Design — ' + garmentLabel,
-      garment:       garmentLabel + ' (' + colorLabel + ') · ' + dcPrintLoc,
+      garment:       garmentLabel + ' (' + colorLabel + ') · ' + sidesLabel,
       size:          sz,
       price:         perShirt,
       priceStr:      '$' + perShirt.toFixed(2) + '/shirt (est.)',
       isCustomDesign: true,
       qty,
       img:           previewImg,
+      frontDesign:   canvasStates.front || null,
+      backDesign:    canvasStates.back  || null,
     });
   });
   localStorage.setItem('vp_cart', JSON.stringify(cart));
