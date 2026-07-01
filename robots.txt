@@ -11,4 +11,4 @@ Disallow: /pending_orders/
 Disallow: /visits/
 Disallow: /download-designs.php
 
-Sitemap: https://rebuild.vistecprints.com/sitemap.xml
+Sitemap: https://vistecprints.com/sitemap.xml
