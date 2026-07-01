@@ -7,15 +7,23 @@ $provided = $_GET['token'] ?? '';
 if (!$provided || !hash_equals($expected, $provided)) { http_response_code(403); die('Forbidden'); }
 
 $repo = '/home3/vistecpr/vistecprints-git';
-$dest = '/home3/vistecpr/public_html/rebuild';
+$dests = [
+    '/home3/vistecpr/public_html/rebuild',  // staging subdomain
+    '/home3/vistecpr/public_html',           // live vistecprints.com
+];
 
 exec("cd $repo && git fetch --all && git reset --hard origin/main 2>&1", $out1, $code1);
-exec("/bin/cp -Rf $repo/. $dest/ 2>&1", $out2, $code2);
-exec("/bin/rm -rf $dest/.git $dest/.cpanel.yml 2>&1");
+
+$results = [];
+foreach ($dests as $dest) {
+    exec("/bin/cp -Rf $repo/. $dest/ 2>&1", $outCopy, $codeCopy);
+    exec("/bin/rm -rf $dest/.git $dest/.cpanel.yml 2>&1");
+    $results[$dest] = ($codeCopy === 0 ? 'success' : 'failed');
+}
 
 http_response_code(200);
 echo json_encode([
     'status' => 'ok',
-    'git' => implode("\n", $out1),
-    'copy' => ($code2 === 0 ? 'success' : 'failed'),
+    'git'    => implode("\n", $out1),
+    'copy'   => $results,
 ]);
