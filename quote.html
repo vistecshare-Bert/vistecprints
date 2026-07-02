@@ -304,18 +304,20 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,0.06);paddin
         <div class="qty-row">
           <div class="qty-stepper">
             <button class="qty-btn" onclick="adjustQty(-1)">−</button>
-            <input class="qty-input" type="number" id="qtyInput" value="12" min="1" max="9999" oninput="calcEstimate()"/>
+            <input class="qty-input" type="number" id="qtyInput" value="10" min="1" max="9999" oninput="calcEstimate()"/>
             <button class="qty-btn" onclick="adjustQty(1)">+</button>
           </div>
           <span style="font-size:13px;color:var(--gray);">pieces</span>
         </div>
         <div class="qty-tiers">
-          <div class="qty-tier" onclick="setQty(1)"><span class="tier-label">1–5</span> · no discount</div>
-          <div class="qty-tier" onclick="setQty(6)"><span class="tier-label">6–11</span> · save 5%</div>
-          <div class="qty-tier active" onclick="setQty(12)"><span class="tier-label">12–23</span> · save 10%</div>
-          <div class="qty-tier" onclick="setQty(24)"><span class="tier-label">24–47</span> · save 15%</div>
-          <div class="qty-tier" onclick="setQty(48)"><span class="tier-label">48–99</span> · save 20%</div>
-          <div class="qty-tier" onclick="setQty(100)"><span class="tier-label">100+</span> · save 25%</div>
+          <div class="qty-tier" data-min="1"   data-max="4"   onclick="setQty(1)"  ><span class="tier-label">1–4</span> · $14/print</div>
+          <div class="qty-tier" data-min="5"   data-max="9"   onclick="setQty(5)"  ><span class="tier-label">5–9</span> · $12/print</div>
+          <div class="qty-tier" data-min="10"  data-max="24"  onclick="setQty(10)" ><span class="tier-label">10–24</span> · $11/print</div>
+          <div class="qty-tier" data-min="25"  data-max="49"  onclick="setQty(25)" ><span class="tier-label">25–49</span> · $10/print</div>
+          <div class="qty-tier" data-min="50"  data-max="99"  onclick="setQty(50)" ><span class="tier-label">50–99</span> · $8/print</div>
+          <div class="qty-tier" data-min="100" data-max="249" onclick="setQty(100)"><span class="tier-label">100–249</span> · $6/print</div>
+          <div class="qty-tier" data-min="250" data-max="499" onclick="setQty(250)"><span class="tier-label">250–499</span> · $5/print</div>
+          <div class="qty-tier" data-min="500"               onclick="setQty(500)"><span class="tier-label">500+</span> · $4/print</div>
         </div>
       </div>
 
@@ -394,7 +396,7 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,0.06);paddin
         <div class="est-line"><span class="label">Print method</span><span class="val" id="estMethod">Full Color Transfer</span></div>
         <div class="est-line"><span class="label">Print cost</span><span class="val" id="estPrintCost">$4.00 / ea</span></div>
         <div class="est-line"><span class="label">Quantity</span><span class="val" id="estQty">12</span></div>
-        <div class="est-line"><span class="label">Volume discount</span><span class="val" id="estDiscount" style="color:#4CAF50;">−10%</span></div>
+        <div class="est-line"><span class="label">Print rate</span><span class="val" id="estDiscount" style="color:#4CAF50;">$11/print</span></div>
 
         <div class="est-total-row">
           <div>
@@ -470,37 +472,49 @@ const LOCATION_LABELS = {
 const METHOD_LABELS = {
   dtf:'Full Color Transfer', screen:'Screen Print', embroidery:'Embroidery', sublimation:'Sublimation'
 };
-const TIERS = [
-  { min:1,   max:5,   disc:0    },
-  { min:6,   max:11,  disc:0.05 },
-  { min:12,  max:23,  disc:0.10 },
-  { min:24,  max:47,  disc:0.15 },
-  { min:48,  max:99,  disc:0.20 },
-  { min:100, max:Infinity, disc:0.25 },
+// DTF print price per shirt by quantity (from price table)
+const DTF_TIERS = [
+  { min:1,   max:4,   area1:14.00, addArea:8.00 },
+  { min:5,   max:9,   area1:12.00, addArea:8.00 },
+  { min:10,  max:24,  area1:11.00, addArea:8.00 },
+  { min:25,  max:49,  area1:10.00, addArea:7.00 },
+  { min:50,  max:99,  area1: 8.00, addArea:6.00 },
+  { min:100, max:249, area1: 6.00, addArea:6.00 },
+  { min:250, max:499, area1: 5.00, addArea:5.00 },
+  { min:500, max:Infinity, area1:4.00, addArea:4.00 },
 ];
+// How each location maps to print areas
+// a1 = full-size areas, add = additional/small areas
+const LOCATION_PRINT = {
+  full_front: { a1:1, add:0 },
+  full_back:  { a1:1, add:0 },
+  left_chest: { a1:0, add:1 },
+  sleeve:     { a1:0, add:1 },
+  front_back: { a1:1, add:1 },
+};
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let state = {
   garment:'tshirt', garmentBase:8.50,
   location:'full_front', locationMult:1.0,
   method:'dtf', methodMult:1.0,
-  qty:12, artwork:'yes'
+  qty:10, artwork:'yes'
 };
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
-function getDiscount(qty) {
-  return (TIERS.find(t => qty >= t.min && qty <= t.max) || TIERS[0]).disc;
+function getDTFTier(qty) {
+  return DTF_TIERS.find(t => qty >= t.min && qty <= t.max) || DTF_TIERS[DTF_TIERS.length - 1];
 }
 
 function calcEstimate() {
   const qty = parseInt(document.getElementById('qtyInput').value) || 1;
   state.qty = qty;
 
-  const printCost = 4.0 * state.locationMult * state.methodMult;
+  const tier = getDTFTier(qty);
+  const lp   = LOCATION_PRINT[state.location] || { a1:1, add:0 };
+  const printCost = (tier.area1 * lp.a1 + tier.addArea * lp.add) * state.methodMult;
   const unitCost  = state.garmentBase + printCost;
-  const disc      = getDiscount(qty);
-  const unitFinal = unitCost * (1 - disc);
-  const total     = unitFinal * qty;
+  const total     = unitCost * qty;
 
   document.getElementById('estGarment').textContent     = GARMENT_LABELS[state.garment] || state.garment;
   document.getElementById('estGarmentCost').textContent = '$' + state.garmentBase.toFixed(2) + ' / ea';
@@ -508,21 +522,24 @@ function calcEstimate() {
   document.getElementById('estMethod').textContent      = METHOD_LABELS[state.method] || state.method;
   document.getElementById('estPrintCost').textContent   = '$' + printCost.toFixed(2) + ' / ea';
   document.getElementById('estQty').textContent         = qty;
-  document.getElementById('estDiscount').textContent    = disc > 0 ? '−' + Math.round(disc*100) + '%' : 'None';
-  document.getElementById('estPer').textContent         = '$' + unitFinal.toFixed(2) + ' / ea';
+  document.getElementById('estDiscount').textContent    = '$' + tier.area1.toFixed(2) + '/print';
+  document.getElementById('estPer').textContent         = '$' + unitCost.toFixed(2) + ' / ea';
   document.getElementById('estTotal').textContent       = '$' + Math.round(total);
 
   const banner = document.getElementById('estDiscountBanner');
-  if (disc > 0) {
+  const prevTier = DTF_TIERS.find(t => qty - 1 >= t.min && qty - 1 <= t.max);
+  if (prevTier && prevTier.area1 > tier.area1) {
     banner.style.display = 'block';
-    banner.textContent   = '🎉 Volume discount applied: ' + Math.round(disc*100) + '% off';
+    banner.textContent   = '🎉 Better price unlocked at ' + qty + ' pieces — $' + tier.area1.toFixed(2) + '/print';
   } else {
     banner.style.display = 'none';
   }
 
-  // Highlight active tier
-  document.querySelectorAll('.qty-tier').forEach((t, i) => {
-    t.classList.toggle('active', qty >= TIERS[i].min && qty <= TIERS[i].max);
+  // Highlight active tier chip
+  document.querySelectorAll('.qty-tier').forEach(t => {
+    const min = parseInt(t.dataset.min);
+    const max = parseInt(t.dataset.max) || Infinity;
+    t.classList.toggle('active', qty >= min && qty <= max);
   });
 }
 
@@ -591,9 +608,10 @@ document.getElementById('quoteForm').addEventListener('submit', async function(e
   }
 
   const qty       = state.qty;
-  const printCost = 4.0 * state.locationMult * state.methodMult;
-  const disc      = getDiscount(qty);
-  const unitFinal = (state.garmentBase + printCost) * (1 - disc);
+  const tier      = getDTFTier(qty);
+  const lp        = LOCATION_PRINT[state.location] || { a1:1, add:0 };
+  const printCost = (tier.area1 * lp.a1 + tier.addArea * lp.add) * state.methodMult;
+  const unitFinal = state.garmentBase + printCost;
   const total     = unitFinal * qty;
 
   btn.disabled = true; btn.textContent = 'Submitting...'; msg.style.display = 'none';
