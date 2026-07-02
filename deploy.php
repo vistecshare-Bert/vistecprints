@@ -9,7 +9,6 @@ if (!$provided || !hash_equals($expected, $provided)) { http_response_code(403);
 $repo = '/home3/vistecpr/vistecprints-git';
 $dests = [
     '/home3/vistecpr/public_html/vistecprints.com',  // live vistecprints.com
-    '/home3/vistecpr/public_html/rebuild',            // staging subdomain
 ];
 
 exec("cd $repo && git fetch --all && git reset --hard origin/main 2>&1", $out1, $code1);
