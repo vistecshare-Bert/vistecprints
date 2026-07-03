@@ -1,0 +1,4 @@
+RewriteEngine On
+
+# Serve our logo PNG when any browser auto-requests favicon.ico
+RewriteRule ^favicon\.ico$ /favicon-32x32.png [L,R=301]
