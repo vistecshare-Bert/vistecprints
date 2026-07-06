@@ -618,8 +618,13 @@ function render() {
     <div class="design-card" onclick="useDesign(${d.id},'${d.name.replace(/'/g,"\\'")}','${d.cat}')">
       <div class="design-img-wrap">
         <img class="design-img" src="${imgUrl(d.id)}" alt="${d.name}" loading="lazy"
-          onerror="this.src='${imgFallback(d.id)}';this.onerror=function(){this.style.display='none';this.nextElementSibling.style.display='flex';}"/>
-        <div class="img-placeholder" style="display:none">No Preview</div>
+          onerror="
+            if(this.dataset.fb==='1'){this.src=designImgFallback2(${d.id});this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';return;}
+            this.dataset.fb='1';this.src='${imgFallback(d.id)}';
+          "/>
+        <div class="img-placeholder" style="display:none">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
       </div>
       <div class="design-info">
         <div class="design-name">${d.name}</div>

@@ -264,7 +264,12 @@ function designImgUrl(id) {
   return 'design-images/' + id + '.png';
 }
 function designImgFallback(id) {
-  return 'https://www.vistecprints.com/aimages/' + id + '/1/0/design.jpg';
+  // Try without www (SSL cert covers vistecprints.com, not www.)
+  return 'https://vistecprints.com/aimages/' + id + '/1/0/design.jpg';
+}
+function designImgFallback2(id) {
+  // Last resort: transparent 1×1 so onerror doesn't loop
+  return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 }
 function designCatLabel(key) {
   return DESIGN_CATS.find(c => c.key === key)?.label || key;
