@@ -1680,8 +1680,8 @@ function captureDesign(size = 520) {
   const mockImg = document.getElementById('mockupImg');
   try { ctx.drawImage(mockImg, 0, 0, size, size); } catch(e) {}
 
-  // Design layer from Fabric canvas
-  try { ctx.drawImage(canvas.getElement(), 0, 0); } catch(e) {}
+  // Design layer from Fabric canvas — specify dest size to handle HiDPI (retina) screens
+  try { ctx.drawImage(canvas.getElement(), 0, 0, size, size); } catch(e) {}
 
   // Restore
   pz.style.display = pzWas;
