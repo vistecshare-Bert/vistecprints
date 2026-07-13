@@ -3,7 +3,8 @@ session_start();
 if (empty($_SESSION['vp_admin'])) { header('Location: index.php'); exit; }
 
 $currentUser = $_SESSION['vp_user'] ?? [];
-if (($currentUser['role'] ?? '') !== 'admin') {
+$vpRole = $currentUser['role'] ?? '';
+if ($vpRole !== 'admin' && $vpRole !== '') {
     header('Location: dashboard.php');
     exit;
 }
