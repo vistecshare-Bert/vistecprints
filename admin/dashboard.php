@@ -631,6 +631,14 @@ tr:hover td{background:#fafafa;}
   </ul>
   <div class="sb-label">Tools</div>
   <ul class="sb-nav" style="padding-bottom:8px;">
+    <?php $vpRole = $_SESSION['vp_user']['role'] ?? ''; if ($vpRole === 'admin' || $vpRole === ''): ?>
+    <li>
+      <a href="users.php">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Users
+      </a>
+    </li>
+    <?php endif; ?>
     <li>
       <a href="products.html">
         <svg viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
