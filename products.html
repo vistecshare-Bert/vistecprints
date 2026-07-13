@@ -650,7 +650,7 @@ document.getElementById('catTabs').addEventListener('click', e => {
   renderProducts(btn.dataset.cat);
 });
 
-fetch('products.json')
+fetch('get-products.php')
   .then(r => r.json())
   .then(data => {
     products = data;
