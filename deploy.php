@@ -13,11 +13,36 @@ $dests = [
 
 exec("cd $repo && git fetch --all && git reset --hard origin/main 2>&1", $out1, $code1);
 
+// Files/dirs that live only on the server — never overwrite from git
+$excludes = [
+    '.git',
+    '.cpanel.yml',
+    'products.json',          // admin-managed product catalog
+    'orders.json',            // stripe orders
+    'admin/users.json',       // admin user accounts
+    'stripe-config.php',      // secrets
+    'admin-config.php',       // secrets
+    'carolina-config.php',    // secrets
+    'carolina-products.json', // synced supplier data
+    'carolina-sync-meta.json',
+    'carolina-ids.json',
+    'pending_orders/',
+    'orders/',                // DTF orders + artwork uploads
+    'quotes/',
+    'contacts/',
+    'visits/',
+    'images/decorated/',      // uploaded decorated product images
+    'images/designs/',        // uploaded design files
+];
+
+$excludeFlags = implode(' ', array_map(fn($e) => '--exclude=' . escapeshellarg($e), $excludes));
+
 $results = [];
 foreach ($dests as $dest) {
-    exec("/bin/cp -Rf $repo/. $dest/ 2>&1", $outCopy, $codeCopy);
-    exec("/bin/rm -rf $dest/.git $dest/.cpanel.yml 2>&1");
-    $results[$dest] = ($codeCopy === 0 ? 'success' : 'failed');
+    // rsync: only update code files, preserve server-only data
+    $cmd = "/usr/bin/rsync -a --delete $excludeFlags " . escapeshellarg($repo . '/') . ' ' . escapeshellarg($dest . '/') . ' 2>&1';
+    exec($cmd, $outSync, $codeSync);
+    $results[$dest] = ($codeSync === 0 ? 'success' : 'failed: ' . implode(' ', $outSync));
 }
 
 http_response_code(200);
