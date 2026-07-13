@@ -40,8 +40,10 @@ $excludeFlags = implode(' ', array_map(fn($e) => '--exclude=' . escapeshellarg($
 $results = [];
 foreach ($dests as $dest) {
     // rsync: only update code files, preserve server-only data
-    $cmd = "/usr/bin/rsync -a --delete $excludeFlags " . escapeshellarg($repo . '/') . ' ' . escapeshellarg($dest . '/') . ' 2>&1';
+    $cmd = "/usr/bin/rsync -a --delete --chmod=D755,F644 $excludeFlags " . escapeshellarg($repo . '/') . ' ' . escapeshellarg($dest . '/') . ' 2>&1';
     exec($cmd, $outSync, $codeSync);
+    // Ensure destination dir stays world-readable regardless of git clone perms
+    exec('chmod 755 ' . escapeshellarg($dest));
     $results[$dest] = ($codeSync === 0 ? 'success' : 'failed: ' . implode(' ', $outSync));
 }
 
