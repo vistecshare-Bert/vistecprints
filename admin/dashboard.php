@@ -2240,19 +2240,25 @@ document.querySelectorAll('.ftab').forEach(btn => {
   window.captureAndSubmit = function(e) {
     e.preventDefault();
     fc.discardActiveObject(); fc.renderAll();
+    const mockImg = document.getElementById('decMockupImg');
+    // Colorize shirt on a clean canvas (transparent bg) so multiply only
+    // affects shirt pixels — not the white background we'll add later
+    const shirtCanvas = document.createElement('canvas');
+    shirtCanvas.width = shirtCanvas.height = SIZE;
+    const sCtx = shirtCanvas.getContext('2d');
+    try { sCtx.drawImage(mockImg, 0, 0, SIZE, SIZE); } catch(_) {}
+    if (decColorHex) {
+      sCtx.globalCompositeOperation = 'multiply';
+      sCtx.fillStyle = decColorHex; sCtx.fillRect(0, 0, SIZE, SIZE);
+      sCtx.globalCompositeOperation = 'source-over';
+    }
+    // Final composite: white bg + colorized shirt + design overlay
     const off = document.createElement('canvas');
     off.width = off.height = SIZE;
     const ctx = off.getContext('2d');
-    // White background so product card matches other products
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, SIZE, SIZE);
-    const mockImg = document.getElementById('decMockupImg');
-    try { ctx.drawImage(mockImg, 0, 0, SIZE, SIZE); } catch(_) {}
-    if (decColorHex) {
-      ctx.globalCompositeOperation = 'multiply';
-      ctx.fillStyle = decColorHex; ctx.fillRect(0, 0, SIZE, SIZE);
-      ctx.globalCompositeOperation = 'source-over';
-    }
+    ctx.drawImage(shirtCanvas, 0, 0);
     const fabricImg = new Image();
     fabricImg.onload = () => {
       ctx.drawImage(fabricImg, 0, 0, SIZE, SIZE);

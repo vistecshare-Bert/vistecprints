@@ -10,7 +10,7 @@ if (file_exists($file)) {
     $data = json_decode(file_get_contents($file), true) ?: [];
     // Exclude DTF blanks — shop only shows decorated/regular products
     $data = array_values(array_filter($data, function($p) {
-        return ($p['badge'] ?? '') !== 'CUSTOM DTF PRINT';
+        return ($p['cat'] ?? '') !== 'dtf';
     }));
     echo json_encode(array_values(array_reverse($data)));
 } else {
