@@ -894,7 +894,15 @@ tr:hover td{background:#fafafa;}
             </div>
             <div class="form-group">
               <label>Garment</label>
-              <input type="text" name="garment" placeholder="Heavy Cotton T-Shirt"/>
+              <select name="garment" id="decGarmentSelect" onchange="syncGarmentFromDropdown(this)">
+                <option value="">— Select garment —</option>
+                <option value="Gildan 5000 — Heavy Cotton 100%"        data-garment="tshirt"        data-price="25.00">Gildan 5000 — Heavy Cotton 100% — $5.75/shirt</option>
+                <option value="Gildan 6400 — SoftStyle 100%"           data-garment="tshirt"        data-price="27.00">Gildan 6400 — SoftStyle 100% — $7.75/shirt</option>
+                <option value="Gildan 75000 — Heavy Blend Crew"        data-garment="tshirt"        data-price="30.00">Gildan 75000 — Heavy Blend Crew — $10.00/shirt</option>
+                <option value="Augusta 790 — Nexgen Performance Tee"   data-garment="tshirt"        data-price="27.00">Augusta 790 — Nexgen Performance Tee (Unisex) — $7.75/shirt</option>
+                <option value="Augusta 1790 — Ladies NexGen Wicking"   data-garment="tshirt-female" data-price="27.00">Augusta 1790 — Ladies NexGen Wicking Tee — $7.75/shirt</option>
+                <option value="Hoodie — Heavy Blend 50/50"             data-garment="hoodie"        data-price="57.00">Hoodie — Heavy Blend 50/50 — $35.00/shirt</option>
+              </select>
             </div>
           </div>
 
@@ -2081,6 +2089,18 @@ document.querySelectorAll('.ftab').forEach(btn => {
     decGarment = type;
     document.querySelectorAll('[data-garment]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active'); updateDecMockup();
+  };
+
+  window.syncGarmentFromDropdown = function(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    const type = opt.dataset.garment || 'tshirt';
+    const price = opt.dataset.price || '';
+    // Update mockup garment buttons
+    const matchBtn = document.querySelector('.mockup-btn[data-garment="' + type + '"]');
+    if (matchBtn) setDecGarment(type, matchBtn);
+    // Auto-fill price if field is empty
+    const priceField = document.querySelector('[name="price"]');
+    if (priceField && (!priceField.value || priceField.value === '$')) priceField.value = '$' + price;
   };
 
   window.setDecView = function(view, btn) {
