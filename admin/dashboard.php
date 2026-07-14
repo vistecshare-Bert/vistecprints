@@ -307,6 +307,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    if ($action === 'bulk_delete') {
+        $ids = $_POST['ids'] ?? [];
+        if (is_array($ids) && !empty($ids)) {
+            $count = 0;
+            $products = array_values(array_filter($products, function($p) use ($ids, &$count) {
+                if (in_array($p['id'] ?? '', $ids)) { $count++; return false; }
+                return true;
+            }));
+            saveProducts($jsonFile, $products);
+            $msg = $count . ' product(s) deleted.';
+            $msgType = 'warning';
+        }
+    }
+
     header('Location: dashboard.php?msg=' . urlencode($msg ?? '') . '&type=' . ($msgType ?? 'success'));
     exit;
 }
@@ -1609,9 +1623,23 @@ tr:hover td{background:#fafafa;}
       <?php if (empty($products)): ?>
       <div class="empty-state"><p>No products yet. Click <strong>Add Product</strong> to get started.</p></div>
       <?php else: ?>
+
+      <!-- Bulk action bar -->
+      <div id="bulkBar" style="display:none;align-items:center;gap:12px;padding:10px 24px;background:#fff8ec;border-bottom:1px solid #f0e0b0;">
+        <span id="bulkCount" style="font-size:13px;font-weight:600;color:#333;"></span>
+        <button onclick="bulkDelete()" class="btn btn-red btn-sm">Delete Selected</button>
+        <button onclick="clearBulkSelection()" class="btn btn-outline btn-sm">Clear</button>
+      </div>
+      <!-- Hidden form for bulk delete POST -->
+      <form method="POST" id="bulkDeleteForm" style="display:none;">
+        <input type="hidden" name="action" value="bulk_delete"/>
+        <div id="bulkIds"></div>
+      </form>
+
       <table id="productTable">
         <thead>
           <tr>
+            <th style="width:36px;"><input type="checkbox" id="selectAllProds" title="Select all visible" style="width:16px;height:16px;cursor:pointer;accent-color:var(--gold);"></th>
             <th>Image</th>
             <th>Product Name</th>
             <th>Category</th>
@@ -1629,6 +1657,7 @@ tr:hover td{background:#fafafa;}
             $displaySrc = $isLocal ? '../' . $imgSrc : $imgSrc;
           ?>
           <tr data-cat="<?= htmlspecialchars($p['cat']) ?>">
+            <td><input type="checkbox" class="prod-check" value="<?= htmlspecialchars($p['id'] ?? '') ?>" style="width:16px;height:16px;cursor:pointer;accent-color:var(--gold);"></td>
             <td>
               <?php if ($imgSrc): ?>
               <img src="<?= htmlspecialchars($displaySrc) ?>" alt="" class="prod-img" onerror="this.style.display='none'"/>
@@ -1912,8 +1941,61 @@ document.querySelectorAll('.ftab').forEach(btn => {
     document.querySelectorAll('#productTable tbody tr').forEach(row => {
       row.style.display = (cat === 'all' || row.dataset.cat === cat) ? '' : 'none';
     });
+    // Reset bulk selection when filter changes
+    clearBulkSelection();
   });
 });
+
+// ── BULK DELETE ─────────────────────────────────────────
+(function() {
+  const selectAll = document.getElementById('selectAllProds');
+  const bar = document.getElementById('bulkBar');
+  if (!selectAll || !bar) return;
+
+  function updateBulkBar() {
+    const checked = document.querySelectorAll('.prod-check:checked');
+    bar.style.display = checked.length > 0 ? 'flex' : 'none';
+    document.getElementById('bulkCount').textContent = checked.length + ' product' + (checked.length !== 1 ? 's' : '') + ' selected';
+    // Sync select-all state
+    const allVisible = [...document.querySelectorAll('#productTable tbody tr')]
+      .filter(r => r.style.display !== 'none')
+      .map(r => r.querySelector('.prod-check'));
+    selectAll.checked = allVisible.length > 0 && allVisible.every(cb => cb.checked);
+    selectAll.indeterminate = !selectAll.checked && allVisible.some(cb => cb.checked);
+  }
+
+  selectAll.addEventListener('change', function() {
+    document.querySelectorAll('#productTable tbody tr').forEach(row => {
+      if (row.style.display !== 'none') row.querySelector('.prod-check').checked = this.checked;
+    });
+    updateBulkBar();
+  });
+
+  document.getElementById('productTable').addEventListener('change', function(e) {
+    if (e.target.classList.contains('prod-check')) updateBulkBar();
+  });
+
+  window.clearBulkSelection = function() {
+    document.querySelectorAll('.prod-check').forEach(cb => cb.checked = false);
+    selectAll.checked = false;
+    selectAll.indeterminate = false;
+    bar.style.display = 'none';
+  };
+
+  window.bulkDelete = function() {
+    const checked = [...document.querySelectorAll('.prod-check:checked')];
+    if (!checked.length) return;
+    if (!confirm('Delete ' + checked.length + ' product(s)? This cannot be undone.')) return;
+    const container = document.getElementById('bulkIds');
+    container.innerHTML = '';
+    checked.forEach(cb => {
+      const inp = document.createElement('input');
+      inp.type = 'hidden'; inp.name = 'ids[]'; inp.value = cb.value;
+      container.appendChild(inp);
+    });
+    document.getElementById('bulkDeleteForm').submit();
+  };
+})();
 
 // â”€â”€ DECORATED CREATOR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 (function() {
