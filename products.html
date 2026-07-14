@@ -256,37 +256,6 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 .payment-icons{display:flex;gap:8px;flex-wrap:wrap;}
 .pay-icon{background:var(--dark2);border:1px solid var(--dark3);padding:4px 12px;font-size:11px;color:var(--gray);border-radius:2px;letter-spacing:1px;text-transform:uppercase;}
 
-/* ZOOM ICON ON PRODUCT CARD */
-.product-zoom-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background 0.25s;pointer-events:none;}
-.product-zoom-icon svg{opacity:0;transform:scale(0.7);transition:all 0.25s;color:#fff;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6));}
-.product-card:hover .product-zoom-icon{background:rgba(0,0,0,0.38);}
-.product-card:hover .product-zoom-icon svg{opacity:1;transform:scale(1);}
-
-/* ZOOM LIGHTBOX */
-.zl-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.94);z-index:600;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
-.zl-overlay.open{opacity:1;pointer-events:all;}
-.zl-dialog{background:var(--dark2);border:1px solid rgba(212,152,72,0.15);border-radius:4px;width:100%;max-width:780px;display:flex;flex-direction:column;max-height:92vh;transform:scale(0.96);transition:transform 0.25s;overflow:hidden;}
-.zl-overlay.open .zl-dialog{transform:scale(1);}
-.zl-top{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.07);gap:12px;flex-shrink:0;}
-.zl-top-info{flex:1;min-width:0;}
-.zl-top-name{font-weight:600;font-size:15px;color:var(--offwhite);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.zl-top-garment{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
-.zl-close{background:transparent;border:none;cursor:pointer;color:var(--gray);padding:6px;display:flex;align-items:center;transition:color 0.2s;flex-shrink:0;}
-.zl-close:hover{color:var(--offwhite);}
-.zl-img-wrap{flex:1;overflow:hidden;position:relative;background:var(--dark3);min-height:260px;max-height:60vh;user-select:none;-webkit-user-select:none;}
-.zl-img-wrap img{position:absolute;width:100%;height:100%;top:0;left:0;object-fit:contain;display:block;pointer-events:none;-webkit-user-drag:none;image-rendering:-webkit-optimize-contrast;image-rendering:high-quality;}
-.zl-hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.72);color:var(--offwhite);font-size:12px;letter-spacing:0.5px;padding:8px 18px;border-radius:20px;white-space:nowrap;pointer-events:none;transition:opacity 0.5s;}
-.zl-bottom{display:flex;align-items:center;padding:14px 20px;border-top:1px solid rgba(255,255,255,0.07);gap:14px;flex-shrink:0;flex-wrap:wrap;}
-.zl-zoom-ctrl{display:flex;align-items:center;gap:8px;}
-.zl-ctrl-btn{background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--offwhite);width:34px;height:34px;border-radius:2px;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-family:inherit;line-height:1;}
-.zl-ctrl-btn:hover{background:rgba(212,152,72,0.15);border-color:var(--gold-dim);}
-.zl-scale{font-size:14px;color:var(--gold);font-weight:700;min-width:40px;text-align:center;}
-.zl-reset{background:transparent;border:1px solid rgba(255,255,255,0.12);color:var(--gray);padding:7px 14px;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:2px;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
-.zl-reset:hover{border-color:var(--gold-dim);color:var(--offwhite);}
-.zl-bottom-price{color:var(--gold);font-size:18px;font-weight:700;margin-left:auto;}
-.zl-atc-btn{background:var(--gold);color:var(--black);border:none;padding:11px 26px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:2px;transition:background 0.2s;white-space:nowrap;}
-.zl-atc-btn:hover{background:var(--gold-light);}
-@media(max-width:520px){.zl-bottom-price{margin-left:0;}.zl-bottom{gap:10px;}}
 
 /* RESPONSIVE */
 @media(max-width:768px){
@@ -430,34 +399,6 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
   </div>
 </div>
 
-<!-- ZOOM LIGHTBOX -->
-<div class="zl-overlay" id="zlOverlay">
-  <div class="zl-dialog">
-    <div class="zl-top">
-      <div class="zl-top-info">
-        <div class="zl-top-name" id="zlName"></div>
-        <div class="zl-top-garment" id="zlGarment"></div>
-      </div>
-      <button class="zl-close" onclick="closeZoom()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="zl-img-wrap" id="zlImgWrap">
-      <img id="zlImg" src="" alt="" draggable="false"/>
-      <div class="zl-hint" id="zlHint">Scroll to zoom &nbsp;&middot;&nbsp; Drag to pan</div>
-    </div>
-    <div class="zl-bottom">
-      <div class="zl-zoom-ctrl">
-        <button class="zl-ctrl-btn" onclick="zoomBy(-0.5)">−</button>
-        <span class="zl-scale" id="zlScaleLabel">1×</span>
-        <button class="zl-ctrl-btn" onclick="zoomBy(0.5)">+</button>
-        <button class="zl-reset" onclick="resetZoom()">Reset</button>
-      </div>
-      <div class="zl-bottom-price" id="zlPrice"></div>
-      <button class="zl-atc-btn" onclick="zlAddToCart()">Add to Cart</button>
-    </div>
-  </div>
-</div>
 
 <!-- PAGE HERO -->
 <div class="page-hero">
@@ -631,14 +572,11 @@ function renderProducts(cat) {
     return;
   }
   grid.innerHTML = sorted.map(p => `
-    <div class="product-card" onclick="openZoom('${p.id}')">
+    <div class="product-card" onclick="openSizeModal('${p.id}')">
       <div class="product-img">
         <img src="${p.img}" alt="${p.name}" loading="lazy"
           onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'>VP</div>'"/>
         ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
-        <div class="product-zoom-icon">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-        </div>
       </div>
       <div class="product-info">
         <div class="product-name">${p.name}</div>
@@ -970,132 +908,6 @@ document.getElementById('sgOverlay').addEventListener('click', function(e) {
 
 updateCartUI();
 
-// ── ZOOM LIGHTBOX ──────────────────────────────────────
-let zlProduct = null, zlScale = 1, zlOffX = 0, zlOffY = 0;
-let zlDragging = false, zlLastX = 0, zlLastY = 0;
-let zlTouchDist = null, zlHintShown = false;
-
-function openZoom(productId) {
-  const p = productMap[productId];
-  if (!p) return;
-  zlProduct = p; zlScale = 1; zlOffX = 0; zlOffY = 0;
-  document.getElementById('zlImg').src = p.img || '';
-  document.getElementById('zlName').textContent = p.name;
-  document.getElementById('zlGarment').textContent = (p.garment || '');
-  document.getElementById('zlPrice').textContent = p.price || '';
-  applyZl();
-  const hint = document.getElementById('zlHint');
-  if (!zlHintShown) {
-    hint.style.opacity = '1'; hint.style.display = 'block';
-    setTimeout(() => { hint.style.opacity = '0'; }, 2200);
-    setTimeout(() => { hint.style.display = 'none'; zlHintShown = true; }, 2700);
-  } else { hint.style.display = 'none'; }
-  document.getElementById('zlOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeZoom() {
-  document.getElementById('zlOverlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function zlAddToCart() { closeZoom(); if (zlProduct) openSizeModal(zlProduct.id); }
-
-function applyZl() {
-  const wrap = document.getElementById('zlImgWrap');
-  const img = document.getElementById('zlImg');
-  const ww = wrap.offsetWidth;
-  const wh = wrap.offsetHeight;
-
-  if (zlScale <= 1) {
-    zlScale = 1; zlOffX = 0; zlOffY = 0;
-    img.style.width = '100%'; img.style.height = '100%';
-    img.style.top = '0'; img.style.left = '0';
-    img.style.objectFit = 'contain';
-    img.style.cursor = 'zoom-in';
-  } else {
-    // Compute base contain dimensions from natural image size
-    const iw = img.naturalWidth || ww;
-    const ih = img.naturalHeight || wh;
-    const baseRatio = Math.min(ww / iw, wh / ih);
-    const baseW = iw * baseRatio;
-    const baseH = ih * baseRatio;
-    const scaledW = baseW * zlScale;
-    const scaledH = baseH * zlScale;
-
-    // Clamp pan so image can't drift off screen
-    const maxX = Math.max(0, (scaledW - ww) / 2);
-    const maxY = Math.max(0, (scaledH - wh) / 2);
-    zlOffX = Math.max(-maxX, Math.min(maxX, zlOffX));
-    zlOffY = Math.max(-maxY, Math.min(maxY, zlOffY));
-
-    img.style.objectFit = 'fill';
-    img.style.width = scaledW + 'px';
-    img.style.height = scaledH + 'px';
-    img.style.left = ((ww - scaledW) / 2 + zlOffX) + 'px';
-    img.style.top  = ((wh - scaledH) / 2 + zlOffY) + 'px';
-    img.style.cursor = zlDragging ? 'grabbing' : 'grab';
-  }
-  document.getElementById('zlScaleLabel').textContent = zlScale.toFixed(1) + '×';
-}
-function zoomBy(delta) {
-  zlScale = Math.max(1, Math.min(4, parseFloat((zlScale + delta).toFixed(2))));
-  applyZl();
-}
-function resetZoom() { zlScale = 1; zlOffX = 0; zlOffY = 0; applyZl(); }
-
-const _zlWrap = document.getElementById('zlImgWrap');
-
-// Scroll to zoom
-_zlWrap.addEventListener('wheel', e => {
-  e.preventDefault();
-  zoomBy(e.deltaY < 0 ? 0.25 : -0.25);
-}, { passive: false });
-
-// Double-click toggle
-_zlWrap.addEventListener('dblclick', () => {
-  zlScale < 2 ? zoomBy(2 - zlScale) : resetZoom();
-});
-
-// Mouse drag
-_zlWrap.addEventListener('mousedown', e => {
-  if (zlScale <= 1) return;
-  zlDragging = true; zlLastX = e.clientX; zlLastY = e.clientY;
-  e.preventDefault();
-});
-window.addEventListener('mousemove', e => {
-  if (!zlDragging) return;
-  zlOffX += e.clientX - zlLastX; zlOffY += e.clientY - zlLastY;
-  zlLastX = e.clientX; zlLastY = e.clientY;
-  applyZl();
-});
-window.addEventListener('mouseup', () => { if (zlDragging) { zlDragging = false; applyZl(); } });
-
-// Touch pinch-to-zoom + drag
-_zlWrap.addEventListener('touchstart', e => {
-  if (e.touches.length === 2) {
-    zlTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-  } else if (e.touches.length === 1 && zlScale > 1) {
-    zlDragging = true; zlLastX = e.touches[0].clientX; zlLastY = e.touches[0].clientY;
-  }
-}, { passive: true });
-_zlWrap.addEventListener('touchmove', e => {
-  if (e.touches.length === 2 && zlTouchDist !== null) {
-    e.preventDefault();
-    const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-    zlScale = Math.max(1, Math.min(4, zlScale * d / zlTouchDist));
-    zlTouchDist = d;
-    applyZl();
-  } else if (e.touches.length === 1 && zlDragging) {
-    zlOffX += e.touches[0].clientX - zlLastX; zlOffY += e.touches[0].clientY - zlLastY;
-    zlLastX = e.touches[0].clientX; zlLastY = e.touches[0].clientY;
-    applyZl();
-  }
-}, { passive: false });
-_zlWrap.addEventListener('touchend', () => { zlDragging = false; zlTouchDist = null; });
-
-// Close on background click
-document.getElementById('zlOverlay').addEventListener('click', function(e) {
-  if (e.target === this) closeZoom();
-});
 </script>
 
 <!-- QUOTE MODAL -->
