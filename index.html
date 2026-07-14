@@ -266,29 +266,28 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 /* ---- SIZE MODAL ---- */
 .sm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
 .sm-overlay.open{opacity:1;pointer-events:all;}
-.sm-box{background:var(--dark2);border:1px solid rgba(212,152,72,0.18);border-radius:4px;width:100%;max-width:768px;overflow:hidden;transform:scale(0.95);transition:transform 0.25s;}
+.sm-box{background:var(--dark2);border:1px solid rgba(212,152,72,0.18);border-radius:4px;width:100%;max-width:768px;overflow:hidden;transform:scale(0.95);transition:transform 0.25s;display:flex;flex-direction:column;max-height:92vh;}
 .sm-overlay.open .sm-box{transform:scale(1);}
-.sm-top{display:flex;border-bottom:1px solid rgba(255,255,255,0.07);position:relative;}
-.sm-img{width:216px;height:216px;background:var(--dark3);flex-shrink:0;overflow:hidden;position:relative;}
+.sm-main{display:flex;align-items:stretch;flex:1;overflow:hidden;}
+.sm-img{width:280px;flex-shrink:0;background:var(--dark3);overflow:hidden;position:relative;min-height:380px;}
 .sm-img img{width:100%;height:100%;object-fit:cover;transition:opacity 0.2s;}
-#smColorCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;object-fit:cover;}
-.sm-meta{padding:18px 20px;flex:1;}
-.sm-pname{font-weight:600;font-size:15px;color:var(--offwhite);margin-bottom:4px;line-height:1.3;}
-.sm-garment{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
-.sm-price{font-size:22px;color:var(--gold);font-weight:700;}
-.sm-close-x{position:absolute;top:10px;right:12px;background:transparent;border:none;cursor:pointer;color:var(--gray);padding:4px;transition:color 0.2s;}
+#smColorCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;}
+.sm-right{flex:1;padding:28px;display:flex;flex-direction:column;gap:20px;position:relative;overflow-y:auto;}
+.sm-pname{font-weight:700;font-size:20px;color:var(--offwhite);line-height:1.3;padding-right:30px;}
+.sm-garment{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+.sm-price{font-size:30px;color:var(--gold);font-weight:700;}
+.sm-close-x{position:absolute;top:14px;right:14px;background:transparent;border:none;cursor:pointer;color:var(--gray);padding:4px;transition:color 0.2s;}
 .sm-close-x:hover{color:var(--offwhite);}
-.sm-body{padding:20px 24px;display:flex;flex-direction:column;gap:16px;}
 .sm-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
 .sm-lbl a{color:var(--gold);cursor:pointer;font-size:10px;letter-spacing:1px;text-transform:uppercase;}
 .sm-sizes{display:flex;gap:8px;flex-wrap:wrap;}
 .sm-size{min-width:52px;height:44px;padding:0 10px;background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--offwhite);font-size:12px;font-weight:500;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-family:'DM Sans',sans-serif;letter-spacing:0.5px;}
 .sm-size:hover{border-color:rgba(212,152,72,0.5);}
 .sm-size.sel{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:700;}
-.sm-size-err{font-size:12px;color:#e05555;display:none;margin-top:-8px;}
+.sm-size-err{font-size:12px;color:#e05555;display:none;margin-top:6px;}
 .sm-size-err.show{display:block;}
 .sm-colors{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
-.sm-color-dot{width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform 0.15s,border-color 0.15s;flex-shrink:0;}
+.sm-color-dot{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform 0.15s,border-color 0.15s;flex-shrink:0;}
 .sm-color-dot:hover{transform:scale(1.18);}
 .sm-color-dot.sel{border-color:var(--gold);transform:scale(1.18);box-shadow:0 0 0 1px var(--gold);}
 .sm-color-dot.light{border:2px solid rgba(0,0,0,0.15);}
@@ -296,11 +295,13 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 .sm-qty-row{display:flex;align-items:center;gap:16px;}
 .sm-qty-label{font-size:13px;color:var(--gray);}
 .sm-qctrl{display:flex;align-items:center;gap:10px;}
-.sm-qbtn{background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--offwhite);width:34px;height:34px;border-radius:2px;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-family:inherit;line-height:1;}
+.sm-qbtn{background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--offwhite);width:36px;height:36px;border-radius:2px;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-family:inherit;line-height:1;}
 .sm-qbtn:hover{background:rgba(212,152,72,0.15);border-color:var(--gold-dim);}
 .sm-qval{font-size:16px;color:var(--offwhite);min-width:28px;text-align:center;font-weight:500;}
-.sm-add-btn{width:100%;background:var(--gold);color:var(--black);border:none;padding:14px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:2px;transition:background 0.2s;}
+.sm-footer{border-top:1px solid rgba(255,255,255,0.07);padding:16px 24px;flex-shrink:0;}
+.sm-add-btn{width:100%;background:var(--gold);color:var(--black);border:none;padding:15px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:2px;transition:background 0.2s;}
 .sm-add-btn:hover{background:var(--gold-light);}
+@media(max-width:600px){.sm-main{flex-direction:column;}.sm-img{width:100%;min-height:220px;max-height:260px;}}
 
 /* ---- SIZE GUIDE MODAL ---- */
 .sg-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
@@ -395,46 +396,51 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 <!-- SIZE SELECTION MODAL -->
 <div class="sm-overlay" id="smOverlay">
   <div class="sm-box">
-    <div class="sm-top">
-      <div class="sm-img"><img id="smImg" src="" alt=""/><canvas id="smColorCanvas" width="216" height="216"></canvas></div>
-      <div class="sm-meta">
-        <div class="sm-pname" id="smName"></div>
-        <div class="sm-garment" id="smGarment"></div>
-        <div class="sm-price" id="smPrice"></div>
+    <div class="sm-main">
+      <div class="sm-img">
+        <img id="smImg" src="" alt=""/>
+        <canvas id="smColorCanvas" width="216" height="216"></canvas>
       </div>
-      <button class="sm-close-x" onclick="closeSizeModal()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="sm-body">
-      <div>
-        <div class="sm-lbl">Select Size <a onclick="openSizeGuide()">Size Guide</a></div>
-        <div class="sm-sizes">
-          <button class="sm-size" data-size="XS">XS</button>
-          <button class="sm-size" data-size="S">S</button>
-          <button class="sm-size" data-size="M">M</button>
-          <button class="sm-size" data-size="L">L</button>
-          <button class="sm-size" data-size="XL">XL</button>
-          <button class="sm-size" data-size="XXL">XXL</button>
-          <button class="sm-size" data-size="3XL">3XL</button>
+      <div class="sm-right">
+        <button class="sm-close-x" onclick="closeSizeModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div>
+          <div class="sm-pname" id="smName"></div>
+          <div class="sm-garment" id="smGarment"></div>
         </div>
-        <div class="sm-size-err" id="smSizeErr">Please select a size.</div>
-      </div>
-      <div id="smColorSection" style="display:none;">
-        <div class="sm-lbl">Select Color</div>
-        <div class="sm-colors" id="smColors"></div>
-        <div class="sm-size-err" id="smColorErr">Please select a color.</div>
-      </div>
-      <div>
-        <div class="sm-lbl">Quantity</div>
-        <div class="sm-qty-row">
-          <div class="sm-qctrl">
-            <button class="sm-qbtn" onclick="changeSmQty(-1)">−</button>
-            <span class="sm-qval" id="smQtyVal">1</span>
-            <button class="sm-qbtn" onclick="changeSmQty(1)">+</button>
+        <div class="sm-price" id="smPrice"></div>
+        <div>
+          <div class="sm-lbl">Select Size <a onclick="openSizeGuide()">Size Guide</a></div>
+          <div class="sm-sizes">
+            <button class="sm-size" data-size="XS">XS</button>
+            <button class="sm-size" data-size="S">S</button>
+            <button class="sm-size" data-size="M">M</button>
+            <button class="sm-size" data-size="L">L</button>
+            <button class="sm-size" data-size="XL">XL</button>
+            <button class="sm-size" data-size="XXL">XXL</button>
+            <button class="sm-size" data-size="3XL">3XL</button>
+          </div>
+          <div class="sm-size-err" id="smSizeErr">Please select a size.</div>
+        </div>
+        <div id="smColorSection" style="display:none;">
+          <div class="sm-lbl">Select Color</div>
+          <div class="sm-colors" id="smColors"></div>
+          <div class="sm-size-err" id="smColorErr">Please select a color.</div>
+        </div>
+        <div>
+          <div class="sm-lbl">Quantity</div>
+          <div class="sm-qty-row">
+            <div class="sm-qctrl">
+              <button class="sm-qbtn" onclick="changeSmQty(-1)">−</button>
+              <span class="sm-qval" id="smQtyVal">1</span>
+              <button class="sm-qbtn" onclick="changeSmQty(1)">+</button>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+    <div class="sm-footer">
       <button class="sm-add-btn" id="smAddBtn" onclick="confirmAddToCart()">Add to Cart</button>
     </div>
   </div>
