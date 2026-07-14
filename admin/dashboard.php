@@ -896,12 +896,12 @@ tr:hover td{background:#fafafa;}
               <label>Garment</label>
               <select name="garment" id="decGarmentSelect" onchange="syncGarmentFromDropdown(this)">
                 <option value="">— Select garment —</option>
-                <option value="Gildan 5000 — Heavy Cotton 100%"        data-garment="tshirt"        data-price="25.00">Gildan 5000 — Heavy Cotton 100% — $5.75/shirt</option>
-                <option value="Gildan 6400 — SoftStyle 100%"           data-garment="tshirt"        data-price="27.00">Gildan 6400 — SoftStyle 100% — $7.75/shirt</option>
-                <option value="Gildan 75000 — Heavy Blend Crew"        data-garment="tshirt"        data-price="30.00">Gildan 75000 — Heavy Blend Crew — $10.00/shirt</option>
-                <option value="Augusta 790 — Nexgen Performance Tee"   data-garment="tshirt"        data-price="27.00">Augusta 790 — Nexgen Performance Tee (Unisex) — $7.75/shirt</option>
-                <option value="Augusta 1790 — Ladies NexGen Wicking"   data-garment="tshirt-female" data-price="27.00">Augusta 1790 — Ladies NexGen Wicking Tee — $7.75/shirt</option>
-                <option value="Hoodie — Heavy Blend 50/50"             data-garment="hoodie"        data-price="57.00">Hoodie — Heavy Blend 50/50 — $35.00/shirt</option>
+                <option value="Gildan 5000 — Heavy Cotton 100%"        data-garment="tshirt"        data-price="25.00" data-code="5000">Gildan 5000 — Heavy Cotton 100% — $5.75/shirt</option>
+                <option value="Gildan 6400 — SoftStyle 100%"           data-garment="tshirt"        data-price="27.00" data-code="64000">Gildan 6400 — SoftStyle 100% — $7.75/shirt</option>
+                <option value="Gildan 75000 — Heavy Blend Crew"        data-garment="tshirt"        data-price="30.00" data-code="75000">Gildan 75000 — Heavy Blend Crew — $10.00/shirt</option>
+                <option value="Augusta 790 — Nexgen Performance Tee"   data-garment="tshirt"        data-price="27.00" data-code="790">Augusta 790 — Nexgen Performance Tee (Unisex) — $7.75/shirt</option>
+                <option value="Augusta 1790 — Ladies NexGen Wicking"   data-garment="tshirt-female" data-price="27.00" data-code="1790">Augusta 1790 — Ladies NexGen Wicking Tee — $7.75/shirt</option>
+                <option value="Hoodie — Heavy Blend 50/50"             data-garment="hoodie"        data-price="57.00" data-code="12500">Hoodie — Heavy Blend 50/50 — $35.00/shirt</option>
               </select>
             </div>
           </div>
@@ -2091,16 +2091,61 @@ document.querySelectorAll('.ftab').forEach(btn => {
     btn.classList.add('active'); updateDecMockup();
   };
 
+  // Colors available per product code (matches designer page)
+  const GARMENT_COLORS = {
+    '5000':  ['gray','white','black','navy','red','royal','forest','maroon'],
+    '64000': ['gray','white','black','navy','red','royal','maroon'],
+    '75000': ['gray','white','black','navy','red','royal','maroon'],
+    '790':   ['white','black','navy','red','royal','maroon'],
+    '1790':  ['white','black','navy','red','royal','maroon'],
+    '12500': ['gray','white','black','navy','red','royal','forest','maroon'],
+  };
+
   window.syncGarmentFromDropdown = function(sel) {
     const opt = sel.options[sel.selectedIndex];
-    const type = opt.dataset.garment || 'tshirt';
-    const price = opt.dataset.price || '';
+    const type  = opt.dataset.garment || 'tshirt';
+    const price = opt.dataset.price   || '';
+    const code  = opt.dataset.code    || '';
+
     // Update mockup garment buttons
     const matchBtn = document.querySelector('.mockup-btn[data-garment="' + type + '"]');
     if (matchBtn) setDecGarment(type, matchBtn);
+
     // Auto-fill price if field is empty
     const priceField = document.querySelector('[name="price"]');
     if (priceField && (!priceField.value || priceField.value === '$')) priceField.value = '$' + price;
+
+    // Filter color swatches based on garment
+    const allowed = GARMENT_COLORS[code];
+    if (!allowed) return;
+
+    // Mockup preview swatches
+    document.querySelectorAll('.dec-swatch').forEach(sw => {
+      const c = sw.dataset.color;
+      if (allowed.includes(c)) {
+        sw.style.display = '';
+      } else {
+        sw.style.display = 'none';
+        sw.classList.remove('active');
+      }
+    });
+    // If active mockup color is now hidden, switch to first allowed
+    const activeSwatch = document.querySelector('.dec-swatch.active');
+    if (!activeSwatch || activeSwatch.style.display === 'none') {
+      const first = document.querySelector('.dec-swatch[data-color="' + allowed[0] + '"]');
+      if (first) setDecColor(allowed[0], first);
+    }
+
+    // Form "Available Colors" swatches
+    document.querySelectorAll('.fcswatch').forEach(sw => {
+      const c = sw.dataset.color;
+      if (allowed.includes(c)) {
+        sw.style.display = '';
+      } else {
+        sw.style.display = 'none';
+        sw.classList.remove('selected');
+      }
+    });
   };
 
   window.setDecView = function(view, btn) {
