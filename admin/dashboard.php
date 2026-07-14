@@ -492,14 +492,6 @@ tr:hover td{background:#fafafa;}
 .dec-swatches{display:flex;flex-wrap:wrap;gap:6px;}
 .dec-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 0.2s;position:relative;}
 .dec-swatch.active{border-color:var(--gold);transform:scale(1.15);}
-.dec-swatch[data-color="gray"]{background:#8c8c8c;}
-.dec-swatch[data-color="white"]{background:#f0f0f0;box-shadow:0 0 0 1px #aaa inset;}
-.dec-swatch[data-color="black"]{background:#1a1a1a;box-shadow:0 0 0 1px #555 inset;}
-.dec-swatch[data-color="navy"]{background:#1a2744;}
-.dec-swatch[data-color="red"]{background:#c0392b;}
-.dec-swatch[data-color="royal"]{background:#2850a0;}
-.dec-swatch[data-color="forest"]{background:#1e5e38;}
-.dec-swatch[data-color="maroon"]{background:#6b1a1a;}
 .dec-props-panel{background:#242424;border:1px solid #333;border-radius:3px;padding:10px 12px;margin-top:8px;display:none;}
 .dec-props-panel.visible{display:block;}
 .dec-prop-group{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
@@ -514,14 +506,6 @@ tr:hover td{background:#fafafa;}
 .form-color-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
 .fcswatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid #ddd;transition:all 0.15s;flex-shrink:0;}
 .fcswatch.on{border-color:var(--gold);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--gold);}
-.fcswatch[data-color="gray"]{background:#8c8c8c;}
-.fcswatch[data-color="white"]{background:#f0f0f0;border-color:#ccc;}
-.fcswatch[data-color="black"]{background:#1a1a1a;}
-.fcswatch[data-color="navy"]{background:#1a2744;}
-.fcswatch[data-color="red"]{background:#c0392b;}
-.fcswatch[data-color="royal"]{background:#2850a0;}
-.fcswatch[data-color="forest"]{background:#1e5e38;}
-.fcswatch[data-color="maroon"]{background:#6b1a1a;}
 .size-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:4px;}
 .size-check{display:none;}
 .size-check+.size-label{display:block;text-align:center;padding:7px 4px;border:1px solid #ddd;border-radius:2px;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;}
@@ -821,16 +805,7 @@ tr:hover td{background:#fafafa;}
               <button type="button" class="mockup-btn" data-view="back" onclick="setDecView('back',this)">Back</button>
             </div>
             <div class="dec-ctrl-group">
-              <div class="dec-swatches">
-                <div class="dec-swatch active" data-color="gray"   title="Gray"         onclick="setDecColor('gray',this)"></div>
-                <div class="dec-swatch"        data-color="white"  title="White"        onclick="setDecColor('white',this)"></div>
-                <div class="dec-swatch"        data-color="black"  title="Black"        onclick="setDecColor('black',this)"></div>
-                <div class="dec-swatch"        data-color="navy"   title="Navy"         onclick="setDecColor('navy',this)"></div>
-                <div class="dec-swatch"        data-color="red"    title="Red"          onclick="setDecColor('red',this)"></div>
-                <div class="dec-swatch"        data-color="royal"  title="Royal Blue"   onclick="setDecColor('royal',this)"></div>
-                <div class="dec-swatch"        data-color="forest" title="Forest Green" onclick="setDecColor('forest',this)"></div>
-                <div class="dec-swatch"        data-color="maroon" title="Maroon"       onclick="setDecColor('maroon',this)"></div>
-              </div>
+              <div class="dec-swatches" id="decPreviewSwatches"></div>
             </div>
           </div>
 
@@ -920,11 +895,7 @@ tr:hover td{background:#fafafa;}
 
           <div class="form-group">
             <label>Available Colors</label>
-            <div class="form-color-row">
-              <?php foreach (['gray'=>'Gray','white'=>'White','black'=>'Black','navy'=>'Navy','red'=>'Red','royal'=>'Royal Blue','forest'=>'Forest','maroon'=>'Maroon'] as $k=>$v): ?>
-              <div class="fcswatch" data-color="<?= $k ?>" data-name="<?= $v ?>" title="<?= $v ?>" onclick="toggleFormColor(this)"></div>
-              <?php endforeach; ?>
-            </div>
+            <div class="form-color-row" id="decFormColors"></div>
             <div id="decColorsHidden"></div>
           </div>
 
@@ -1901,7 +1872,7 @@ document.querySelectorAll('.ftab').forEach(btn => {
   };
 
   let fc = null;
-  let decGarment = 'tshirt', decColor = 'gray', decView = 'front';
+  let decGarment = 'tshirt', decColor = 'Ash', decColorHex = '#CCCCCC', decView = 'front';
   let history = [], historyIndex = -1;
 
   function pushHistory() {
@@ -1947,8 +1918,7 @@ document.querySelectorAll('.ftab').forEach(btn => {
     const img = document.getElementById('decMockupImg');
     img.onerror = () => { img.onerror = null; img.src = fallback; };
     img.src = src;
-    const hex = DEC_COLOR_HEX[decColor];
-    document.getElementById('decMockupColor').style.background = hex || 'transparent';
+    document.getElementById('decMockupColor').style.background = decColorHex || 'transparent';
     updateDecPrintZone();
   }
 
@@ -2091,23 +2061,122 @@ document.querySelectorAll('.ftab').forEach(btn => {
     btn.classList.add('active'); updateDecMockup();
   };
 
-  // Colors available per product code (matches designer page)
-  const GARMENT_COLORS = {
-    '5000':  ['gray','white','black','navy','red','royal','forest','maroon'],
-    '64000': ['gray','white','black','navy','red','royal','maroon'],
-    '75000': ['gray','white','black','navy','red','royal','maroon'],
-    '790':   ['white','black','navy','red','royal','maroon'],
-    '1790':  ['white','black','navy','red','royal','maroon'],
-    '12500': ['gray','white','black','navy','red','royal','forest','maroon'],
+  // Full color catalog per product code — matches designer page exactly
+  const GARMENT_COLOR_CATALOG = {
+    '5000': [
+      {name:'Ash',                    hex:'#CCCCCC'},{name:'Azalea',                hex:'#F47BA8'},
+      {name:'Black',                  hex:'#25282A'},{name:'Cardinal Red',          hex:'#8E151E'},
+      {name:'Carolina Blue',          hex:'#648EC8'},{name:'Charcoal',              hex:'#64605E'},
+      {name:'Daisy',                  hex:'#F5C65E'},{name:'Dark Chocolate',        hex:'#412D30'},
+      {name:'Dark Heather',           hex:'#51595C'},{name:'Forest',                hex:'#123B2D'},
+      {name:'Gold',                   hex:'#FFB81C'},{name:'Graphite Heather',      hex:'#64686B'},
+      {name:'Heather Military Green', hex:'#5D6A60'},{name:'Heather Navy',          hex:'#3A4155'},
+      {name:'Heliconia',              hex:'#EE3086'},{name:'Irish Green',           hex:'#05A34C'},
+      {name:'Light Blue',             hex:'#A2C6E9'},{name:'Light Pink',            hex:'#F7D2DA'},
+      {name:'Lime',                   hex:'#78D64B'},{name:'Maroon',                hex:'#5C272F'},
+      {name:'Military Green',         hex:'#71775E'},{name:'Natural',               hex:'#E5D8C8'},
+      {name:'Navy',                   hex:'#2E324B'},{name:'Old Gold',              hex:'#C09466'},
+      {name:'Orange',                 hex:'#F44B34'},{name:'Purple',                hex:'#57316E'},
+      {name:'Red',                    hex:'#E02C43'},{name:'Royal',                 hex:'#1D4F91'},
+      {name:'S Orange',               hex:'#F55721'},{name:'Safety Green',          hex:'#C5E53F'},
+      {name:'Sand',                   hex:'#C6B9A7'},{name:'Sapphire',              hex:'#058EBA'},
+      {name:'Sport Grey',             hex:'#A8A9A3'},{name:'Tennessee Orange',      hex:'#F89629'},
+      {name:'White',                  hex:'#EAEEF2'},
+    ],
+    '790': [
+      {name:'White',         hex:'#F5F5F5'},{name:'Black',        hex:'#1C1C1C'},
+      {name:'Navy',          hex:'#1A2744'},{name:'Royal',         hex:'#2850A0'},
+      {name:'Red',           hex:'#CC1100'},{name:'Scarlet',       hex:'#CC1A2A'},
+      {name:'Cardinal',      hex:'#8C1A1A'},{name:'Maroon',        hex:'#6B0000'},
+      {name:'Athletic Gold', hex:'#F0A500'},{name:'Vegas Gold',    hex:'#C9A84C'},
+      {name:'Orange',        hex:'#E8560A'},{name:'Kelly Green',   hex:'#1E8A1E'},
+      {name:'Dark Green',    hex:'#1B4332'},{name:'Purple',        hex:'#4B0082'},
+      {name:'Pink',          hex:'#E87EA0'},{name:'Light Blue',    hex:'#9FC5D8'},
+      {name:'Columbia Blue', hex:'#6BAED6'},{name:'Silver',        hex:'#B8B8B8'},
+      {name:'Graphite',      hex:'#4A4A4A'},{name:'Slate',         hex:'#708090'},
+    ],
+    '1790': [
+      {name:'White',         hex:'#F5F5F5'},{name:'Black',        hex:'#1C1C1C'},
+      {name:'Navy',          hex:'#1A2744'},{name:'Royal',         hex:'#2850A0'},
+      {name:'Red',           hex:'#CC1100'},{name:'Scarlet',       hex:'#CC1A2A'},
+      {name:'Cardinal',      hex:'#8C1A1A'},{name:'Maroon',        hex:'#6B0000'},
+      {name:'Athletic Gold', hex:'#F0A500'},{name:'Orange',        hex:'#E8560A'},
+      {name:'Kelly Green',   hex:'#1E8A1E'},{name:'Dark Green',    hex:'#1B4332'},
+      {name:'Purple',        hex:'#4B0082'},{name:'Pink',          hex:'#E87EA0'},
+      {name:'Light Blue',    hex:'#9FC5D8'},{name:'Columbia Blue', hex:'#6BAED6'},
+      {name:'Silver',        hex:'#B8B8B8'},{name:'Graphite',      hex:'#4A4A4A'},
+    ],
+    '12500': [
+      {name:'Ash',          hex:'#CCCCCC'},{name:'Black',         hex:'#25282A'},
+      {name:'Cardinal Red', hex:'#8E151E'},{name:'Carolina Blue', hex:'#648EC8'},
+      {name:'Charcoal',     hex:'#64605E'},{name:'Dark Heather',  hex:'#51595C'},
+      {name:'Forest',       hex:'#123B2D'},{name:'Gold',          hex:'#FFB81C'},
+      {name:'Heliconia',    hex:'#EE3086'},{name:'Irish Green',   hex:'#05A34C'},
+      {name:'Light Blue',   hex:'#A2C6E9'},{name:'Light Pink',    hex:'#F7D2DA'},
+      {name:'Lime',         hex:'#78D64B'},{name:'Maroon',        hex:'#5C272F'},
+      {name:'Military Green',hex:'#71775E'},{name:'Natural',      hex:'#E5D8C8'},
+      {name:'Navy',         hex:'#2E324B'},{name:'Orange',        hex:'#F44B34'},
+      {name:'Purple',       hex:'#57316E'},{name:'Red',           hex:'#E02C43'},
+      {name:'Royal',        hex:'#1D4F91'},{name:'Sand',          hex:'#C6B9A7'},
+      {name:'Sapphire',     hex:'#058EBA'},{name:'Sport Grey',    hex:'#A8A9A3'},
+      {name:'White',        hex:'#EAEEF2'},
+    ],
   };
+  GARMENT_COLOR_CATALOG['64000'] = GARMENT_COLOR_CATALOG['5000'];
+  GARMENT_COLOR_CATALOG['75000'] = GARMENT_COLOR_CATALOG['5000'];
+
+  function isLightHex(hex) {
+    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    return (r * 0.299 + g * 0.587 + b * 0.114) > 180;
+  }
+
+  function renderGarmentColors(code) {
+    const colors = GARMENT_COLOR_CATALOG[code] || GARMENT_COLOR_CATALOG['5000'];
+    const previewWrap = document.getElementById('decPreviewSwatches');
+    const formWrap    = document.getElementById('decFormColors');
+    const hiddenWrap  = document.getElementById('decColorsHidden');
+    if (!previewWrap || !formWrap) return;
+    previewWrap.innerHTML = '';
+    formWrap.innerHTML    = '';
+    if (hiddenWrap) hiddenWrap.innerHTML = '';
+
+    colors.forEach((color, i) => {
+      const light = isLightHex(color.hex);
+      const shadow = light ? 'inset 0 0 0 1px rgba(0,0,0,0.18)' : '';
+
+      // Mockup preview swatch
+      const sw = document.createElement('div');
+      sw.className = 'dec-swatch' + (i === 0 ? ' active' : '');
+      sw.title = color.name;
+      sw.style.background = color.hex;
+      if (shadow) sw.style.boxShadow = shadow;
+      sw.addEventListener('click', function() { setDecColor(color.name, color.hex, this); });
+      previewWrap.appendChild(sw);
+
+      // Form "Available Colors" swatch (checkbox style)
+      const fSw = document.createElement('div');
+      fSw.className = 'fcswatch';
+      fSw.setAttribute('data-color', color.name);
+      fSw.setAttribute('data-name', color.name);
+      fSw.title = color.name;
+      fSw.style.background = color.hex;
+      if (shadow) fSw.style.boxShadow = shadow;
+      fSw.addEventListener('click', function() { toggleFormColor(this); });
+      formWrap.appendChild(fSw);
+    });
+
+    // Auto-select first color in mockup
+    if (colors.length > 0) setDecColor(colors[0].name, colors[0].hex, previewWrap.firstChild);
+  }
 
   window.syncGarmentFromDropdown = function(sel) {
     const opt   = sel.options[sel.selectedIndex];
     const type  = opt.getAttribute('data-garment') || 'tshirt';
     const price = opt.getAttribute('data-price')   || '';
     const code  = opt.getAttribute('data-code')    || '';
+    if (!code) return;
 
-    // Update mockup garment buttons
+    // Sync garment mockup buttons
     const matchBtn = document.querySelector('.mockup-btn[data-garment="' + type + '"]');
     if (matchBtn) setDecGarment(type, matchBtn);
 
@@ -2115,32 +2184,8 @@ document.querySelectorAll('.ftab').forEach(btn => {
     const priceField = document.querySelector('[name="price"]');
     if (priceField && (!priceField.value || priceField.value === '$')) priceField.value = '$' + price;
 
-    // Filter color swatches based on garment
-    const allowed = GARMENT_COLORS[code];
-    if (!allowed) return;
-
-    // Mockup preview swatches — show/hide based on allowed list
-    let activeStillVisible = false;
-    document.querySelectorAll('.dec-swatch').forEach(sw => {
-      const c = sw.getAttribute('data-color');
-      const ok = allowed.includes(c);
-      sw.style.display = ok ? '' : 'none';
-      if (!ok) sw.classList.remove('active');
-      else if (sw.classList.contains('active')) activeStillVisible = true;
-    });
-    // If current color was hidden, switch mockup to first allowed color
-    if (!activeStillVisible) {
-      const first = document.querySelector('.dec-swatch[data-color="' + allowed[0] + '"]');
-      if (first) setDecColor(allowed[0], first);
-    }
-
-    // Form "Available Colors" swatches — show/hide and deselect hidden ones
-    document.querySelectorAll('.fcswatch').forEach(sw => {
-      const c = sw.getAttribute('data-color');
-      const ok = allowed.includes(c);
-      sw.style.display = ok ? '' : 'none';
-      if (!ok) sw.classList.remove('selected');
-    });
+    // Rebuild color swatches for this product
+    renderGarmentColors(code);
   };
 
   window.setDecView = function(view, btn) {
@@ -2149,10 +2194,12 @@ document.querySelectorAll('.ftab').forEach(btn => {
     btn.classList.add('active'); updateDecMockup();
   };
 
-  window.setDecColor = function(color, el) {
-    decColor = color;
+  window.setDecColor = function(name, hex, el) {
+    decColor    = name;
+    decColorHex = hex || null;
     document.querySelectorAll('.dec-swatch').forEach(s => s.classList.remove('active'));
-    el.classList.add('active'); updateDecMockup();
+    if (el) el.classList.add('active');
+    updateDecMockup();
   };
 
   window.toggleFormColor = function(el) {
@@ -2201,10 +2248,9 @@ document.querySelectorAll('.ftab').forEach(btn => {
     ctx.fillRect(0, 0, SIZE, SIZE);
     const mockImg = document.getElementById('decMockupImg');
     try { ctx.drawImage(mockImg, 0, 0, SIZE, SIZE); } catch(_) {}
-    const hex = DEC_COLOR_HEX[decColor];
-    if (hex) {
+    if (decColorHex) {
       ctx.globalCompositeOperation = 'multiply';
-      ctx.fillStyle = hex; ctx.fillRect(0, 0, SIZE, SIZE);
+      ctx.fillStyle = decColorHex; ctx.fillRect(0, 0, SIZE, SIZE);
       ctx.globalCompositeOperation = 'source-over';
     }
     const fabricImg = new Image();
@@ -2217,6 +2263,7 @@ document.querySelectorAll('.ftab').forEach(btn => {
   };
 
   initCanvas();
+  renderGarmentColors('5000');
 })();
 
 // DTF modal
