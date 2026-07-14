@@ -758,7 +758,7 @@ tr:hover td{background:#fafafa;}
     <?php elseif ($activeTab === 'decorated'): ?>
     <!-- ===== DECORATED TAB ===== -->
     <?php
-      $decProducts = array_values(array_filter($products, fn($p) => !empty($p['decorated'])));
+      $decProducts = array_reverse(array_values(array_filter($products, fn($p) => !empty($p['decorated']))));
     ?>
 
     <form method="POST" id="decForm" enctype="multipart/form-data" onsubmit="captureAndSubmit(event)">
@@ -1584,7 +1584,7 @@ tr:hover td{background:#fafafa;}
 
     <?php else: ?>
     <!-- ===== PRODUCTS TAB ===== -->
-    <?php $regProducts = array_filter($products, fn($p) => empty($p['decorated'])); ?>
+    <?php $regProducts = array_reverse(array_values(array_filter($products, fn($p) => empty($p['decorated'])))); ?>
 
     <div class="stats">
       <div class="stat-card"><div class="num"><?= count($regProducts) ?></div><div class="lbl">Total Products</div></div>
@@ -2102,10 +2102,10 @@ document.querySelectorAll('.ftab').forEach(btn => {
   };
 
   window.syncGarmentFromDropdown = function(sel) {
-    const opt = sel.options[sel.selectedIndex];
-    const type  = opt.dataset.garment || 'tshirt';
-    const price = opt.dataset.price   || '';
-    const code  = opt.dataset.code    || '';
+    const opt   = sel.options[sel.selectedIndex];
+    const type  = opt.getAttribute('data-garment') || 'tshirt';
+    const price = opt.getAttribute('data-price')   || '';
+    const code  = opt.getAttribute('data-code')    || '';
 
     // Update mockup garment buttons
     const matchBtn = document.querySelector('.mockup-btn[data-garment="' + type + '"]');
@@ -2119,32 +2119,27 @@ document.querySelectorAll('.ftab').forEach(btn => {
     const allowed = GARMENT_COLORS[code];
     if (!allowed) return;
 
-    // Mockup preview swatches
+    // Mockup preview swatches — show/hide based on allowed list
+    let activeStillVisible = false;
     document.querySelectorAll('.dec-swatch').forEach(sw => {
-      const c = sw.dataset.color;
-      if (allowed.includes(c)) {
-        sw.style.display = '';
-      } else {
-        sw.style.display = 'none';
-        sw.classList.remove('active');
-      }
+      const c = sw.getAttribute('data-color');
+      const ok = allowed.includes(c);
+      sw.style.display = ok ? '' : 'none';
+      if (!ok) sw.classList.remove('active');
+      else if (sw.classList.contains('active')) activeStillVisible = true;
     });
-    // If active mockup color is now hidden, switch to first allowed
-    const activeSwatch = document.querySelector('.dec-swatch.active');
-    if (!activeSwatch || activeSwatch.style.display === 'none') {
+    // If current color was hidden, switch mockup to first allowed color
+    if (!activeStillVisible) {
       const first = document.querySelector('.dec-swatch[data-color="' + allowed[0] + '"]');
       if (first) setDecColor(allowed[0], first);
     }
 
-    // Form "Available Colors" swatches
+    // Form "Available Colors" swatches — show/hide and deselect hidden ones
     document.querySelectorAll('.fcswatch').forEach(sw => {
-      const c = sw.dataset.color;
-      if (allowed.includes(c)) {
-        sw.style.display = '';
-      } else {
-        sw.style.display = 'none';
-        sw.classList.remove('selected');
-      }
+      const c = sw.getAttribute('data-color');
+      const ok = allowed.includes(c);
+      sw.style.display = ok ? '' : 'none';
+      if (!ok) sw.classList.remove('selected');
     });
   };
 
@@ -2201,6 +2196,9 @@ document.querySelectorAll('.ftab').forEach(btn => {
     const off = document.createElement('canvas');
     off.width = off.height = SIZE;
     const ctx = off.getContext('2d');
+    // White background so product card matches other products
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, SIZE, SIZE);
     const mockImg = document.getElementById('decMockupImg');
     try { ctx.drawImage(mockImg, 0, 0, SIZE, SIZE); } catch(_) {}
     const hex = DEC_COLOR_HEX[decColor];
