@@ -798,7 +798,7 @@ function toggleShopMore() {
 function renderProducts(cat) {
   activecat = cat;
   const grid = document.getElementById('productsGrid');
-  const filtered = cat === 'all' ? products : products.filter(p => p.cat === cat);
+  const filtered = cat === 'all' ? products.filter(p => p.cat !== 'no_kings') : products.filter(p => p.cat === cat);
   if (!filtered.length) {
     grid.innerHTML = '<p style="color:var(--gray);padding:40px 0;">No products in this category yet.</p>';
     document.getElementById('shopViewMoreWrap').style.display = 'none';
