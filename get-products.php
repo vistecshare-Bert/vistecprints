@@ -8,6 +8,10 @@ header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 $file = __DIR__ . '/products.json';
 if (file_exists($file)) {
     $data = json_decode(file_get_contents($file), true) ?: [];
+    // Exclude DTF blanks — shop only shows decorated/regular products
+    $data = array_values(array_filter($data, function($p) {
+        return ($p['badge'] ?? '') !== 'CUSTOM DTF PRINT';
+    }));
     echo json_encode(array_values(array_reverse($data)));
 } else {
     echo '[]';
