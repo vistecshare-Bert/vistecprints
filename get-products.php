@@ -6,4 +6,9 @@ header('Pragma: no-cache');
 header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 
 $file = __DIR__ . '/products.json';
-echo file_exists($file) ? file_get_contents($file) : '[]';
+if (file_exists($file)) {
+    $data = json_decode(file_get_contents($file), true) ?: [];
+    echo json_encode(array_values(array_reverse($data)));
+} else {
+    echo '[]';
+}
