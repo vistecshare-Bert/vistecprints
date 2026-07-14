@@ -266,10 +266,10 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 /* ---- SIZE MODAL ---- */
 .sm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;}
 .sm-overlay.open{opacity:1;pointer-events:all;}
-.sm-box{background:var(--dark2);border:1px solid rgba(212,152,72,0.18);border-radius:4px;width:100%;max-width:640px;overflow:hidden;transform:scale(0.95);transition:transform 0.25s;}
+.sm-box{background:var(--dark2);border:1px solid rgba(212,152,72,0.18);border-radius:4px;width:100%;max-width:768px;overflow:hidden;transform:scale(0.95);transition:transform 0.25s;}
 .sm-overlay.open .sm-box{transform:scale(1);}
 .sm-top{display:flex;border-bottom:1px solid rgba(255,255,255,0.07);position:relative;}
-.sm-img{width:180px;height:180px;background:var(--dark3);flex-shrink:0;overflow:hidden;position:relative;}
+.sm-img{width:216px;height:216px;background:var(--dark3);flex-shrink:0;overflow:hidden;position:relative;}
 .sm-img img{width:100%;height:100%;object-fit:cover;transition:opacity 0.2s;}
 #smColorCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;object-fit:cover;}
 .sm-meta{padding:18px 20px;flex:1;}
@@ -427,7 +427,7 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 <div class="sm-overlay" id="smOverlay">
   <div class="sm-box">
     <div class="sm-top">
-      <div class="sm-img"><img id="smImg" src="" alt=""/><canvas id="smColorCanvas" width="180" height="180"></canvas></div>
+      <div class="sm-img"><img id="smImg" src="" alt=""/><canvas id="smColorCanvas" width="216" height="216"></canvas></div>
       <div class="sm-meta">
         <div class="sm-pname" id="smName"></div>
         <div class="sm-garment" id="smGarment"></div>
@@ -1067,7 +1067,7 @@ function renderShirtPreview(hex, garmentStr, designSrc) {
   const canvas = document.getElementById('smColorCanvas');
   const img    = document.getElementById('smImg');
   if (!canvas) return;
-  const SIZE = 180;
+  const SIZE = 216;
   canvas.width = canvas.height = SIZE;
   const ctx = canvas.getContext('2d');
 
