@@ -239,6 +239,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    // ── EDIT DECORATED PRODUCT ──────────────────────────────────
+    if ($action === 'edit_decorated') {
+        $pid     = trim($_POST['pid']     ?? '');
+        $name    = trim($_POST['name']    ?? '');
+        $cat     = trim($_POST['cat']     ?? '');
+        $price   = trim($_POST['price']   ?? '');
+        $badge   = trim($_POST['badge']   ?? '');
+        $garment = trim($_POST['garment'] ?? '');
+        $sizes   = array_values($_POST['sizes']  ?? []);
+        $colors  = array_values($_POST['colors'] ?? []);
+        foreach ($products as &$p) {
+            if ($p['id'] === $pid) {
+                $p['name']    = $name;
+                $p['cat']     = $cat;
+                $p['price']   = $price;
+                $p['badge']   = $badge;
+                $p['garment'] = $garment;
+                $p['sizes']   = $sizes;
+                $p['colors']  = $colors;
+                break;
+            }
+        }
+        unset($p);
+        saveProducts($jsonFile, $products);
+        header('Location: dashboard.php?tab=decorated&msg=' . urlencode($name . ' updated!') . '&type=success');
+        exit;
+    }
+
     if ($action === 'add' || $action === 'edit') {
         $cat      = trim($_POST['cat'] ?? 'fun');
         $uploaded = handleImageUpload($cat);
@@ -961,11 +989,14 @@ tr:hover td{background:#fafafa;}
             <td><?= htmlspecialchars($p['price'] ?? 'â€”') ?></td>
             <td style="font-size:12px;color:#666;"><?= htmlspecialchars(implode(', ', $p['sizes'] ?? [])) ?></td>
             <td>
-              <form method="POST" onsubmit="return confirm('Delete this product?')" style="display:inline;">
-                <input type="hidden" name="action" value="delete"/>
-                <input type="hidden" name="index" value="<?= $i ?>"/>
-                <button type="submit" class="btn btn-red btn-sm">Delete</button>
-              </form>
+              <div class="actions">
+                <button type="button" class="btn btn-outline btn-sm" onclick='openDecEditModal(<?= htmlspecialchars(json_encode($p), ENT_QUOTES) ?>)'>Edit</button>
+                <form method="POST" onsubmit="return confirm('Delete this product?')" style="display:inline;">
+                  <input type="hidden" name="action" value="delete"/>
+                  <input type="hidden" name="index" value="<?= $i ?>"/>
+                  <button type="submit" class="btn btn-red btn-sm">Delete</button>
+                </form>
+              </div>
             </td>
           </tr>
           <?php endforeach; ?>
@@ -1195,6 +1226,78 @@ tr:hover td{background:#fafafa;}
         </div>
       </div>
       <?php endforeach; ?>
+    </div>
+
+    <!-- Decorated Product Edit Modal -->
+    <div class="modal-overlay" id="decEditModalOverlay">
+      <div class="modal" style="max-width:560px;">
+        <div class="modal-head">
+          <h3>Edit Decorated Product</h3>
+          <button class="modal-close" onclick="closeDecEditModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form method="POST" id="decEditForm">
+            <input type="hidden" name="action" value="edit_decorated"/>
+            <input type="hidden" name="pid" id="decEditPid"/>
+            <div class="form-group">
+              <label>Product Name *</label>
+              <input type="text" name="name" id="decEditName" required/>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Category *</label>
+                <select name="cat" id="decEditCat">
+                  <?php foreach ($categories as $key => $label): ?>
+                  <option value="<?= $key ?>"><?= $label ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Price</label>
+                <input type="text" name="price" id="decEditPrice" placeholder="$25.00"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Badge <span style="font-weight:300;text-transform:none;">(optional)</span></label>
+                <input type="text" name="badge" id="decEditBadge" placeholder="New, Hot, Sale..."/>
+              </div>
+              <div class="form-group">
+                <label>Garment</label>
+                <select name="garment" id="decEditGarment" onchange="refreshDecEditColors()">
+                  <option value="">— Select garment —</option>
+                  <option value="Gildan 5000 — Heavy Cotton 100%" data-code="5000">Gildan 5000 — Heavy Cotton 100%</option>
+                  <option value="Gildan 6400 — SoftStyle 100%" data-code="64000">Gildan 6400 — SoftStyle 100%</option>
+                  <option value="Gildan 75000 — Heavy Blend Crew" data-code="75000">Gildan 75000 — Heavy Blend Crew</option>
+                  <option value="Augusta 790 — Nexgen Performance Tee" data-code="790">Augusta 790 — Nexgen Performance Tee</option>
+                  <option value="Augusta 1790 — Ladies NexGen Wicking" data-code="1790">Augusta 1790 — Ladies NexGen Wicking</option>
+                  <option value="Hoodie — Heavy Blend 50/50" data-code="12500">Hoodie — Heavy Blend 50/50</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Available Sizes</label>
+              <div class="size-grid" id="decEditSizes">
+                <?php foreach (['S','M','L','XL','2XL','3XL','4XL','5XL'] as $sz): ?>
+                <div>
+                  <input type="checkbox" class="size-check" id="edsz_<?= $sz ?>" name="sizes[]" value="<?= $sz ?>"/>
+                  <label class="size-label" for="edsz_<?= $sz ?>"><?= $sz ?></label>
+                </div>
+                <?php endforeach; ?>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Available Colors</label>
+              <div class="form-color-row" id="decEditColors" style="max-height:160px;overflow-y:auto;flex-wrap:wrap;"></div>
+              <div id="decEditColorsHidden"></div>
+            </div>
+            <div class="modal-foot" style="padding:0;margin-top:16px;">
+              <button type="button" class="btn btn-outline" onclick="closeDecEditModal()">Cancel</button>
+              <button type="submit" class="btn btn-gold">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
     <!-- DTF Order Modal (new + edit) -->
@@ -2124,6 +2227,7 @@ document.querySelectorAll('.ftab').forEach(btn => {
   };
   GARMENT_COLOR_CATALOG['64000'] = GARMENT_COLOR_CATALOG['5000'];
   GARMENT_COLOR_CATALOG['75000'] = GARMENT_COLOR_CATALOG['5000'];
+  window.GARMENT_COLOR_CATALOG   = GARMENT_COLOR_CATALOG;
 
   function isLightHex(hex) {
     const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
@@ -2325,6 +2429,65 @@ function dtfPreviewArtwork(input) {
 }
 const dtfOverlay = document.getElementById('dtfModalOverlay');
 if (dtfOverlay) dtfOverlay.addEventListener('click', function(e){ if(e.target===this) closeDtfModal(); });
+
+// ── Decorated Product Edit Modal ─────────────────────────────
+function openDecEditModal(p) {
+  document.getElementById('decEditPid').value   = p.id      || '';
+  document.getElementById('decEditName').value  = p.name    || '';
+  document.getElementById('decEditPrice').value = p.price   || '';
+  document.getElementById('decEditBadge').value = p.badge   || '';
+  const catSel = document.getElementById('decEditCat');
+  if (catSel) catSel.value = p.cat || '';
+  const garSel = document.getElementById('decEditGarment');
+  if (garSel) garSel.value = p.garment || '';
+  document.querySelectorAll('#decEditSizes .size-check').forEach(cb => {
+    cb.checked = (p.sizes || []).includes(cb.value);
+  });
+  const code = garSel && garSel.selectedIndex > 0
+    ? (garSel.options[garSel.selectedIndex].dataset.code || '5000') : '5000';
+  renderDecEditColors(code, p.colors || []);
+  document.getElementById('decEditModalOverlay').classList.add('open');
+}
+function closeDecEditModal() {
+  document.getElementById('decEditModalOverlay').classList.remove('open');
+}
+function refreshDecEditColors() {
+  const garSel = document.getElementById('decEditGarment');
+  const code = garSel && garSel.selectedIndex > 0
+    ? (garSel.options[garSel.selectedIndex].dataset.code || '5000') : '5000';
+  renderDecEditColors(code, []);
+}
+function renderDecEditColors(code, selectedColors) {
+  const catalog = window.GARMENT_COLOR_CATALOG || {};
+  const colors  = catalog[code] || catalog['5000'] || [];
+  const wrap    = document.getElementById('decEditColors');
+  const hidden  = document.getElementById('decEditColorsHidden');
+  if (!wrap) return;
+  wrap.innerHTML = ''; hidden.innerHTML = '';
+  colors.forEach(({name, hex}) => {
+    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    const light = (r*299 + g*587 + b*114)/1000 > 180;
+    const sw = document.createElement('div');
+    sw.className = 'fcswatch' + (selectedColors.includes(name) ? ' selected' : '');
+    sw.dataset.color = name; sw.dataset.hex = hex;
+    sw.style.cssText = `background:${hex};${light ? 'border:1px solid #ccc;' : ''}`;
+    sw.title = name;
+    sw.onclick = function() { this.classList.toggle('selected'); syncDecEditHiddenColors(); };
+    wrap.appendChild(sw);
+  });
+  syncDecEditHiddenColors();
+}
+function syncDecEditHiddenColors() {
+  const hidden = document.getElementById('decEditColorsHidden');
+  hidden.innerHTML = '';
+  document.querySelectorAll('#decEditColors .fcswatch.selected').forEach(sw => {
+    const inp = document.createElement('input');
+    inp.type = 'hidden'; inp.name = 'colors[]'; inp.value = sw.dataset.color;
+    hidden.appendChild(inp);
+  });
+}
+const decEditOverlay = document.getElementById('decEditModalOverlay');
+if (decEditOverlay) decEditOverlay.addEventListener('click', function(e){ if(e.target===this) closeDecEditModal(); });
 </script>
 </body>
 </html>
