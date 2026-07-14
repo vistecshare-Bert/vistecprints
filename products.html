@@ -327,7 +327,7 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
     <div class="sm-main">
       <div class="sm-img">
         <img id="smImg" src="" alt=""/>
-        <canvas id="smColorCanvas" width="216" height="216"></canvas>
+        <canvas id="smColorCanvas" width="400" height="400"></canvas>
       </div>
       <div class="sm-right">
         <button class="sm-close-x" onclick="closeSizeModal()">
@@ -785,7 +785,7 @@ function renderShirtPreview(hex, garmentStr, designSrc) {
   const canvas = document.getElementById('smColorCanvas');
   const img    = document.getElementById('smImg');
   if (!canvas) return;
-  const SIZE = 216;
+  const SIZE = 400;
   canvas.width = canvas.height = SIZE;
   const ctx = canvas.getContext('2d');
 
