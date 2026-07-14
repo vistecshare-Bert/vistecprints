@@ -286,6 +286,12 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 .sm-size.sel{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:700;}
 .sm-size-err{font-size:12px;color:#e05555;display:none;margin-top:-8px;}
 .sm-size-err.show{display:block;}
+.sm-colors{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.sm-color-dot{width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform 0.15s,border-color 0.15s;flex-shrink:0;}
+.sm-color-dot:hover{transform:scale(1.18);}
+.sm-color-dot.sel{border-color:var(--gold);transform:scale(1.18);box-shadow:0 0 0 1px var(--gold);}
+.sm-color-dot.light{border:2px solid rgba(0,0,0,0.15);}
+.sm-color-dot.light.sel{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
 .sm-qty-row{display:flex;align-items:center;gap:16px;}
 .sm-qty-label{font-size:13px;color:var(--gray);}
 .sm-qctrl{display:flex;align-items:center;gap:10px;}
@@ -443,6 +449,11 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
           <button class="sm-size" data-size="3XL">3XL</button>
         </div>
         <div class="sm-size-err" id="smSizeErr">Please select a size.</div>
+      </div>
+      <div id="smColorSection" style="display:none;">
+        <div class="sm-lbl">Select Color</div>
+        <div class="sm-colors" id="smColors"></div>
+        <div class="sm-size-err" id="smColorErr">Please select a color.</div>
       </div>
       <div>
         <div class="sm-lbl">Quantity</div>
@@ -894,15 +905,15 @@ function saveCart() {
   updateCartUI();
 }
 
-function addToCart(product, size, qty) {
-  const key = product.id + '_' + size;
+function addToCart(product, size, qty, color) {
+  const key = product.id + '_' + size + (color ? '_' + color.replace(/\s+/g,'_') : '');
   const existing = cart.find(i => i._key === key);
   if (existing) {
     existing.qty += qty;
   } else {
     const priceNum = parseFloat((product.price || '0').replace(/[^0-9.]/g,'')) || 0;
     cart.push({ _key: key, id: product.id, name: product.name, img: product.img,
-      price: priceNum, priceStr: product.price || 'TBD', size, qty, garment: product.garment || '' });
+      price: priceNum, priceStr: product.price || 'TBD', size, color: color || '', qty, garment: product.garment || '' });
   }
   saveCart();
 }
@@ -954,7 +965,7 @@ function renderCartBody() {
       <div class="c-item-img"><img src="${item.img}" alt="${item.name}" onerror="this.src='';this.style.display='none'"/></div>
       <div class="c-item-info">
         <div class="c-item-name">${item.name}</div>
-        <div class="c-item-meta">Size: ${item.size} &nbsp;·&nbsp; ${item.garment}</div>
+        <div class="c-item-meta">Size: ${item.size}${item.color ? ' &nbsp;·&nbsp; ' + item.color : ''} &nbsp;·&nbsp; ${item.garment}</div>
         <div class="c-item-bottom">
           <span class="c-item-price">${item.priceStr}</span>
           <div class="c-item-qty">
@@ -987,15 +998,28 @@ function goCheckout() {
   window.location.href = 'checkout.html';
 }
 
+// ── COLOR HEX LOOKUP ─────────────────────────────────
+const COLOR_HEX = {
+  'Ash':'#CCCCCC','Azalea':'#F47BA8','Black':'#25282A','Cardinal Red':'#8E151E',
+  'Carolina Blue':'#648EC8','Charcoal':'#64605E','Cherry Red':'#BE1C31',
+  'Coral Silk':'#E8896C','Dark Heather':'#51595C','Dark Chocolate':'#3D2A22',
+  'Forest':'#123B2D','Gold':'#FFB81C','Graphite Heather':'#6B7070',
+  'Heliconia':'#EE3086','Ice Grey':'#D3D3D3','Indigo Blue':'#3D5A80',
+  'Irish Green':'#05A34C','Kelly Green':'#2E8B3E','Light Blue':'#A2C6E9',
+  'Light Pink':'#F7D2DA','Lime':'#78D64B','Maroon':'#5C272F',
+  'Military Green':'#71775E','Natural':'#E5D8C8','Navy':'#2E324B',
+  'Orange':'#F44B34','Purple':'#57316E','Red':'#E02C43','Royal':'#1D4F91',
+  'Sand':'#C6B9A7','Sapphire':'#058EBA','Sport Grey':'#A8A9A3',
+  'Tropical Blue':'#3ABED2','Violet':'#5B2D8E','White':'#EAEEF2',
+};
+
 // ── SIZE MODAL ────────────────────────────────────────
-let smProduct = null;
-let smQty = 1;
-let smSize = null;
+let smProduct = null, smQty = 1, smSize = null, smColor = null;
 
 function openSizeModal(productId) {
   const p = productMap[productId];
   if (!p) return;
-  smProduct = p; smQty = 1; smSize = null;
+  smProduct = p; smQty = 1; smSize = null; smColor = null;
   document.getElementById('smImg').src = p.img || '';
   document.getElementById('smName').textContent = p.name;
   document.getElementById('smGarment').textContent = (p.garment || '');
@@ -1003,8 +1027,30 @@ function openSizeModal(productId) {
   document.getElementById('smQtyVal').textContent = 1;
   document.getElementById('smSizeErr').classList.remove('show');
   document.querySelectorAll('.sm-size').forEach(b => b.classList.remove('sel'));
+  // Color swatches
+  const colorSection = document.getElementById('smColorSection');
+  const colorWrap = document.getElementById('smColors');
+  document.getElementById('smColorErr').classList.remove('show');
+  if (p.colors && p.colors.length > 0) {
+    colorSection.style.display = '';
+    colorWrap.innerHTML = p.colors.map(name => {
+      const hex = COLOR_HEX[name] || '#888';
+      const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+      const light = (r*299+g*587+b*114)/1000 > 200;
+      return `<div class="sm-color-dot${light?' light':''}" style="background:${hex}" title="${name}" data-color="${name}" onclick="selectSmColor(this)"></div>`;
+    }).join('');
+  } else {
+    colorSection.style.display = 'none';
+    colorWrap.innerHTML = '';
+  }
   document.getElementById('smOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+function selectSmColor(el) {
+  smColor = el.dataset.color;
+  document.querySelectorAll('#smColors .sm-color-dot').forEach(d => d.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('smColorErr').classList.remove('show');
 }
 function closeSizeModal() {
   document.getElementById('smOverlay').classList.remove('open');
@@ -1027,7 +1073,10 @@ function changeSmQty(delta) {
 }
 function confirmAddToCart() {
   if (!smSize) { document.getElementById('smSizeErr').classList.add('show'); return; }
-  addToCart(smProduct, smSize, smQty);
+  if (smProduct.colors && smProduct.colors.length > 0 && !smColor) {
+    document.getElementById('smColorErr').classList.add('show'); return;
+  }
+  addToCart(smProduct, smSize, smQty, smColor);
   closeSizeModal();
   openCart();
 }

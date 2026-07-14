@@ -1228,78 +1228,6 @@ tr:hover td{background:#fafafa;}
       <?php endforeach; ?>
     </div>
 
-    <!-- Decorated Product Edit Modal -->
-    <div class="modal-overlay" id="decEditModalOverlay">
-      <div class="modal" style="max-width:560px;">
-        <div class="modal-head">
-          <h3>Edit Decorated Product</h3>
-          <button class="modal-close" onclick="closeDecEditModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-          <form method="POST" id="decEditForm">
-            <input type="hidden" name="action" value="edit_decorated"/>
-            <input type="hidden" name="pid" id="decEditPid"/>
-            <div class="form-group">
-              <label>Product Name *</label>
-              <input type="text" name="name" id="decEditName" required/>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Category *</label>
-                <select name="cat" id="decEditCat">
-                  <?php foreach ($categories as $key => $label): ?>
-                  <option value="<?= $key ?>"><?= $label ?></option>
-                  <?php endforeach; ?>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Price</label>
-                <input type="text" name="price" id="decEditPrice" placeholder="$25.00"/>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Badge <span style="font-weight:300;text-transform:none;">(optional)</span></label>
-                <input type="text" name="badge" id="decEditBadge" placeholder="New, Hot, Sale..."/>
-              </div>
-              <div class="form-group">
-                <label>Garment</label>
-                <select name="garment" id="decEditGarment" onchange="refreshDecEditColors()">
-                  <option value="">— Select garment —</option>
-                  <option value="Gildan 5000 — Heavy Cotton 100%" data-code="5000">Gildan 5000 — Heavy Cotton 100%</option>
-                  <option value="Gildan 6400 — SoftStyle 100%" data-code="64000">Gildan 6400 — SoftStyle 100%</option>
-                  <option value="Gildan 75000 — Heavy Blend Crew" data-code="75000">Gildan 75000 — Heavy Blend Crew</option>
-                  <option value="Augusta 790 — Nexgen Performance Tee" data-code="790">Augusta 790 — Nexgen Performance Tee</option>
-                  <option value="Augusta 1790 — Ladies NexGen Wicking" data-code="1790">Augusta 1790 — Ladies NexGen Wicking</option>
-                  <option value="Hoodie — Heavy Blend 50/50" data-code="12500">Hoodie — Heavy Blend 50/50</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Available Sizes</label>
-              <div class="size-grid" id="decEditSizes">
-                <?php foreach (['S','M','L','XL','2XL','3XL','4XL','5XL'] as $sz): ?>
-                <div>
-                  <input type="checkbox" class="size-check" id="edsz_<?= $sz ?>" name="sizes[]" value="<?= $sz ?>"/>
-                  <label class="size-label" for="edsz_<?= $sz ?>"><?= $sz ?></label>
-                </div>
-                <?php endforeach; ?>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Available Colors</label>
-              <div class="form-color-row" id="decEditColors" style="max-height:160px;overflow-y:auto;flex-wrap:wrap;"></div>
-              <div id="decEditColorsHidden"></div>
-            </div>
-            <div class="modal-foot" style="padding:0;margin-top:16px;">
-              <button type="button" class="btn btn-outline" onclick="closeDecEditModal()">Cancel</button>
-              <button type="submit" class="btn btn-gold">Save Changes</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
     <!-- DTF Order Modal (new + edit) -->
     <div class="modal-overlay" id="dtfModalOverlay">
       <div class="modal" style="max-width:640px;">
@@ -1734,6 +1662,78 @@ tr:hover td{background:#fafafa;}
     </div>
 
     <?php endif; // end products tab ?>
+  </div>
+</div>
+
+<!-- Decorated Product Edit Modal -->
+<div class="modal-overlay" id="decEditModalOverlay">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-head">
+      <h3>Edit Decorated Product</h3>
+      <button class="modal-close" onclick="closeDecEditModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form method="POST" id="decEditForm">
+        <input type="hidden" name="action" value="edit_decorated"/>
+        <input type="hidden" name="pid" id="decEditPid"/>
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" name="name" id="decEditName" required/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category *</label>
+            <select name="cat" id="decEditCat">
+              <?php foreach ($categories as $key => $label): ?>
+              <option value="<?= $key ?>"><?= $label ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Price</label>
+            <input type="text" name="price" id="decEditPrice" placeholder="$25.00"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Badge <span style="font-weight:300;text-transform:none;">(optional)</span></label>
+            <input type="text" name="badge" id="decEditBadge" placeholder="New, Hot, Sale..."/>
+          </div>
+          <div class="form-group">
+            <label>Garment</label>
+            <select name="garment" id="decEditGarment" onchange="refreshDecEditColors()">
+              <option value="">— Select garment —</option>
+              <option value="Gildan 5000 — Heavy Cotton 100%" data-code="5000">Gildan 5000 — Heavy Cotton 100%</option>
+              <option value="Gildan 6400 — SoftStyle 100%" data-code="64000">Gildan 6400 — SoftStyle 100%</option>
+              <option value="Gildan 75000 — Heavy Blend Crew" data-code="75000">Gildan 75000 — Heavy Blend Crew</option>
+              <option value="Augusta 790 — Nexgen Performance Tee" data-code="790">Augusta 790 — Nexgen Performance Tee</option>
+              <option value="Augusta 1790 — Ladies NexGen Wicking" data-code="1790">Augusta 1790 — Ladies NexGen Wicking</option>
+              <option value="Hoodie — Heavy Blend 50/50" data-code="12500">Hoodie — Heavy Blend 50/50</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Available Sizes</label>
+          <div class="size-grid" id="decEditSizes">
+            <?php foreach (['S','M','L','XL','2XL','3XL','4XL','5XL'] as $sz): ?>
+            <div>
+              <input type="checkbox" class="size-check" id="edsz_<?= $sz ?>" name="sizes[]" value="<?= $sz ?>"/>
+              <label class="size-label" for="edsz_<?= $sz ?>"><?= $sz ?></label>
+            </div>
+            <?php endforeach; ?>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Available Colors</label>
+          <div class="form-color-row" id="decEditColors" style="max-height:160px;overflow-y:auto;flex-wrap:wrap;"></div>
+          <div id="decEditColorsHidden"></div>
+        </div>
+        <div class="modal-foot" style="padding:0;margin-top:16px;">
+          <button type="button" class="btn btn-outline" onclick="closeDecEditModal()">Cancel</button>
+          <button type="submit" class="btn btn-gold">Save Changes</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
