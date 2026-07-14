@@ -176,8 +176,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
 .sm-overlay.open .sm-box{transform:scale(1);}
 .sm-top{display:flex;border-bottom:1px solid rgba(255,255,255,0.07);position:relative;}
 .sm-img{width:120px;height:120px;background:var(--dark3);flex-shrink:0;overflow:hidden;position:relative;}
-.sm-img img{width:100%;height:100%;object-fit:cover;}
-#smColorOverlay{position:absolute;inset:0;background:transparent;mix-blend-mode:multiply;pointer-events:none;transition:background 0.25s;}
+.sm-img img{width:100%;height:100%;object-fit:cover;transition:opacity 0.2s;}
+#smColorCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;object-fit:cover;}
 .sm-meta{padding:18px 20px;flex:1;}
 .sm-pname{font-weight:600;font-size:15px;color:var(--offwhite);margin-bottom:4px;line-height:1.3;}
 .sm-garment{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
@@ -355,7 +355,7 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
 <div class="sm-overlay" id="smOverlay">
   <div class="sm-box">
     <div class="sm-top">
-      <div class="sm-img"><img id="smImg" src="" alt=""/><div id="smColorOverlay"></div></div>
+      <div class="sm-img"><img id="smImg" src="" alt=""/><canvas id="smColorCanvas" width="120" height="120"></canvas></div>
       <div class="sm-meta">
         <div class="sm-pname" id="smName"></div>
         <div class="sm-garment" id="smGarment"></div>
@@ -806,8 +806,7 @@ function openSizeModal(productId) {
   const colorSection = document.getElementById('smColorSection');
   const colorWrap = document.getElementById('smColors');
   document.getElementById('smColorErr').classList.remove('show');
-  const overlay = document.getElementById('smColorOverlay');
-  if (overlay) overlay.style.background = 'transparent';
+  resetShirtPreview();
   if (p.colors && p.colors.length > 0) {
     colorSection.style.display = '';
     colorWrap.innerHTML = p.colors.map(name => {
@@ -828,8 +827,51 @@ function selectSmColor(el) {
   document.querySelectorAll('#smColors .sm-color-dot').forEach(d => d.classList.remove('sel'));
   el.classList.add('sel');
   document.getElementById('smColorErr').classList.remove('show');
-  const overlay = document.getElementById('smColorOverlay');
-  if (overlay) overlay.style.background = el.style.background;
+  renderShirtPreview(el.style.background, smProduct.garment || '');
+}
+
+function garmentToMockup(garmentStr) {
+  const g = (garmentStr || '').toLowerCase();
+  if (g.includes('hoodie')) return 'hoodie-white-front.png';
+  if (g.includes('1790') || g.includes('ladies')) return 'tshirt-female-white-front.png';
+  return 'tshirt-white-front.png';
+}
+
+function renderShirtPreview(hex, garmentStr) {
+  const canvas = document.getElementById('smColorCanvas');
+  const img    = document.getElementById('smImg');
+  if (!canvas) return;
+  const SIZE = 120;
+  canvas.width = canvas.height = SIZE;
+  const ctx = canvas.getContext('2d');
+  const mockup = new Image();
+  mockup.crossOrigin = 'anonymous';
+  mockup.onload = function() {
+    // Draw mockup on transparent temp canvas so multiply only hits shirt pixels
+    const tmp = document.createElement('canvas');
+    tmp.width = tmp.height = SIZE;
+    const tCtx = tmp.getContext('2d');
+    tCtx.drawImage(mockup, 0, 0, SIZE, SIZE);
+    tCtx.globalCompositeOperation = 'multiply';
+    tCtx.fillStyle = hex;
+    tCtx.fillRect(0, 0, SIZE, SIZE);
+    tCtx.globalCompositeOperation = 'source-over';
+    // Composite: white bg + colored shirt
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, SIZE, SIZE);
+    ctx.drawImage(tmp, 0, 0);
+    canvas.style.display = 'block';
+    img.style.opacity = '0';
+  };
+  mockup.onerror = function() { resetShirtPreview(); };
+  mockup.src = 'mockups/' + garmentToMockup(garmentStr);
+}
+
+function resetShirtPreview() {
+  const canvas = document.getElementById('smColorCanvas');
+  const img    = document.getElementById('smImg');
+  if (canvas) canvas.style.display = 'none';
+  if (img) img.style.opacity = '1';
 }
 function closeSizeModal() {
   document.getElementById('smOverlay').classList.remove('open');
