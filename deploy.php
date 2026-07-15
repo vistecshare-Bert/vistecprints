@@ -18,8 +18,8 @@ if (file_exists($ghTokenFile)) {
     $ghToken = trim(file_get_contents($ghTokenFile));
     $fetchUrl = "https://$ghToken@github.com/vistecshare-Bert/vistecprints.git";
 }
-exec("cd $repo && git fetch " . escapeshellarg($fetchUrl) . " main:main 2>&1", $outFetch, $codeFetch);
-exec("cd $repo && git reset --hard main 2>&1", $outReset, $codeReset);
+exec("cd $repo && git fetch " . escapeshellarg($fetchUrl) . " main 2>&1", $outFetch, $codeFetch);
+exec("cd $repo && git reset --hard FETCH_HEAD 2>&1", $outReset, $codeReset);
 $out1 = array_merge($outFetch, ['fetch_exit:'.$codeFetch], $outReset, ['reset_exit:'.$codeReset]);
 
 // Files/dirs that live only on the server — never overwrite from git
