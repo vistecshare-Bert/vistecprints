@@ -11,7 +11,9 @@ $dests = [
     '/home3/vistecpr/public_html/vistecprints.com',  // live vistecprints.com
 ];
 
-exec("cd $repo && git fetch --all && git reset --hard origin/main 2>&1", $out1, $code1);
+exec("cd $repo && git fetch origin main 2>&1", $outFetch, $codeFetch);
+exec("cd $repo && git reset --hard origin/main 2>&1", $outReset, $codeReset);
+$out1 = array_merge(['--- fetch ---'], $outFetch, ['fetch_exit:'.$codeFetch, '--- reset ---'], $outReset, ['reset_exit:'.$codeReset]);
 
 // Files/dirs that live only on the server — never overwrite from git
 $excludes = [
