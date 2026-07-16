@@ -1,4 +1,5 @@
 <?php
+set_time_limit(180);
 // Auto-deploy webhook — called by GitHub Actions on every push
 $key_file = '/home3/vistecpr/.vistec_deploy_key';
 if (!file_exists($key_file)) { http_response_code(500); die('Deploy key not configured'); }
@@ -57,7 +58,7 @@ $excludes = [
     'stripe-config.php', 'admin-config.php', 'carolina-config.php',
     'carolina-products.json', 'carolina-sync-meta.json', 'carolina-ids.json',
     'pending_orders/', 'orders/', 'quotes/', 'contacts/', 'visits/',
-    'images/decorated/', 'images/designs/',
+    'images/decorated/', 'images/designs/', 'design-images/',
 ];
 $excludeFlags = implode(' ', array_map(fn($e) => '--exclude=' . escapeshellarg($e), $excludes));
 $cmd = "/usr/bin/rsync -a --delete --chmod=D755,F644 $excludeFlags " . escapeshellarg($src) . ' ' . escapeshellarg($dest . '/') . ' 2>&1';
