@@ -17,8 +17,10 @@ if (file_exists($ghTokenFile)) {
     $ghToken = trim(file_get_contents($ghTokenFile));
 }
 
-// Download latest code as ZIP from GitHub API
-$zipUrl = 'https://api.github.com/repos/vistecshare-Bert/vistecprints/zipball/main';
+// Use exact commit SHA from GitHub Actions if provided, otherwise fall back to main
+$sha    = preg_replace('/[^a-f0-9]/i', '', $_GET['sha'] ?? '');
+$ref    = $sha ?: 'main';
+$zipUrl = "https://api.github.com/repos/vistecshare-Bert/vistecprints/zipball/$ref";
 $ctx = stream_context_create(['http' => [
     'method'          => 'GET',
     'header'          => "Authorization: token $ghToken\r\nUser-Agent: VistecDeploy/1.0\r\n",

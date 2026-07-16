@@ -12,7 +12,7 @@ jobs:
       - name: Trigger deploy via webhook
         run: |
           HTTP_STATUS=$(curl -s -o /tmp/deploy_out.txt -w "%{http_code}" \
-            "https://vistecprints.com/deploy.php?token=${{ secrets.DEPLOY_TOKEN }}")
+            "https://vistecprints.com/deploy.php?token=${{ secrets.DEPLOY_TOKEN }}&sha=${{ github.sha }}")
           cat /tmp/deploy_out.txt
           echo ""
           echo "HTTP status: $HTTP_STATUS"
