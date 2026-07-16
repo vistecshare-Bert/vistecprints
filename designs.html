@@ -615,11 +615,11 @@ function render() {
 
   const grid = document.getElementById('designGrid');
   grid.innerHTML = shown.length ? shown.map(d => `
-    <div class="design-card" onclick="useDesign(${d.id},'${d.name.replace(/'/g,"\\'")}','${d.cat}')">
+    <div class="design-card" onclick="useDesign('${d.id}','${d.name.replace(/'/g,"\\'")}','${d.cat}')">
       <div class="design-img-wrap">
         <img class="design-img" src="${imgUrl(d.id)}" alt="${d.name}" loading="lazy"
           onerror="
-            if(this.dataset.fb==='1'){this.src=designImgFallback2(${d.id});this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';return;}
+            if(this.dataset.fb==='1'){this.src=designImgFallback2('${d.id}');this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';return;}
             this.dataset.fb='1';this.src='${imgFallback(d.id)}';
           "/>
         <div class="img-placeholder" style="display:none">
