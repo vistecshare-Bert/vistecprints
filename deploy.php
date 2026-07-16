@@ -25,7 +25,7 @@ $ctx = stream_context_create(['http' => [
     'method'          => 'GET',
     'header'          => "Authorization: token $ghToken\r\nUser-Agent: VistecDeploy/1.0\r\n",
     'follow_location' => 1,
-    'timeout'         => 60,
+    'timeout'         => 120,
 ]]);
 $zipContent = file_get_contents($zipUrl, false, $ctx);
 if (!$zipContent || strlen($zipContent) < 1000) {
