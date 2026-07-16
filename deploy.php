@@ -6,60 +6,70 @@ $expected = trim(file_get_contents($key_file));
 $provided = $_GET['token'] ?? '';
 if (!$provided || !hash_equals($expected, $provided)) { http_response_code(403); die('Forbidden'); }
 
-$repo = '/home3/vistecpr/vistecprints-git';
-$dests = [
-    '/home3/vistecpr/public_html/vistecprints.com',  // live vistecprints.com
-];
+$dest = '/home3/vistecpr/public_html/vistecprints.com';
+$tmp  = sys_get_temp_dir();
+$zip  = "$tmp/vistec_deploy.zip";
+$dir  = "$tmp/vistec_extract";
 
-// Use stored GitHub token so fetch works even if the cloned remote URL expires
+$ghToken = '';
 $ghTokenFile = '/home3/vistecpr/.github_token';
-$fetchUrl = 'https://github.com/vistecshare-Bert/vistecprints.git';
 if (file_exists($ghTokenFile)) {
     $ghToken = trim(file_get_contents($ghTokenFile));
-    $fetchUrl = "https://$ghToken@github.com/vistecshare-Bert/vistecprints.git";
 }
-exec("cd $repo && git remote set-url origin " . escapeshellarg($fetchUrl) . " 2>&1");
-exec("cd $repo && git fetch origin 2>&1", $outFetch, $codeFetch);
-exec("cd $repo && git reset --hard origin/main 2>&1", $outReset, $codeReset);
-$out1 = array_merge($outFetch, ['fetch_exit:'.$codeFetch], $outReset, ['reset_exit:'.$codeReset]);
 
-// Files/dirs that live only on the server — never overwrite from git
+// Download latest code as ZIP from GitHub API
+$zipUrl = 'https://api.github.com/repos/vistecshare-Bert/vistecprints/zipball/main';
+$ctx = stream_context_create(['http' => [
+    'method'          => 'GET',
+    'header'          => "Authorization: token $ghToken\r\nUser-Agent: VistecDeploy/1.0\r\n",
+    'follow_location' => 1,
+    'timeout'         => 60,
+]]);
+$zipContent = file_get_contents($zipUrl, false, $ctx);
+if (!$zipContent || strlen($zipContent) < 1000) {
+    http_response_code(500);
+    die(json_encode(['status' => 'error', 'msg' => 'ZIP download failed', 'size' => strlen($zipContent ?: '')]));
+}
+file_put_contents($zip, $zipContent);
+
+// Extract ZIP
+exec("rm -rf " . escapeshellarg($dir) . " && mkdir -p " . escapeshellarg($dir));
+exec("unzip -q " . escapeshellarg($zip) . " -d " . escapeshellarg($dir) . " 2>&1", $unzipOut, $unzipCode);
+if ($unzipCode !== 0) {
+    http_response_code(500);
+    die(json_encode(['status' => 'error', 'msg' => 'Unzip failed', 'detail' => implode("\n", $unzipOut)]));
+}
+
+// GitHub ZIP extracts into a single subdir named "owner-repo-HASH/"
+$subdirs = glob($dir . '/*/');
+if (empty($subdirs)) {
+    http_response_code(500);
+    die(json_encode(['status' => 'error', 'msg' => 'No extracted directory found']));
+}
+$src = rtrim($subdirs[0], '/') . '/';
+$ref = basename(rtrim($subdirs[0], '/'));
+
+// Files that live only on the server — never overwrite from GitHub
 $excludes = [
-    '.git',
-    '.cpanel.yml',
-    'products.json',          // admin-managed product catalog
-    'orders.json',            // stripe orders
-    'admin/users.json',       // admin user accounts
-    'stripe-config.php',      // secrets
-    'admin-config.php',       // secrets
-    'carolina-config.php',    // secrets
-    'carolina-products.json', // synced supplier data
-    'carolina-sync-meta.json',
-    'carolina-ids.json',
-    'pending_orders/',
-    'orders/',                // DTF orders + artwork uploads
-    'quotes/',
-    'contacts/',
-    'visits/',
-    'images/decorated/',      // uploaded decorated product images
-    'images/designs/',        // uploaded design files
+    'products.json', 'orders.json', 'admin/users.json',
+    'stripe-config.php', 'admin-config.php', 'carolina-config.php',
+    'carolina-products.json', 'carolina-sync-meta.json', 'carolina-ids.json',
+    'pending_orders/', 'orders/', 'quotes/', 'contacts/', 'visits/',
+    'images/decorated/', 'images/designs/',
 ];
-
 $excludeFlags = implode(' ', array_map(fn($e) => '--exclude=' . escapeshellarg($e), $excludes));
+$cmd = "/usr/bin/rsync -a --delete --chmod=D755,F644 $excludeFlags " . escapeshellarg($src) . ' ' . escapeshellarg($dest . '/') . ' 2>&1';
+exec($cmd, $syncOut, $syncCode);
+exec('chmod 755 ' . escapeshellarg($dest));
 
-$results = [];
-foreach ($dests as $dest) {
-    // rsync: only update code files, preserve server-only data
-    $cmd = "/usr/bin/rsync -a --delete --chmod=D755,F644 $excludeFlags " . escapeshellarg($repo . '/') . ' ' . escapeshellarg($dest . '/') . ' 2>&1';
-    exec($cmd, $outSync, $codeSync);
-    // Ensure destination dir stays world-readable regardless of git clone perms
-    exec('chmod 755 ' . escapeshellarg($dest));
-    $results[$dest] = ($codeSync === 0 ? 'success' : 'failed: ' . implode(' ', $outSync));
-}
+// Cleanup
+exec("rm -f " . escapeshellarg($zip));
+exec("rm -rf " . escapeshellarg($dir));
 
 http_response_code(200);
 echo json_encode([
-    'status' => 'ok',
-    'git'    => implode("\n", $out1),
-    'copy'   => $results,
+    'status' => $syncCode === 0 ? 'ok' : 'sync_error',
+    'ref'    => $ref,
+    'size'   => strlen($zipContent),
+    'sync'   => $syncCode === 0 ? 'success' : implode("\n", $syncOut),
 ]);
