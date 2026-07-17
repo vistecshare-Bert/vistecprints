@@ -2668,7 +2668,7 @@ if (_presetId && _presetName) {
   document.body.appendChild(banner);
 
   // Load design image onto canvas
-  const imgSrc = 'design-images/' + _presetId + '.jpg';
+  const imgSrc = 'design-images/' + (/\.\w+$/.test(_presetId) ? _presetId : _presetId + '.png');
   fabric.Image.fromURL(imgSrc, function(img) {
     const maxSize = 220;
     const scale   = Math.min(maxSize / img.width, maxSize / img.height);
