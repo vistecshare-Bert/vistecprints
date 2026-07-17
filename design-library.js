@@ -62,13 +62,16 @@ const DESIGN_LIBRARY = {
     {id:626103671,name:"Fishers of Men"},
   ],
   funprint: [
-    {id:605883461,name:"Thick-Fil-A"},
-    {id:605883466,name:"Tired"},
-    {id:605883471,name:"Culture Champion"},
-    {id:605883476,name:"Hustle Hard"},
-    {id:605883481,name:"Thicker Than a Snicker"},
-    {id:605883486,name:"Lips"},
-    {id:605883491,name:"God Is Good"},
+    {id:"thick-fil-a.jpg",                                      name:"Thick-Fil-A"},
+    {id:"tired.jpg",                                            name:"Tired"},
+    {id:"culture.jpg",                                          name:"Culture Champion"},
+    {id:"hustle_hard.jpg",                                      name:"Hustle Hard"},
+    {id:"thicker_than_a_snicker.jpg",                           name:"Thicker Than a Snicker"},
+    {id:"lips.jpg",                                             name:"Lips"},
+    {id:"god_is_good_print.jpg",                                name:"God Is Good"},
+    {id:"i_m_ok_broken.jpg",                                    name:"I'm OK Broken"},
+    {id:"i_m_ok_broken_hoodie.jpg",                             name:"I'm OK Broken Hoodie"},
+    {id:"the_woman_of_my_dreams_wears_pink_and_gr.jpg",         name:"Woman of My Dreams"},
   ],
   women: [
     {id:605883696,name:"Denim Boss Lady 1"},
@@ -149,7 +152,7 @@ for (const [cat, items] of Object.entries(DESIGN_LIBRARY)) {
 }
 
 function designImgUrl(id) {
-  return 'design-images/' + id + '.png';
+  return 'design-images/' + (/\.\w+$/.test(id) ? id : id + '.png');
 }
 function designImgFallback(id) {
   // Try without www (SSL cert covers vistecprints.com, not www.)
