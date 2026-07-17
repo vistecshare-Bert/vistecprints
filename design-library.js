@@ -63,11 +63,15 @@ const DESIGN_LIBRARY = {
   ],
   funprint: [
     {id:"funprint/Culture.png",              name:"Culture"},
+    {id:"funprint/HERE WE GO PNG.png",       name:"Here We Go"},
     {id:"funprint/HUSTLE HARD.png",          name:"Hustle Hard"},
+    {id:"funprint/i need a hug black.png",   name:"I Need a Hug (Black)"},
+    {id:"funprint/i need a hug.png",         name:"I Need a Hug"},
     {id:"funprint/LIPS.png",                 name:"Lips"},
+    {id:"funprint/Swallow.png",              name:"Swallow"},
     {id:"funprint/THICK-FIL-A.png",          name:"Thick-Fil-A"},
     {id:"funprint/THICKERTHANASNICKER.png",  name:"Thicker Than a Snicker"},
-    {id:"funprint/TIRED.png",               name:"Tired"},
+    {id:"funprint/TIRED.png",                name:"Tired"},
   ],
   women: [
     {id:605883696,name:"Denim Boss Lady 1"},
