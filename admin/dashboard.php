@@ -505,8 +505,13 @@ tr:hover td{background:#fafafa;}
 .order-section h4{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#aaa;margin-bottom:10px;}
 .order-section p{font-size:13px;color:#333;margin-bottom:4px;}
 .order-items-list{list-style:none;}
-.order-items-list li{font-size:13px;color:#333;padding:5px 0;border-bottom:1px solid #f5f5f5;display:flex;justify-content:space-between;}
+.order-items-list li{font-size:13px;color:#333;padding:6px 0;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;gap:8px;}
 .order-items-list li:last-child{border-bottom:none;}
+.item-design-thumb{width:52px;height:52px;object-fit:contain;border-radius:3px;background:#f5f5f5;border:1px solid #eee;flex-shrink:0;}
+.item-name-col{flex:1;line-height:1.4;}
+.item-price-tag{color:#888;white-space:nowrap;}
+.btn-dl-design{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#f0f0f0;border:1px solid #ddd;border-radius:3px;color:#555;text-decoration:none;font-size:15px;flex-shrink:0;transition:all 0.15s;}
+.btn-dl-design:hover{background:var(--gold);border-color:var(--gold);color:#fff;}
 .order-card-foot{padding:12px 20px;border-top:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .status-select{border:1px solid #ddd;padding:7px 10px;font-size:12px;font-family:'DM Sans',sans-serif;border-radius:2px;color:#555;background:#fff;cursor:pointer;}
 .sb-badge{background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;margin-left:auto;}
@@ -750,11 +755,19 @@ tr:hover td{background:#fafafa;}
         </div>
         <div class="order-section">
           <h4>Items Â· Subtotal $<?= number_format($o['subtotal']??0,2) ?> + $<?= number_format($o['shipping']??4.99,2) ?> shipping</h4>
-          <ul class="order-items-list">
-          <?php foreach (($o['items'] ?? []) as $item): ?>
+          <ul class=”order-items-list”>
+          <?php foreach (($o['items'] ?? []) as $itIdx => $item):
+            $hasImg = !empty($item['img']) && str_starts_with($item['img'], 'data:');
+          ?>
             <li>
-              <span><?= htmlspecialchars($item['name'] ?? '') ?> â€” Size <?= htmlspecialchars($item['size'] ?? '') ?></span>
-              <span><?= htmlspecialchars($item['priceStr'] ?? '') ?> Ã—<?= intval($item['qty'] ?? 1) ?></span>
+              <?php if ($hasImg): ?>
+              <img class=”item-design-thumb” src=”<?= htmlspecialchars($item['img']) ?>” alt=”Design preview”/>
+              <?php endif; ?>
+              <span class=”item-name-col”><?= htmlspecialchars($item['name'] ?? '') ?> &mdash; Size <?= htmlspecialchars($item['size'] ?? '') ?></span>
+              <span class=”item-price-tag”><?= htmlspecialchars($item['priceStr'] ?? '') ?> &times;<?= intval($item['qty'] ?? 1) ?></span>
+              <?php if ($hasImg): ?>
+              <a class=”btn-dl-design” href=”<?= htmlspecialchars($item['img']) ?>” download=”design-<?= htmlspecialchars($o['id']) ?>-<?= $itIdx + 1 ?>.png” title=”Download design PNG”>&darr;</a>
+              <?php endif; ?>
             </li>
           <?php endforeach; ?>
           </ul>
