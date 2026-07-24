@@ -750,5 +750,6 @@ const urlCat = new URLSearchParams(location.search).get('cat');
 if (urlCat && DESIGNS[urlCat]) setFilter(urlCat);
 </script>
 <script>fetch('track.php?page=designs&ref='+encodeURIComponent(document.referrer),{keepalive:true}).catch(()=>{});</script>
+<script src="auth-modal.js"></script>
 </body>
 </html>
