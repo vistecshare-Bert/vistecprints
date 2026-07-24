@@ -5,7 +5,7 @@
   const AUTH_URL    = '/auth.php';
   let   currentUser = null;
   let   gisReady    = false;
-  let   currentMode = 'login'; // 'login' | 'signup'
+  let   currentMode = 'login';
 
   // ── Load Google Identity Services ────────────────────────
   function loadGIS() {
@@ -21,17 +21,36 @@
 
   // ── CSS ──────────────────────────────────────────────────
   const css = `
-  #vpAuthOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:99999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
+  #vpAuthOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:99999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
   #vpAuthOverlay.vp-open{display:flex;}
-  .vp-modal{background:#111;border:1px solid #2a2a2a;border-radius:4px;width:100%;max-width:380px;padding:40px 32px 32px;position:relative;text-align:center;}
+  .vp-modal{background:#111;border:1px solid #2a2a2a;border-radius:4px;width:100%;max-width:400px;padding:36px 32px 28px;position:relative;}
   .vp-modal-close{position:absolute;top:12px;right:16px;background:none;border:none;color:#555;font-size:24px;cursor:pointer;line-height:1;transition:color .15s;}
   .vp-modal-close:hover{color:#fff;}
-  .vp-modal-eyebrow{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:#D49848;margin-bottom:10px;}
-  .vp-modal-title{font-size:22px;font-weight:700;color:#F0EDE8;margin-bottom:8px;}
-  .vp-modal-sub{font-size:13px;color:#666;margin-bottom:28px;line-height:1.6;}
-  #vpGoogleBtnWrap{display:flex;justify-content:center;min-height:44px;}
-  .vp-modal-note{font-size:11px;color:#444;margin-top:20px;line-height:1.6;}
-  .vp-modal-switch{font-size:12px;color:#555;margin-top:14px;}
+  .vp-modal-eyebrow{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:3px;color:#D49848;margin-bottom:8px;}
+  .vp-modal-title{font-size:22px;font-weight:700;color:#F0EDE8;margin-bottom:20px;}
+
+  /* Form fields */
+  .vp-field{margin-bottom:14px;}
+  .vp-field label{display:block;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#888;margin-bottom:5px;}
+  .vp-field input{width:100%;background:#1a1a1a;border:1px solid #333;border-radius:2px;color:#F0EDE8;font-size:14px;padding:10px 12px;font-family:inherit;outline:none;transition:border-color .15s;box-sizing:border-box;}
+  .vp-field input:focus{border-color:#D49848;}
+  .vp-field input::placeholder{color:#444;}
+  .vp-error{font-size:12px;color:#e05555;min-height:16px;margin-bottom:10px;line-height:1.4;}
+  .vp-btn-submit{width:100%;background:#D49848;color:#000;border:none;border-radius:2px;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:12px;cursor:pointer;font-family:inherit;transition:opacity .15s;margin-bottom:16px;}
+  .vp-btn-submit:hover{opacity:.85;}
+  .vp-btn-submit:disabled{opacity:.5;cursor:not-allowed;}
+
+  /* Divider */
+  .vp-divider{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+  .vp-divider::before,.vp-divider::after{content:'';flex:1;height:1px;background:#2a2a2a;}
+  .vp-divider span{font-size:11px;color:#555;letter-spacing:1px;text-transform:uppercase;}
+
+  /* Google button */
+  #vpGoogleBtnWrap{display:flex;justify-content:center;min-height:44px;margin-bottom:16px;}
+
+  /* Footer */
+  .vp-modal-note{font-size:11px;color:#444;text-align:center;line-height:1.6;margin-bottom:10px;}
+  .vp-modal-switch{font-size:12px;color:#555;text-align:center;}
   .vp-modal-switch button{background:none;border:none;color:#D49848;font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0;}
 
   /* Nav — logged out: two buttons */
@@ -55,22 +74,67 @@
   styleEl.textContent = css;
   document.head.appendChild(styleEl);
 
-  // ── Modal HTML ───────────────────────────────────────────
+  // ── Modal shell (content swapped dynamically) ─────────────
   const modalHtml = `
   <div id="vpAuthOverlay">
     <div class="vp-modal" role="dialog" aria-modal="true">
       <button class="vp-modal-close" aria-label="Close" onclick="vpAuth.close()">&times;</button>
       <div class="vp-modal-eyebrow">Vistec GraphX</div>
-      <h2 class="vp-modal-title" id="vpModalTitle">Welcome Back</h2>
-      <p class="vp-modal-sub" id="vpModalSub">Sign in with Google to access your orders and saved designs.</p>
-      <div id="vpGoogleBtnWrap"></div>
-      <p class="vp-modal-note">We only store your name, email, and profile photo.<br>Your information is never shared or sold.</p>
-      <p class="vp-modal-switch" id="vpModalSwitch">
-        Don't have an account? <button onclick="vpAuth.open('signup')">Sign Up</button>
-      </p>
+      <h2 class="vp-modal-title" id="vpModalTitle"></h2>
+      <div id="vpModalBody"></div>
     </div>
   </div>`;
 
+  // ── Form templates ────────────────────────────────────────
+  function loginBody() {
+    return `
+      <form id="vpLoginForm" onsubmit="return false;">
+        <div class="vp-field">
+          <label for="vpLoginEmail">Email</label>
+          <input type="email" id="vpLoginEmail" placeholder="your@email.com" autocomplete="email" required/>
+        </div>
+        <div class="vp-field">
+          <label for="vpLoginPass">Password</label>
+          <input type="password" id="vpLoginPass" placeholder="••••••••" autocomplete="current-password" required/>
+        </div>
+        <div class="vp-error" id="vpLoginErr"></div>
+        <button type="submit" class="vp-btn-submit" id="vpLoginBtn">Login</button>
+      </form>
+      <div class="vp-divider"><span>or</span></div>
+      <div id="vpGoogleBtnWrap"></div>
+      <p class="vp-modal-note">We only store your name, email, and profile photo.</p>
+      <p class="vp-modal-switch">Don't have an account? <button onclick="vpAuth.open('signup')">Sign Up</button></p>`;
+  }
+
+  function signupBody() {
+    return `
+      <form id="vpSignupForm" onsubmit="return false;">
+        <div class="vp-field">
+          <label for="vpSignupName">Full Name</label>
+          <input type="text" id="vpSignupName" placeholder="Your name" autocomplete="name" required/>
+        </div>
+        <div class="vp-field">
+          <label for="vpSignupEmail">Email</label>
+          <input type="email" id="vpSignupEmail" placeholder="your@email.com" autocomplete="email" required/>
+        </div>
+        <div class="vp-field">
+          <label for="vpSignupPass">Password</label>
+          <input type="password" id="vpSignupPass" placeholder="Min. 8 characters" autocomplete="new-password" required/>
+        </div>
+        <div class="vp-field">
+          <label for="vpSignupPass2">Confirm Password</label>
+          <input type="password" id="vpSignupPass2" placeholder="Repeat password" autocomplete="new-password" required/>
+        </div>
+        <div class="vp-error" id="vpSignupErr"></div>
+        <button type="submit" class="vp-btn-submit" id="vpSignupBtn">Create Account</button>
+      </form>
+      <div class="vp-divider"><span>or</span></div>
+      <div id="vpGoogleBtnWrap"></div>
+      <p class="vp-modal-note">We only store your name, email, and profile photo.</p>
+      <p class="vp-modal-switch">Already have an account? <button onclick="vpAuth.open('login')">Login</button></p>`;
+  }
+
+  // ── Inject modal ──────────────────────────────────────────
   function injectModal() {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     document.getElementById('vpAuthOverlay').addEventListener('click', function (e) {
@@ -78,7 +142,144 @@
     });
   }
 
-  // ── Nav: inject two buttons into .nav-right ───────────────
+  // ── Set modal content for mode ────────────────────────────
+  function applyMode(mode) {
+    currentMode = mode;
+    document.getElementById('vpModalTitle').textContent = mode === 'signup' ? 'Create Account' : 'Welcome Back';
+    document.getElementById('vpModalBody').innerHTML    = mode === 'signup' ? signupBody() : loginBody();
+
+    if (mode === 'login') {
+      document.getElementById('vpLoginForm').addEventListener('submit', handleLoginSubmit);
+    } else {
+      document.getElementById('vpSignupForm').addEventListener('submit', handleSignupSubmit);
+    }
+
+    renderGoogleBtn(mode);
+  }
+
+  // ── Form submit handlers ──────────────────────────────────
+  async function handleLoginSubmit() {
+    const email  = document.getElementById('vpLoginEmail').value.trim();
+    const pass   = document.getElementById('vpLoginPass').value;
+    const errEl  = document.getElementById('vpLoginErr');
+    const btn    = document.getElementById('vpLoginBtn');
+    errEl.textContent = '';
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+
+    try {
+      const fd = new FormData();
+      fd.append('email', email);
+      fd.append('password', pass);
+      const r = await fetch(AUTH_URL + '?action=login', { method: 'POST', body: fd, credentials: 'include' });
+      const d = await r.json();
+      if (d.success) {
+        onAuthSuccess(d.user);
+      } else {
+        errEl.textContent = d.error || 'Login failed. Please try again.';
+        btn.disabled = false;
+        btn.textContent = 'Login';
+      }
+    } catch (e) {
+      errEl.textContent = 'Connection error. Please try again.';
+      btn.disabled = false;
+      btn.textContent = 'Login';
+    }
+  }
+
+  async function handleSignupSubmit() {
+    const name   = document.getElementById('vpSignupName').value.trim();
+    const email  = document.getElementById('vpSignupEmail').value.trim();
+    const pass   = document.getElementById('vpSignupPass').value;
+    const pass2  = document.getElementById('vpSignupPass2').value;
+    const errEl  = document.getElementById('vpSignupErr');
+    const btn    = document.getElementById('vpSignupBtn');
+    errEl.textContent = '';
+
+    if (pass !== pass2) { errEl.textContent = 'Passwords do not match.'; return; }
+    if (pass.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Creating account…';
+
+    try {
+      const fd = new FormData();
+      fd.append('name',     name);
+      fd.append('email',    email);
+      fd.append('password', pass);
+      const r = await fetch(AUTH_URL + '?action=register', { method: 'POST', body: fd, credentials: 'include' });
+      const d = await r.json();
+      if (d.success) {
+        onAuthSuccess(d.user);
+      } else {
+        errEl.textContent = d.error || 'Sign up failed. Please try again.';
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      }
+    } catch (e) {
+      errEl.textContent = 'Connection error. Please try again.';
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+    }
+  }
+
+  // ── Shared post-auth handler ──────────────────────────────
+  function onAuthSuccess(user) {
+    currentUser = user;
+    refreshNav(user);
+    vpAuth.close();
+    const msg = currentMode === 'signup'
+      ? 'Account created — welcome, ' + user.name.split(' ')[0] + '!'
+      : 'Welcome back, ' + user.name.split(' ')[0] + '!';
+    showToast(msg);
+  }
+
+  // ── Google Sign-In button ─────────────────────────────────
+  async function renderGoogleBtn(mode) {
+    await loadGIS();
+    const wrap = document.getElementById('vpGoogleBtnWrap');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    google.accounts.id.initialize({
+      client_id: CLIENT_ID,
+      callback:  handleGoogleCredential,
+      use_fedcm_for_prompt: false,
+    });
+    google.accounts.id.renderButton(wrap, {
+      theme:          'outline',
+      size:           'large',
+      text:           mode === 'signup' ? 'signup_with' : 'signin_with',
+      width:          336,
+      logo_alignment: 'left',
+    });
+  }
+
+  async function handleGoogleCredential(response) {
+    const fd = new FormData();
+    fd.append('credential', response.credential);
+    try {
+      const r = await fetch(AUTH_URL + '?action=google', { method: 'POST', body: fd, credentials: 'include' });
+      const d = await r.json();
+      if (d.success) {
+        onAuthSuccess(d.user);
+      } else {
+        alert('Google sign-in failed: ' + (d.error || 'Please try again.'));
+      }
+    } catch (e) {
+      alert('Connection error. Please check your connection and try again.');
+    }
+  }
+
+  // ── Toast ─────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#D49848;color:#000;padding:12px 28px;border-radius:3px;font-size:13px;font-weight:700;letter-spacing:1px;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:opacity .4s;white-space:nowrap;';
+    t.textContent   = msg;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
+  }
+
+  // ── Nav buttons ───────────────────────────────────────────
   function makeAuthWrap() {
     const wrap = document.createElement('div');
     wrap.className = 'vp-nav-auth-wrap';
@@ -105,7 +306,10 @@
     navRight.insertBefore(makeAuthWrap(), navRight.firstChild);
   }
 
-  // ── Nav: swap between auth buttons and user pill ──────────
+  function escHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
   function refreshNav(user) {
     const existing = document.getElementById('vpNavAuthWrap') || document.getElementById('vpNavUser');
     if (!existing) return;
@@ -119,7 +323,10 @@
       pill.className = 'vp-nav-user';
       pill.id        = 'vpNavUser';
       pill.innerHTML = `
-        <img src="${escHtml(user.picture)}" alt="${escHtml(user.name)}" referrerpolicy="no-referrer"/>
+        ${user.picture
+          ? `<img src="${escHtml(user.picture)}" alt="${escHtml(user.name)}" referrerpolicy="no-referrer"/>`
+          : `<div style="width:32px;height:32px;border-radius:50%;border:2px solid #D49848;background:#222;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#D49848;flex-shrink:0;">${escHtml(first[0])}</div>`
+        }
         <span class="vp-nav-user-name">${escHtml(first)}</span>
         <div class="vp-nav-drop">
           <a href="/account.php">My Account</a>
@@ -130,88 +337,13 @@
     }
   }
 
-  function escHtml(s) {
-    return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
-  // ── Update modal copy based on mode ───────────────────────
-  function applyModalMode(mode) {
-    currentMode = mode;
-    const title  = document.getElementById('vpModalTitle');
-    const sub    = document.getElementById('vpModalSub');
-    const toggle = document.getElementById('vpModalSwitch');
-    if (!title) return;
-
-    if (mode === 'signup') {
-      title.textContent  = 'Create Your Account';
-      sub.textContent    = 'Sign up with Google to track orders and save your custom designs.';
-      toggle.innerHTML   = 'Already have an account? <button onclick="vpAuth.open(\'login\')">Login</button>';
-    } else {
-      title.textContent  = 'Welcome Back';
-      sub.textContent    = 'Sign in with Google to access your orders and saved designs.';
-      toggle.innerHTML   = 'Don\'t have an account? <button onclick="vpAuth.open(\'signup\')">Sign Up</button>';
-    }
-  }
-
-  // ── Render Google Sign-In button ─────────────────────────
-  async function renderGoogleBtn(mode) {
-    await loadGIS();
-    const wrap = document.getElementById('vpGoogleBtnWrap');
-    if (!wrap) return;
-    wrap.innerHTML = ''; // clear previous render
-    google.accounts.id.initialize({
-      client_id: CLIENT_ID,
-      callback:  handleCredential,
-      use_fedcm_for_prompt: false,
-    });
-    google.accounts.id.renderButton(wrap, {
-      theme:          'outline',
-      size:           'large',
-      text:           mode === 'signup' ? 'signup_with' : 'signin_with',
-      width:          316,
-      logo_alignment: 'left',
-    });
-  }
-
-  // ── Handle Google credential response ────────────────────
-  async function handleCredential(response) {
-    const fd = new FormData();
-    fd.append('credential', response.credential);
-    try {
-      const r = await fetch(AUTH_URL + '?action=google', { method: 'POST', body: fd, credentials: 'include' });
-      const d = await r.json();
-      if (d.success) {
-        currentUser = d.user;
-        refreshNav(currentUser);
-        vpAuth.close();
-        showWelcome(d.user.name.split(' ')[0], currentMode);
-      } else {
-        alert('Sign-in failed: ' + (d.error || 'Please try again.'));
-      }
-    } catch (e) {
-      alert('Sign-in error. Please check your connection and try again.');
-    }
-  }
-
-  // ── Welcome toast ─────────────────────────────────────────
-  function showWelcome(firstName, mode) {
-    const msg = mode === 'signup'
-      ? 'Account created — welcome, ' + firstName + '!'
-      : 'Welcome back, ' + firstName + '!';
-    const t = document.createElement('div');
-    t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#D49848;color:#000;padding:12px 28px;border-radius:3px;font-size:13px;font-weight:700;letter-spacing:1px;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:opacity .4s;white-space:nowrap;';
-    t.textContent   = msg;
-    document.body.appendChild(t);
-    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
-  }
-
-  // ── Check session on page load ────────────────────────────
+  // ── Session check ─────────────────────────────────────────
   async function checkStatus() {
     try {
       const r = await fetch(AUTH_URL + '?action=status', { credentials: 'include' });
       const d = await r.json();
       if (d.loggedIn) { currentUser = d.user; refreshNav(currentUser); }
-    } catch (e) { /* offline / server error — fail silently */ }
+    } catch (e) {}
   }
 
   // ── Public API ────────────────────────────────────────────
@@ -219,10 +351,9 @@
     open(mode = 'login') {
       const overlay = document.getElementById('vpAuthOverlay');
       if (!overlay) return;
-      applyModalMode(mode);
+      applyMode(mode);
       overlay.classList.add('vp-open');
       document.body.style.overflow = 'hidden';
-      renderGoogleBtn(mode);
     },
     close() {
       const overlay = document.getElementById('vpAuthOverlay');
