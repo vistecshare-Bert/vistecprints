@@ -133,7 +133,10 @@ nav{position:sticky;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,.9
   <div class="not-logged-in">
     <h2>Sign In to View Your Account</h2>
     <p>Track your orders and manage your designs.</p>
-    <button class="btn-outline-gold" onclick="vpAuth.open()">Sign Up / Login with Google</button>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-outline-gold" onclick="vpAuth.open('login')">Login</button>
+      <button class="btn-outline-gold" onclick="vpAuth.open('signup')">Sign Up</button>
+    </div>
   </div>
 
 <?php else: ?>

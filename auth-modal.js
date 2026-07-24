@@ -1,10 +1,11 @@
 (function () {
   'use strict';
 
-  const CLIENT_ID    = '896451806994-mbc9bqqlhca9mgs7m0vuhknlcrruoud6.apps.googleusercontent.com';
-  const AUTH_URL     = '/auth.php';
-  let   currentUser  = null;
-  let   gisReady     = false;
+  const CLIENT_ID   = '896451806994-mbc9bqqlhca9mgs7m0vuhknlcrruoud6.apps.googleusercontent.com';
+  const AUTH_URL    = '/auth.php';
+  let   currentUser = null;
+  let   gisReady    = false;
+  let   currentMode = 'login'; // 'login' | 'signup'
 
   // ── Load Google Identity Services ────────────────────────
   function loadGIS() {
@@ -20,22 +21,27 @@
 
   // ── CSS ──────────────────────────────────────────────────
   const css = `
-  /* Auth overlay */
-  #vpAuthOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
+  #vpAuthOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:99999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
   #vpAuthOverlay.vp-open{display:flex;}
   .vp-modal{background:#111;border:1px solid #2a2a2a;border-radius:4px;width:100%;max-width:380px;padding:40px 32px 32px;position:relative;text-align:center;}
   .vp-modal-close{position:absolute;top:12px;right:16px;background:none;border:none;color:#555;font-size:24px;cursor:pointer;line-height:1;transition:color .15s;}
   .vp-modal-close:hover{color:#fff;}
   .vp-modal-eyebrow{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:#D49848;margin-bottom:10px;}
-  .vp-modal-title{font-size:20px;font-weight:700;color:#F0EDE8;margin-bottom:6px;}
-  .vp-modal-sub{font-size:13px;color:#666;margin-bottom:28px;line-height:1.55;}
-  /* Google button container — rendered by GIS */
+  .vp-modal-title{font-size:22px;font-weight:700;color:#F0EDE8;margin-bottom:8px;}
+  .vp-modal-sub{font-size:13px;color:#666;margin-bottom:28px;line-height:1.6;}
   #vpGoogleBtnWrap{display:flex;justify-content:center;min-height:44px;}
   .vp-modal-note{font-size:11px;color:#444;margin-top:20px;line-height:1.6;}
-  /* Nav auth button (logged out) */
-  .vp-nav-auth{background:none;border:1px solid rgba(212,152,72,.45);color:#D49848;padding:6px 13px;border-radius:2px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0;}
-  .vp-nav-auth:hover{background:rgba(212,152,72,.12);border-color:#D49848;}
-  /* Nav user pill (logged in) */
+  .vp-modal-switch{font-size:12px;color:#555;margin-top:14px;}
+  .vp-modal-switch button{background:none;border:none;color:#D49848;font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0;}
+
+  /* Nav — logged out: two buttons */
+  .vp-nav-auth-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .vp-nav-login{background:none;border:1px solid rgba(212,152,72,.4);color:#D49848;padding:7px 14px;border-radius:2px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0;}
+  .vp-nav-login:hover{background:rgba(212,152,72,.1);border-color:#D49848;}
+  .vp-nav-signup{background:#D49848;border:1px solid #D49848;color:#000;padding:7px 16px;border-radius:2px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;white-space:nowrap;font-family:inherit;transition:opacity .15s;flex-shrink:0;}
+  .vp-nav-signup:hover{opacity:.85;}
+
+  /* Nav — logged in: avatar pill */
   .vp-nav-user{display:flex;align-items:center;gap:8px;cursor:pointer;position:relative;flex-shrink:0;}
   .vp-nav-user img{width:32px;height:32px;border-radius:50%;border:2px solid #D49848;object-fit:cover;flex-shrink:0;}
   .vp-nav-user-name{font-size:12px;color:#D49848;font-weight:700;letter-spacing:.5px;white-space:nowrap;}
@@ -52,17 +58,19 @@
   // ── Modal HTML ───────────────────────────────────────────
   const modalHtml = `
   <div id="vpAuthOverlay">
-    <div class="vp-modal" role="dialog" aria-modal="true" aria-label="Sign in">
+    <div class="vp-modal" role="dialog" aria-modal="true">
       <button class="vp-modal-close" aria-label="Close" onclick="vpAuth.close()">&times;</button>
       <div class="vp-modal-eyebrow">Vistec GraphX</div>
-      <h2 class="vp-modal-title">Sign Up / Login</h2>
-      <p class="vp-modal-sub">Use your Google account to track orders<br>and save your designs.</p>
+      <h2 class="vp-modal-title" id="vpModalTitle">Welcome Back</h2>
+      <p class="vp-modal-sub" id="vpModalSub">Sign in with Google to access your orders and saved designs.</p>
       <div id="vpGoogleBtnWrap"></div>
       <p class="vp-modal-note">We only store your name, email, and profile photo.<br>Your information is never shared or sold.</p>
+      <p class="vp-modal-switch" id="vpModalSwitch">
+        Don't have an account? <button onclick="vpAuth.open('signup')">Sign Up</button>
+      </p>
     </div>
   </div>`;
 
-  // ── Inject modal when DOM is ready ───────────────────────
   function injectModal() {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     document.getElementById('vpAuthOverlay').addEventListener('click', function (e) {
@@ -70,31 +78,41 @@
     });
   }
 
-  // ── Nav: inject button into .nav-right ───────────────────
-  function injectNavButton() {
-    const navRight = document.querySelector('.nav-right');
-    if (!navRight || document.getElementById('vpNavAuth')) return;
-    const btn = document.createElement('button');
-    btn.className = 'vp-nav-auth';
-    btn.id        = 'vpNavAuth';
-    btn.textContent = 'Sign Up / Login';
-    btn.onclick   = () => vpAuth.open();
-    navRight.insertBefore(btn, navRight.firstChild);
+  // ── Nav: inject two buttons into .nav-right ───────────────
+  function makeAuthWrap() {
+    const wrap = document.createElement('div');
+    wrap.className = 'vp-nav-auth-wrap';
+    wrap.id        = 'vpNavAuthWrap';
+
+    const loginBtn = document.createElement('button');
+    loginBtn.className   = 'vp-nav-login';
+    loginBtn.textContent = 'Login';
+    loginBtn.onclick     = () => vpAuth.open('login');
+
+    const signupBtn = document.createElement('button');
+    signupBtn.className   = 'vp-nav-signup';
+    signupBtn.textContent = 'Sign Up';
+    signupBtn.onclick     = () => vpAuth.open('signup');
+
+    wrap.appendChild(loginBtn);
+    wrap.appendChild(signupBtn);
+    return wrap;
   }
 
-  // ── Nav: update to show user avatar or login button ──────
+  function injectNavButton() {
+    const navRight = document.querySelector('.nav-right');
+    if (!navRight || document.getElementById('vpNavAuthWrap')) return;
+    navRight.insertBefore(makeAuthWrap(), navRight.firstChild);
+  }
+
+  // ── Nav: swap between auth buttons and user pill ──────────
   function refreshNav(user) {
-    const existing = document.getElementById('vpNavAuth') || document.getElementById('vpNavUser');
+    const existing = document.getElementById('vpNavAuthWrap') || document.getElementById('vpNavUser');
     if (!existing) return;
     const parent = existing.parentNode;
 
     if (!user) {
-      const btn = document.createElement('button');
-      btn.className = 'vp-nav-auth';
-      btn.id        = 'vpNavAuth';
-      btn.textContent = 'Sign Up / Login';
-      btn.onclick   = () => vpAuth.open();
-      parent.replaceChild(btn, existing);
+      parent.replaceChild(makeAuthWrap(), existing);
     } else {
       const first = (user.name || 'Account').split(' ')[0];
       const pill  = document.createElement('div');
@@ -116,21 +134,41 @@
     return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
+  // ── Update modal copy based on mode ───────────────────────
+  function applyModalMode(mode) {
+    currentMode = mode;
+    const title  = document.getElementById('vpModalTitle');
+    const sub    = document.getElementById('vpModalSub');
+    const toggle = document.getElementById('vpModalSwitch');
+    if (!title) return;
+
+    if (mode === 'signup') {
+      title.textContent  = 'Create Your Account';
+      sub.textContent    = 'Sign up with Google to track orders and save your custom designs.';
+      toggle.innerHTML   = 'Already have an account? <button onclick="vpAuth.open(\'login\')">Login</button>';
+    } else {
+      title.textContent  = 'Welcome Back';
+      sub.textContent    = 'Sign in with Google to access your orders and saved designs.';
+      toggle.innerHTML   = 'Don\'t have an account? <button onclick="vpAuth.open(\'signup\')">Sign Up</button>';
+    }
+  }
+
   // ── Render Google Sign-In button ─────────────────────────
-  async function renderGoogleBtn() {
+  async function renderGoogleBtn(mode) {
     await loadGIS();
     const wrap = document.getElementById('vpGoogleBtnWrap');
     if (!wrap) return;
+    wrap.innerHTML = ''; // clear previous render
     google.accounts.id.initialize({
       client_id: CLIENT_ID,
       callback:  handleCredential,
       use_fedcm_for_prompt: false,
     });
     google.accounts.id.renderButton(wrap, {
-      theme: 'outline',
-      size:  'large',
-      text:  'continue_with',
-      width: 316,
+      theme:          'outline',
+      size:           'large',
+      text:           mode === 'signup' ? 'signup_with' : 'signin_with',
+      width:          316,
       logo_alignment: 'left',
     });
   }
@@ -146,7 +184,7 @@
         currentUser = d.user;
         refreshNav(currentUser);
         vpAuth.close();
-        showWelcome(d.user.name.split(' ')[0]);
+        showWelcome(d.user.name.split(' ')[0], currentMode);
       } else {
         alert('Sign-in failed: ' + (d.error || 'Please try again.'));
       }
@@ -156,12 +194,15 @@
   }
 
   // ── Welcome toast ─────────────────────────────────────────
-  function showWelcome(firstName) {
+  function showWelcome(firstName, mode) {
+    const msg = mode === 'signup'
+      ? 'Account created — welcome, ' + firstName + '!'
+      : 'Welcome back, ' + firstName + '!';
     const t = document.createElement('div');
-    t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#D49848;color:#000;padding:12px 28px;border-radius:3px;font-size:13px;font-weight:700;letter-spacing:1px;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:opacity .4s;';
-    t.textContent   = 'Welcome, ' + firstName + '!';
+    t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#D49848;color:#000;padding:12px 28px;border-radius:3px;font-size:13px;font-weight:700;letter-spacing:1px;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:opacity .4s;white-space:nowrap;';
+    t.textContent   = msg;
     document.body.appendChild(t);
-    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 2800);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
   }
 
   // ── Check session on page load ────────────────────────────
@@ -175,12 +216,13 @@
 
   // ── Public API ────────────────────────────────────────────
   window.vpAuth = {
-    open() {
+    open(mode = 'login') {
       const overlay = document.getElementById('vpAuthOverlay');
       if (!overlay) return;
+      applyModalMode(mode);
       overlay.classList.add('vp-open');
       document.body.style.overflow = 'hidden';
-      renderGoogleBtn();
+      renderGoogleBtn(mode);
     },
     close() {
       const overlay = document.getElementById('vpAuthOverlay');
