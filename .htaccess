@@ -1,5 +1,9 @@
 RewriteEngine On
 
+# Redirect www to non-www (SSL cert only covers vistecprints.com)
+RewriteCond %{HTTP_HOST} ^www\.vistecprints\.com [NC]
+RewriteRule ^(.*)$ https://vistecprints.com/$1 [L,R=301]
+
 # Serve our logo PNG when any browser auto-requests favicon.ico
 RewriteRule ^favicon\.ico$ /favicon-32x32.png [L,R=301]
 
