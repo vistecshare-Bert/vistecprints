@@ -1,5 +1,8 @@
 RewriteEngine On
 
+# Allow AutoSSL / Let's Encrypt DCV validation to pass through without redirect
+RewriteRule ^\.well-known/acme-challenge/ - [L]
+
 # Redirect www to non-www (SSL cert only covers vistecprints.com)
 RewriteCond %{HTTP_HOST} ^www\.vistecprints\.com [NC]
 RewriteRule ^(.*)$ https://vistecprints.com/$1 [L,R=301]
