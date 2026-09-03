@@ -150,6 +150,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
 .c-item-info{flex:1;min-width:0;}
 .c-item-name{font-size:13px;font-weight:500;color:var(--offwhite);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .c-item-meta{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
+.c-item-meta.editable{cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:color 0.15s;}
+.c-item-meta.editable:hover{color:var(--gold);}
+.c-item-meta.editable svg{flex-shrink:0;opacity:0.7;}
 .c-item-bottom{display:flex;align-items:center;justify-content:space-between;}
 .c-item-price{font-size:14px;color:var(--gold);font-weight:600;}
 .c-item-qty{display:flex;align-items:center;gap:8px;}
@@ -642,6 +645,32 @@ function addToCart(product, size, qty, color) {
 
 function removeFromCart(key) { cart = cart.filter(i => i._key !== key); saveCart(); }
 
+// Change the size/color of an item already in the cart. If the new
+// size/color combo matches another line already in the cart, merge
+// quantities into that line instead of creating a duplicate.
+function updateCartItem(oldKey, size, qty, color) {
+  const idx = cart.findIndex(i => i._key === oldKey);
+  if (idx === -1) return;
+  const item = cart[idx];
+  const newKey = item.id + '_' + size + (color ? '_' + color.replace(/\s+/g,'_') : '');
+
+  if (newKey === oldKey) {
+    item.qty = qty;
+  } else {
+    const existingIdx = cart.findIndex(i => i._key === newKey);
+    if (existingIdx !== -1) {
+      cart[existingIdx].qty += qty;
+      cart.splice(idx, 1);
+    } else {
+      item._key = newKey;
+      item.size = size;
+      item.color = color || '';
+      item.qty = qty;
+    }
+  }
+  saveCart();
+}
+
 function updateQty(key, delta) {
   const item = cart.find(i => i._key === key);
   if (!item) return;
@@ -684,7 +713,10 @@ function renderCartBody() {
       <div class="c-item-img"><img src="${item.img}" alt="${item.name}" onerror="this.src='';this.style.display='none'"/></div>
       <div class="c-item-info">
         <div class="c-item-name">${item.name}</div>
-        <div class="c-item-meta">Size: ${item.size}${item.color ? ' &nbsp;·&nbsp; ' + item.color : ''} &nbsp;·&nbsp; ${item.garment}</div>
+        <div class="c-item-meta editable" onclick="openEditCartItem('${item._key}')" title="Change size or color">
+          Size: ${item.size}${item.color ? ' &nbsp;·&nbsp; ' + item.color : ''} &nbsp;·&nbsp; ${item.garment}
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+        </div>
         <div class="c-item-bottom">
           <span class="c-item-price">${item.priceStr}</span>
           <div class="c-item-qty">
@@ -733,12 +765,13 @@ const COLOR_HEX = {
 };
 
 // ── SIZE MODAL ────────────────────────────────────────
-let smProduct = null, smQty = 1, smSize = null, smColor = null;
+let smProduct = null, smQty = 1, smSize = null, smColor = null, smEditKey = null;
 
 function openSizeModal(productId) {
   const p = productMap[productId];
   if (!p) return;
-  smProduct = p; smQty = 1; smSize = null; smColor = null;
+  smProduct = p; smQty = 1; smSize = null; smColor = null; smEditKey = null;
+  document.getElementById('smAddBtn').textContent = 'Add to Cart';
   document.getElementById('smImg').src = p.img || '';
   document.getElementById('smName').textContent = p.name;
   document.getElementById('smGarment').textContent = (p.garment || '');
@@ -766,6 +799,28 @@ function openSizeModal(productId) {
   document.getElementById('smOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+
+// Reopens the size modal pre-filled with an existing cart line's
+// size/color/qty, so the user can change them without re-adding.
+function openEditCartItem(key) {
+  const item = cart.find(i => i._key === key);
+  if (!item) return;
+  openSizeModal(item.id);
+  smEditKey = key;
+  document.getElementById('smAddBtn').textContent = 'Update Cart';
+
+  const sizeBtn = document.querySelector('.sm-size[data-size="' + item.size + '"]');
+  if (sizeBtn) sizeBtn.click();
+
+  if (item.color) {
+    const colorDot = document.querySelector('#smColors .sm-color-dot[data-color="' + item.color + '"]');
+    if (colorDot) colorDot.click();
+  }
+
+  smQty = item.qty;
+  document.getElementById('smQtyVal').textContent = smQty;
+}
+
 function selectSmColor(el) {
   smColor = el.dataset.color;
   document.querySelectorAll('#smColors .sm-color-dot').forEach(d => d.classList.remove('sel'));
@@ -869,7 +924,12 @@ function confirmAddToCart() {
   if (smProduct.colors && smProduct.colors.length > 0 && !smColor) {
     document.getElementById('smColorErr').classList.add('show'); return;
   }
-  addToCart(smProduct, smSize, smQty, smColor);
+  if (smEditKey) {
+    updateCartItem(smEditKey, smSize, smQty, smColor);
+    smEditKey = null;
+  } else {
+    addToCart(smProduct, smSize, smQty, smColor);
+  }
   closeSizeModal();
   openCart();
 }
