@@ -1858,7 +1858,17 @@ tr:hover td{background:#fafafa;}
 
         <div class="form-group">
           <label>Blank Product / Garment</label>
-          <input type="text" name="garment" id="fGarment" placeholder="e.g. Heavy Cotton 100% Cotton T-Shirt"/>
+          <select id="fGarmentSelect" onchange="onGarmentSelectChange()">
+            <option value="">— Select garment —</option>
+            <option value="Gildan 5000 — Heavy Cotton 100%">Gildan 5000 — Heavy Cotton 100% — $5.75/shirt</option>
+            <option value="Gildan 6400 — SoftStyle 100%">Gildan 6400 — SoftStyle 100% — $7.75/shirt</option>
+            <option value="Gildan 75000 — Heavy Blend Crew">Gildan 75000 — Heavy Blend Crew — $10.00/shirt</option>
+            <option value="Augusta 790 — Nexgen Performance Tee">Augusta 790 — Nexgen Performance Tee (Unisex) — $7.75/shirt</option>
+            <option value="Augusta 1790 — Ladies NexGen Wicking">Augusta 1790 — Ladies NexGen Wicking Tee — $7.75/shirt</option>
+            <option value="Hoodie — Heavy Blend 50/50">Hoodie — Heavy Blend 50/50 — $35.00/shirt</option>
+            <option value="__custom__">Custom / Other…</option>
+          </select>
+          <input type="text" name="garment" id="fGarment" placeholder="e.g. Boots, Hat, Custom Print" style="margin-top:8px;display:none;"/>
         </div>
 
         <div class="modal-foot" style="padding:0;margin-top:8px;">
@@ -1871,6 +1881,46 @@ tr:hover td{background:#fafafa;}
 </div>
 
 <script>
+const GARMENT_PRESETS = [
+  'Gildan 5000 — Heavy Cotton 100%',
+  'Gildan 6400 — SoftStyle 100%',
+  'Gildan 75000 — Heavy Blend Crew',
+  'Augusta 790 — Nexgen Performance Tee',
+  'Augusta 1790 — Ladies NexGen Wicking',
+  'Hoodie — Heavy Blend 50/50'
+];
+
+function onGarmentSelectChange() {
+  const sel = document.getElementById('fGarmentSelect');
+  const input = document.getElementById('fGarment');
+  if (sel.value === '__custom__') {
+    input.style.display = '';
+    input.value = '';
+    input.focus();
+  } else {
+    input.style.display = 'none';
+    input.value = sel.value;
+  }
+}
+
+function setGarmentFields(value) {
+  const sel = document.getElementById('fGarmentSelect');
+  const input = document.getElementById('fGarment');
+  if (value && GARMENT_PRESETS.includes(value)) {
+    sel.value = value;
+    input.value = value;
+    input.style.display = 'none';
+  } else if (value) {
+    sel.value = '__custom__';
+    input.value = value;
+    input.style.display = '';
+  } else {
+    sel.value = '';
+    input.value = '';
+    input.style.display = 'none';
+  }
+}
+
 function openModal(edit) {
   document.getElementById('modalOverlay').classList.add('open');
   if (!edit) {
@@ -1882,6 +1932,7 @@ function openModal(edit) {
     document.getElementById('fImgExisting').value = '';
     document.getElementById('currentImgWrap').style.display = 'none';
     document.getElementById('uploadPreviewWrap').style.display = 'none';
+    setGarmentFields('');
     updateUploadHint();
   }
 }
@@ -1901,7 +1952,7 @@ function editProduct(idx, data) {
   document.getElementById('fId').value      = data.id      || '';
   document.getElementById('fPrice').value   = data.price   || '';
   document.getElementById('fBadge').value   = data.badge   || '';
-  document.getElementById('fGarment').value = data.garment || '';
+  setGarmentFields(data.garment || '');
   document.getElementById('fImgExisting').value = data.img || '';
 
   // Show current image
