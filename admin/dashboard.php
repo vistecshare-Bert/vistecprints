@@ -1665,8 +1665,16 @@ tr:hover td{background:#fafafa;}
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($products as $i => $p):
-            if (!empty($p['decorated'])) continue;
+          <?php
+          // Show blank (non-decorated) products newest-first, while keeping $i as the
+          // original products.json index so the existing edit/delete forms still work.
+          $blankProducts = [];
+          foreach ($products as $i => $p) {
+              if (!empty($p['decorated'])) continue;
+              $blankProducts[] = [$i, $p];
+          }
+          $blankProducts = array_reverse($blankProducts);
+          foreach ($blankProducts as [$i, $p]):
             $imgSrc = $p['img'] ?? '';
             $isLocal = $imgSrc && strpos($imgSrc, 'http') !== 0;
             $displaySrc = $isLocal ? '../' . $imgSrc : $imgSrc;
@@ -1702,6 +1710,15 @@ tr:hover td{background:#fafafa;}
           <?php endforeach; ?>
         </tbody>
       </table>
+      <div class="pagination-bar" id="paginationBar" style="display:none;align-items:center;justify-content:space-between;padding:14px 24px;border-top:1px solid #eee;flex-wrap:wrap;gap:10px;">
+        <div id="paginationInfo" style="font-size:12px;color:#888;"></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button type="button" class="btn btn-outline btn-sm" id="prevPageBtn">&larr; Prev</button>
+          <span id="pageIndicator" style="font-size:12px;color:#555;min-width:80px;text-align:center;"></span>
+          <button type="button" class="btn btn-outline btn-sm" id="nextPageBtn">Next &rarr;</button>
+          <button type="button" class="btn btn-outline btn-sm" id="viewAllBtn" style="margin-left:10px;">View All</button>
+        </div>
+      </div>
       <?php endif; ?>
     </div>
 
@@ -2003,12 +2020,8 @@ document.querySelectorAll('.ftab').forEach(btn => {
   btn.addEventListener('click', function() {
     document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
     this.classList.add('active');
-    const cat = this.dataset.cat;
-    document.querySelectorAll('#productTable tbody tr').forEach(row => {
-      row.style.display = (cat === 'all' || row.dataset.cat === cat) ? '' : 'none';
-    });
-    // Reset bulk selection when filter changes
-    clearBulkSelection();
+    // Re-filter and jump back to page 1 (also resets bulk selection)
+    if (window.resetProductPage) window.resetProductPage();
   });
 });
 
@@ -2061,6 +2074,82 @@ document.querySelectorAll('.ftab').forEach(btn => {
     });
     document.getElementById('bulkDeleteForm').submit();
   };
+})();
+
+// ── PRODUCT LIST PAGINATION (10 per page, works together with the category filter) ──
+(function() {
+  const PAGE_SIZE = 10;
+  let currentPage = 1;
+  let viewingAll  = false;
+
+  const table = document.getElementById('productTable');
+  if (!table) return;
+  const tbody     = table.querySelector('tbody');
+  const bar       = document.getElementById('paginationBar');
+  const info      = document.getElementById('paginationInfo');
+  const indicator = document.getElementById('pageIndicator');
+  const prevBtn   = document.getElementById('prevPageBtn');
+  const nextBtn   = document.getElementById('nextPageBtn');
+  const viewAllBtn = document.getElementById('viewAllBtn');
+
+  function activeCat() {
+    const active = document.querySelector('.ftab.active');
+    return active ? active.dataset.cat : 'all';
+  }
+
+  function filteredRows() {
+    const cat = activeCat();
+    return [...tbody.querySelectorAll('tr')].filter(r => cat === 'all' || r.dataset.cat === cat);
+  }
+
+  function render() {
+    const rows     = [...tbody.querySelectorAll('tr')];
+    const filtered = filteredRows();
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    rows.forEach(r => r.style.display = 'none');
+
+    if (viewingAll) {
+      filtered.forEach(r => r.style.display = '');
+    } else {
+      const start = (currentPage - 1) * PAGE_SIZE;
+      filtered.slice(start, start + PAGE_SIZE).forEach(r => r.style.display = '');
+    }
+
+    if (filtered.length <= PAGE_SIZE) {
+      bar.style.display = 'none';
+    } else {
+      bar.style.display = 'flex';
+      if (viewingAll) {
+        info.textContent = 'Showing all ' + filtered.length + ' products';
+        indicator.textContent = '';
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+        viewAllBtn.textContent = 'Paginate';
+      } else {
+        const start = (currentPage - 1) * PAGE_SIZE + 1;
+        const end   = Math.min(currentPage * PAGE_SIZE, filtered.length);
+        info.textContent = filtered.length ? ('Showing ' + start + '–' + end + ' of ' + filtered.length + ' products') : 'No products in this category.';
+        indicator.textContent = 'Page ' + currentPage + ' of ' + totalPages;
+        prevBtn.disabled = currentPage <= 1;
+        nextBtn.disabled = currentPage >= totalPages;
+        viewAllBtn.textContent = 'View All';
+      }
+    }
+
+    if (window.clearBulkSelection) window.clearBulkSelection();
+  }
+
+  prevBtn.addEventListener('click', () => { currentPage--; render(); });
+  nextBtn.addEventListener('click', () => { currentPage++; render(); });
+  viewAllBtn.addEventListener('click', () => { viewingAll = !viewingAll; currentPage = 1; render(); });
+
+  // Called by the category-filter tabs so filtering and pagination stay in sync
+  window.resetProductPage = function() { currentPage = 1; render(); };
+
+  render();
 })();
 
 // â”€â”€ DECORATED CREATOR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
