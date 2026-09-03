@@ -1006,8 +1006,16 @@ tr:hover td{background:#fafafa;}
       <table>
         <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Sizes</th><th>Actions</th></tr></thead>
         <tbody>
-          <?php foreach ($products as $i => $p):
-            if (empty($p['decorated'])) continue;
+          <?php
+          // Show decorated products newest-first, while keeping $i as the original
+          // products.json index so the existing edit/delete forms still work.
+          $decDisplay = [];
+          foreach ($products as $i => $p) {
+              if (empty($p['decorated'])) continue;
+              $decDisplay[] = [$i, $p];
+          }
+          $decDisplay = array_reverse($decDisplay);
+          foreach ($decDisplay as [$i, $p]):
             $imgSrc = $p['img'] ?? '';
             $displaySrc = $imgSrc ? '../' . $imgSrc : '';
           ?>
