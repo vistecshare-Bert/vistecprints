@@ -50,7 +50,9 @@ $defaultCategories = [
 ];
 if (file_exists($catFile)) {
     $loaded = json_decode(file_get_contents($catFile), true);
-    $categories = is_array($loaded) ? $loaded : $defaultCategories;
+    // Fall back to defaults if the file is missing, invalid, or was emptied out —
+    // an empty category list breaks the Category dropdown everywhere on this page.
+    $categories = (is_array($loaded) && !empty($loaded)) ? $loaded : $defaultCategories;
 } else {
     $categories = $defaultCategories;
 }
