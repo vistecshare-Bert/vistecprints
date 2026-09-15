@@ -2413,6 +2413,12 @@ function dcConfirmAdd() {
       frontDesign:   canvasStates.front || null,
       backDesign:    canvasStates.back  || null,
     });
+    fetch('cart-track.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({ id: 'custom-' + garmentLabel, name: 'Custom Design — ' + garmentLabel, size: sz, qty, price: perShirt })
+    }).catch(()=>{});
   });
   localStorage.setItem('vp_cart', JSON.stringify(cart));
   closeDcModal();

@@ -633,14 +633,20 @@ function saveCart() { localStorage.setItem('vp_cart', JSON.stringify(cart)); upd
 
 function addToCart(product, size, qty, color) {
   const key = product.id + '_' + size + (color ? '_' + color.replace(/\s+/g,'_') : '');
+  const priceNum = parseFloat((product.price || '0').replace(/[^0-9.]/g,'')) || 0;
   const existing = cart.find(i => i._key === key);
   if (existing) { existing.qty += qty; }
   else {
-    const priceNum = parseFloat((product.price || '0').replace(/[^0-9.]/g,'')) || 0;
     cart.push({ _key: key, id: product.id, name: product.name, img: product.img,
       price: priceNum, priceStr: product.price || 'TBD', size, color: color || '', qty, garment: product.garment || '' });
   }
   saveCart();
+  fetch('cart-track.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    keepalive: true,
+    body: JSON.stringify({ id: product.id, name: product.name, size, qty, price: priceNum })
+  }).catch(()=>{});
 }
 
 function removeFromCart(key) { cart = cart.filter(i => i._key !== key); saveCart(); }

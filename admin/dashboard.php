@@ -368,6 +368,29 @@ if (is_dir($dtfDir)) {
     }
     usort($dtfOrders, fn($a,$b) => strcmp($b['date']??'', $a['date']??''));
 }
+// Load cart-add events (current + previous month logs)
+$cartEventsDir = __DIR__ . '/../cart_events/';
+$cartEvents = [];
+if (is_dir($cartEventsDir)) {
+    foreach ([date('Y-m'), date('Y-m', strtotime('-1 month'))] as $ym) {
+        $f = $cartEventsDir . $ym . '.jsonl';
+        if (!file_exists($f)) continue;
+        foreach (file($f, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+            $e = json_decode($line, true);
+            if (is_array($e)) $cartEvents[] = $e;
+        }
+    }
+    usort($cartEvents, fn($a,$b) => strcmp($b['t']??'', $a['t']??''));
+}
+$cartEventsToday = count(array_filter($cartEvents, fn($e) => str_starts_with($e['t']??'', date('Y-m-d'))));
+$cartUniqueVisitors = count(array_unique(array_column($cartEvents, 'ih')));
+$cartTopProduct = '—';
+if ($cartEvents) {
+    $cartCounts = [];
+    foreach ($cartEvents as $e) { $n = $e['nm'] ?? ''; if ($n !== '') $cartCounts[$n] = ($cartCounts[$n] ?? 0) + ($e['qty'] ?? 1); }
+    if ($cartCounts) { arsort($cartCounts); $cartTopProduct = array_key_first($cartCounts); }
+}
+
 $newQuotes    = count(array_filter($quotes,    fn($q) => ($q['status']??'new') === 'new'));
 $newContacts  = count(array_filter($contacts,  fn($c) => ($c['status']??'new') === 'new'));
 $newDtfOrders = count(array_filter($dtfOrders, fn($d) => ($d['stage']??'')    === 'new_order'));
@@ -651,6 +674,12 @@ tr:hover td{background:#fafafa;}
         <?php if ($newDtfOrders > 0): ?><span class="sb-badge"><?= $newDtfOrders ?></span><?php endif; ?>
       </a>
     </li>
+    <li>
+      <a href="dashboard.php?tab=cart" <?= $activeTab==='cart' ? 'class="active"' : '' ?>>
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Cart Activity
+      </a>
+    </li>
   </ul>
   <div class="sb-label">Integrations</div>
   <ul class="sb-nav" style="padding-bottom:4px;">
@@ -701,6 +730,7 @@ tr:hover td{background:#fafafa;}
       elseif ($activeTab === 'quotes')   echo 'Quote Requests';
       elseif ($activeTab === 'contacts') echo 'Contact Submissions';
       elseif ($activeTab === 'dtf')      echo 'DTF Pipeline';
+      elseif ($activeTab === 'cart')     echo 'Cart Activity';
       elseif ($activeTab === 'carolina') echo 'Carolina Made Connector';
       else echo 'Products';
     ?></h1>
@@ -1620,6 +1650,49 @@ tr:hover td{background:#fafafa;}
       };
     })();
     </script>
+
+    <?php elseif ($activeTab === 'cart'): ?>
+    <!-- ===== CART ACTIVITY TAB ===== -->
+    <div class="stats">
+      <div class="stat-card"><div class="num"><?= count($cartEvents) ?></div><div class="lbl">Cart Adds (60 Days)</div></div>
+      <div class="stat-card"><div class="num"><?= $cartEventsToday ?></div><div class="lbl">Added Today</div></div>
+      <div class="stat-card"><div class="num"><?= $cartUniqueVisitors ?></div><div class="lbl">Unique Visitors</div></div>
+      <div class="stat-card"><div class="num" style="font-size:16px;"><?= htmlspecialchars($cartTopProduct) ?></div><div class="lbl">Most Added</div></div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <h2>Recent Cart Adds</h2>
+      </div>
+      <?php if (empty($cartEvents)): ?>
+      <div class="empty-state"><p>No cart activity yet. Items added to a cart on the website will appear here.</p></div>
+      <?php else: ?>
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Product</th>
+            <th>Size</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Visitor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach (array_slice($cartEvents, 0, 300) as $e): ?>
+          <tr>
+            <td><?= htmlspecialchars($e['t'] ?? '') ?></td>
+            <td><?= htmlspecialchars($e['nm'] ?? '') ?></td>
+            <td><?= htmlspecialchars($e['sz'] ?? '') ?></td>
+            <td><?= (int)($e['qty'] ?? 1) ?></td>
+            <td>$<?= number_format((float)($e['pr'] ?? 0), 2) ?></td>
+            <td style="color:#aaa;font-size:12px;"><?= htmlspecialchars($e['ih'] ?? '') ?></td>
+          </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+      <?php endif; ?>
+    </div>
 
     <?php else: ?>
     <!-- ===== PRODUCTS TAB ===== -->
