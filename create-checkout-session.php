@@ -58,11 +58,12 @@ $lineItems[] = [
 
 $base    = 'https://rebuild.vistecprints.com';
 $payload = [
-    'mode'           => 'payment',
-    'customer_email' => $customer['email'] ?? '',
-    'success_url'    => $base . '/stripe-success.php?sid={CHECKOUT_SESSION_ID}',
-    'cancel_url'     => $base . '/checkout.html?cancelled=1',
-    'line_items'     => $lineItems,
+    'mode'                     => 'payment',
+    'customer_email'           => $customer['email'] ?? '',
+    'success_url'              => $base . '/stripe-success.php?sid={CHECKOUT_SESSION_ID}',
+    'cancel_url'               => $base . '/checkout.html?cancelled=1',
+    'payment_method_types'     => ['card', 'cashapp'],
+    'line_items'               => $lineItems,
 ];
 
 // Call Stripe API
