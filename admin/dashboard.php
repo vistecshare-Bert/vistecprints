@@ -382,7 +382,7 @@ if (is_dir($cartEventsDir)) {
     }
     usort($cartEvents, fn($a,$b) => strcmp($b['t']??'', $a['t']??''));
 }
-$cartEventsToday = count(array_filter($cartEvents, fn($e) => str_starts_with($e['t']??'', date('Y-m-d'))));
+$cartEventsToday = count(array_filter($cartEvents, fn($e) => substr($e['t']??'', 0, 10) === date('Y-m-d')));
 $cartUniqueVisitors = count(array_unique(array_column($cartEvents, 'ih')));
 $cartTopProduct = '—';
 if ($cartEvents) {
@@ -789,7 +789,7 @@ tr:hover td{background:#fafafa;}
           <h4>Items Â· Subtotal $<?= number_format($o['subtotal']??0,2) ?> + $<?= number_format($o['shipping']??4.99,2) ?> shipping</h4>
           <ul class=”order-items-list”>
           <?php foreach (($o['items'] ?? []) as $itIdx => $item):
-            $hasImg = !empty($item['img']) && str_starts_with($item['img'], 'data:');
+            $hasImg = !empty($item['img']) && substr($item['img'], 0, 5) === 'data:';
           ?>
             <li>
               <?php if ($hasImg): ?>
