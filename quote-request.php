@@ -101,7 +101,7 @@ $printDetails = $garmentType
     : ($product ?: '—');
 
 $message =
-    "New quote request from rebuild.vistecprints.com\n" .
+    "New quote request from vistecprints.com\n" .
     str_repeat('-', 40) . "\n\n" .
     "ID:       $quoteId\n" .
     "Name:     $name\n" .
@@ -113,10 +113,10 @@ $message =
     "Artwork:  " . ($artworkStatus ?: '—') . "\n\n" .
     "Notes:\n" . ($notes ?: '—') . "\n\n" .
     str_repeat('-', 40) . "\n" .
-    "View in admin: https://rebuild.vistecprints.com/admin.php\n";
+    "View in admin: https://vistecprints.com/admin.php\n";
 
 $headers =
-    "From: noreply@rebuild.vistecprints.com\r\n" .
+    "From: noreply@vistecprints.com\r\n" .
     "Reply-To: $email\r\n" .
     "Content-Type: text/plain; charset=UTF-8\r\n";
 

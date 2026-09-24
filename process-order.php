@@ -104,9 +104,9 @@ $bodyStore .= "ITEMS\n{$itemLines}\n";
 $bodyStore .= "Subtotal : \$" . number_format($subtotal, 2) . "\n";
 $bodyStore .= "Shipping : \$" . number_format($shipping, 2) . "\n";
 $bodyStore .= "TOTAL    : \$" . number_format($total, 2) . "\n\n";
-$bodyStore .= "View orders: https://rebuild.vistecprints.com/admin/\n";
+$bodyStore .= "View orders: https://vistecprints.com/admin/\n";
 
-$headersStore = "From: orders@rebuild.vistecprints.com\r\nReply-To: {$customer['email']}";
+$headersStore = "From: orders@vistecprints.com\r\nReply-To: {$customer['email']}";
 mail($toStore, $subjStore, $bodyStore, $headersStore);
 
 // ── Confirmation email to customer ─────────────────────
@@ -126,7 +126,7 @@ $bodyCust .= "Your order will ship once payment is confirmed.\n\n";
 $bodyCust .= "Questions? Reply to this email or call: +1 704-377-6626\n\n";
 $bodyCust .= "— Vistec GraphX\nCharlotte, NC | vistecprints.com";
 
-$headersCust = "From: orders@rebuild.vistecprints.com";
+$headersCust = "From: orders@vistecprints.com";
 mail($customer['email'], $subjCust, $bodyCust, $headersCust);
 
 echo json_encode(['success' => true, 'orderId' => $orderId]);

@@ -54,7 +54,7 @@ if (!file_exists($htaccess)) file_put_contents($htaccess, "Deny from all\n");
 $to      = 'vistecfx@gmail.com';
 $subject = "Contact Form [$contactId] — $inquiry — $name";
 $body    =
-    "New contact form submission from rebuild.vistecprints.com\n" .
+    "New contact form submission from vistecprints.com\n" .
     str_repeat('-', 40) . "\n\n" .
     "ID:       $contactId\n" .
     "Name:     $name\n" .
@@ -66,7 +66,7 @@ $body    =
     "Received: " . date('D, d M Y H:i:s T') . "\n";
 
 $headers =
-    "From: noreply@rebuild.vistecprints.com\r\n" .
+    "From: noreply@vistecprints.com\r\n" .
     "Reply-To: $email\r\n" .
     "Content-Type: text/plain; charset=UTF-8\r\n";
 

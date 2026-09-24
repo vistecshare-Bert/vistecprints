@@ -56,7 +56,7 @@ $lineItems[] = [
     'quantity' => 1,
 ];
 
-$base    = 'https://rebuild.vistecprints.com';
+$base    = 'https://vistecprints.com';
 $payload = [
     'mode'                     => 'payment',
     'customer_email'           => $customer['email'] ?? '',

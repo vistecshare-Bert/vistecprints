@@ -155,7 +155,7 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
         foreach ($order['items'] ?? [] as $it) {
             $adminLines .= '  - ' . ($it['name'] ?? 'Item') . ' Size ' . ($it['size'] ?? '?') . ' ×' . (int)($it['qty'] ?? 1) . "\n";
         }
-        $adminLines .= "\nView in dashboard: https://rebuild.vistecprints.com/admin/dashboard.php?tab=orders";
+        $adminLines .= "\nView in dashboard: https://vistecprints.com/admin/dashboard.php?tab=orders";
         $aHeaders  = "From: Vistec GraphX <noreply@vistecprints.com>\r\n";
         $aHeaders .= "Reply-To: {$toEmail}\r\n";
         mail($adminEmail, 'New Order — ' . $order['orderId'], $adminLines, $aHeaders);
