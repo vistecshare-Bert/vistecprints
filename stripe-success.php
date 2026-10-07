@@ -36,10 +36,26 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
     $order['paidAt']      = date('c');
     $order['stripeEmail'] = $session['customer_details']['email'] ?? ($order['customer']['email'] ?? '');
 
-    $ordersDir = __DIR__ . '/orders';
-    if (!is_dir($ordersDir)) mkdir($ordersDir, 0755, true);
-    file_put_contents($ordersDir . '/' . $order['orderId'] . '.json',
-        json_encode($order, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    // Finalized orders used to be written as a raw file into orders/ — the
+    // same directory the DTF Pipeline tab scans — but that record's field
+    // names (customer/items/total) don't match what the Kanban card expects
+    // (customer_name/garment_type/qty/stage), so it rendered as a blank,
+    // nameless "Qty 0" ghost card. The Orders tab is the right home for the
+    // full record; only the derived DTF summary below belongs in orders/.
+    $ordersJsonFile = __DIR__ . '/orders.json';
+    $ordersList = file_exists($ordersJsonFile) ? (json_decode(file_get_contents($ordersJsonFile), true) ?: []) : [];
+    array_unshift($ordersList, [
+        'id'       => $order['orderId'],
+        'date'     => $order['date'] ?? date('c'),
+        'status'   => 'pending',
+        'customer' => $order['customer'] ?? [],
+        'notes'    => trim(($order['notes'] ?? '') . "\n\nPaid via Stripe."),
+        'items'    => $order['items'] ?? [],
+        'subtotal' => $order['subtotal'] ?? 0,
+        'shipping' => $order['shipping'] ?? 4.99,
+        'total'    => $order['total'] ?? 0,
+    ]);
+    file_put_contents($ordersJsonFile, json_encode($ordersList, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
     unlink($pendingFile);
 
@@ -49,8 +65,13 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
     $dtfItems = $order['items'] ?? [];
     $garmentTypes = array_unique(array_filter(array_map(fn($i) => trim($i['garment'] ?? ''), $dtfItems)));
     $itemLines = '';
+    $sizesSummary = [];
     foreach ($dtfItems as $it) {
-        $itemLines .= '  - ' . ($it['name'] ?? 'Item') . ' | Size: ' . ($it['size'] ?? '?') . ' ×' . (int)($it['qty'] ?? 1) . "\n";
+        $itName = $it['name'] ?? 'Item';
+        $itSize = $it['size'] ?? '?';
+        $itQty  = (int)($it['qty'] ?? 1);
+        $itemLines      .= "  - {$itName} | Size: {$itSize} ×{$itQty}\n";
+        $sizesSummary[]  = "{$itName}: {$itSize} ×{$itQty}";
     }
     $dtfRec = [
         'id'              => $dtfId,
@@ -61,7 +82,7 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
         'garment_type'    => implode(', ', $garmentTypes),
         'qty'             => array_sum(array_map(fn($i) => intval($i['qty'] ?? 1), $dtfItems)),
         'print_location'  => '',
-        'sizes_breakdown' => '',
+        'sizes_breakdown' => implode(', ', $sizesSummary),
         'print_type'      => '',
         'price_charged'   => number_format(floatval($order['total'] ?? 0), 2),
         'production_cost' => '',
