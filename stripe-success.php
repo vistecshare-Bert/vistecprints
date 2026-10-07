@@ -170,7 +170,9 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
     }
 
     // ── Send admin notification ──────────────────────────────────
-    $adminEmail = defined('ADMIN_EMAIL') ? ADMIN_EMAIL : null;
+    $adminCfgFile = __DIR__ . '/admin-config.php';
+    if (!defined('ADMIN_EMAIL') && file_exists($adminCfgFile)) require_once $adminCfgFile;
+    $adminEmail = (defined('ADMIN_EMAIL') && ADMIN_EMAIL && ADMIN_EMAIL !== 'your@email.com') ? ADMIN_EMAIL : 'vistecshare@gmail.com';
     if ($adminEmail) {
         $adminLines = "New order received!\n\nOrder ID: {$order['orderId']}\nCustomer: {$custName}\nEmail: {$toEmail}\nTotal: \${$orderTotal}\n";
         foreach ($order['items'] ?? [] as $it) {
