@@ -1261,8 +1261,16 @@ tr:hover td{background:#fafafa;}
               <?php endif; ?>
             </div>
             <?php endif; ?>
-            <?php if (!empty($d['artwork'])): ?>
+            <?php if (!empty($d['artwork'])):
+              $artExt   = strtolower(pathinfo($d['artwork'], PATHINFO_EXTENSION));
+              $isImgArt = in_array($artExt, ['png','jpg','jpeg','gif','webp']);
+            ?>
             <div style="margin:6px 0;">
+              <?php if ($isImgArt): ?>
+              <a href="../<?= htmlspecialchars($d['artwork']) ?>" target="_blank" rel="noopener">
+                <img src="../<?= htmlspecialchars($d['artwork']) ?>" alt="Design preview" style="max-width:100%;max-height:140px;border-radius:4px;border:1px solid #333;display:block;margin-bottom:4px;object-fit:contain;background:#111;"/>
+              </a>
+              <?php endif; ?>
               <a href="../<?= htmlspecialchars($d['artwork']) ?>" download class="dtf-artwork-link">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <?= htmlspecialchars($d['artwork_name'] ?? 'Download Artwork') ?>

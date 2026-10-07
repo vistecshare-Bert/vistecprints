@@ -66,6 +66,29 @@ $dtfDir = __DIR__ . '/orders/';
 if (!is_dir($dtfDir)) mkdir($dtfDir, 0755, true);
 $dtfId         = 'ORD-' . date('Ymd') . '-' . strtoupper(substr(md5($orderId), 0, 6));
 $garmentTypes  = array_unique(array_filter(array_map(fn($i) => trim($i['garment'] ?? ''), $items)));
+
+// Save the customer's design preview (if the item carries one) as the DTF artwork,
+// so staff can see *what* was ordered, not just a name/qty line.
+$artwork     = '';
+$artworkName = '';
+foreach ($items as $item) {
+    $img = $item['img'] ?? '';
+    if (is_string($img) && preg_match('/^data:image\/(png|jpe?g|gif|webp);base64,(.+)$/i', $img, $m)) {
+        $ext  = strtolower($m[1]) === 'jpeg' ? 'jpg' : strtolower($m[1]);
+        $data = base64_decode($m[2]);
+        if ($data !== false) {
+            $artDir = $dtfDir . 'artwork/';
+            if (!is_dir($artDir)) mkdir($artDir, 0755, true);
+            $artFile = $dtfId . '_artwork.' . $ext;
+            if (file_put_contents($artDir . $artFile, $data)) {
+                $artwork     = 'orders/artwork/' . $artFile;
+                $artworkName = ($item['name'] ?? 'Design') . ' preview.' . $ext;
+            }
+        }
+        break;
+    }
+}
+
 $dtfRec = [
     'id'              => $dtfId,
     'web_order_id'    => $orderId,
@@ -84,29 +107,40 @@ $dtfRec = [
     'stage'           => 'new_order',
     'date'            => date('c'),
     'source'          => 'web_order',
+    'artwork'         => $artwork,
+    'artwork_name'    => $artworkName,
 ];
 file_put_contents($dtfDir . $dtfId . '.json', json_encode($dtfRec, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
 // ── Email to store ─────────────────────────────────────
 $toStore   = 'vistecshare@gmail.com';
 $subjStore = "[New Order] #{$orderId} — {$customer['name']}";
-$bodyStore  = "NEW ORDER RECEIVED\n";
-$bodyStore .= str_repeat('=', 40) . "\n\n";
-$bodyStore .= "Order ID : {$orderId}\n";
-$bodyStore .= "Date     : " . date('M j, Y g:i A') . "\n\n";
-$bodyStore .= "CUSTOMER\n";
-$bodyStore .= "Name   : {$customer['name']}\n";
-$bodyStore .= "Email  : {$customer['email']}\n";
-$bodyStore .= "Phone  : {$customer['phone']}\n\n";
-$bodyStore .= "SHIP TO\n{$addr}\n\n";
-if ($notes) $bodyStore .= "NOTES\n{$notes}\n\n";
-$bodyStore .= "ITEMS\n{$itemLines}\n";
-$bodyStore .= "Subtotal : \$" . number_format($subtotal, 2) . "\n";
-$bodyStore .= "Shipping : \$" . number_format($shipping, 2) . "\n";
-$bodyStore .= "TOTAL    : \$" . number_format($total, 2) . "\n\n";
-$bodyStore .= "View orders: https://vistecprints.com/admin/\n";
+$artworkImgTag = '';
+if (!empty($artwork)) {
+    $artworkUrl = 'https://vistecprints.com/' . $artwork;
+    $artworkImgTag = "<p><img src='" . htmlspecialchars($artworkUrl) . "' alt='Design preview' style='max-width:300px;border:1px solid #ccc;border-radius:4px;display:block;'/></p>";
+}
+$bodyStore = "
+<html><body style='font-family:sans-serif;color:#222;white-space:pre-wrap;'>
+<h2 style='margin:0 0 8px;'>New order received</h2>
+<p style='margin:0 0 4px;'><strong>Order ID:</strong> " . htmlspecialchars($orderId) . "</p>
+<p style='margin:0 0 4px;'><strong>Date:</strong> " . date('M j, Y g:i A') . "</p>
+<p style='margin:0 0 4px;'><strong>Customer:</strong> " . htmlspecialchars($customer['name']) . "</p>
+<p style='margin:0 0 4px;'><strong>Email:</strong> " . htmlspecialchars($customer['email']) . "</p>
+<p style='margin:0 0 4px;'><strong>Phone:</strong> " . htmlspecialchars($customer['phone']) . "</p>
+<p style='margin:0 0 12px;'><strong>Ship to:</strong> " . htmlspecialchars($addr) . "</p>
+" . ($notes ? "<p style='margin:0 0 12px;'><strong>Notes:</strong> " . htmlspecialchars($notes) . "</p>" : "") . "
+<pre style='font-family:sans-serif;margin:0 0 12px;'>" . htmlspecialchars($itemLines) . "</pre>
+<p style='margin:0 0 4px;'>Subtotal: \$" . number_format($subtotal, 2) . "</p>
+<p style='margin:0 0 4px;'>Shipping: \$" . number_format($shipping, 2) . "</p>
+<p style='margin:0 0 12px;'><strong>TOTAL: \$" . number_format($total, 2) . "</strong></p>
+{$artworkImgTag}
+<p style='margin-top:16px;'><a href='https://vistecprints.com/admin/dashboard.php?tab=dtf'>View in DTF Pipeline</a></p>
+</body></html>";
 
-$headersStore = "From: orders@vistecprints.com\r\nReply-To: {$customer['email']}";
+$headersStore  = "MIME-Version: 1.0\r\n";
+$headersStore .= "Content-Type: text/html; charset=UTF-8\r\n";
+$headersStore .= "From: orders@vistecprints.com\r\nReply-To: {$customer['email']}";
 mail($toStore, $subjStore, $bodyStore, $headersStore);
 
 // ── Confirmation email to customer ─────────────────────

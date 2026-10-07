@@ -73,6 +73,29 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
         $itemLines      .= "  - {$itName} | Size: {$itSize} ×{$itQty}\n";
         $sizesSummary[]  = "{$itName}: {$itSize} ×{$itQty}";
     }
+
+    // Save the customer's design preview (if the item carries one) as the DTF artwork,
+    // so staff can see *what* was ordered, not just a name/qty line.
+    $artwork     = '';
+    $artworkName = '';
+    foreach ($dtfItems as $it) {
+        $img = $it['img'] ?? '';
+        if (is_string($img) && preg_match('/^data:image\/(png|jpe?g|gif|webp);base64,(.+)$/i', $img, $m)) {
+            $ext  = strtolower($m[1]) === 'jpeg' ? 'jpg' : strtolower($m[1]);
+            $data = base64_decode($m[2]);
+            if ($data !== false) {
+                $artDir = $dtfDir . 'artwork/';
+                if (!is_dir($artDir)) mkdir($artDir, 0755, true);
+                $artFile = $dtfId . '_artwork.' . $ext;
+                if (file_put_contents($artDir . $artFile, $data)) {
+                    $artwork     = 'orders/artwork/' . $artFile;
+                    $artworkName = ($it['name'] ?? 'Design') . ' preview.' . $ext;
+                }
+            }
+            break;
+        }
+    }
+
     $dtfRec = [
         'id'              => $dtfId,
         'web_order_id'    => $order['orderId'],
@@ -91,6 +114,8 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
         'stage'           => 'new_order',
         'date'            => date('c'),
         'source'          => 'web_order',
+        'artwork'         => $artwork,
+        'artwork_name'    => $artworkName,
     ];
     file_put_contents($dtfDir . $dtfId . '.json', json_encode($dtfRec, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
@@ -174,14 +199,31 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
     if (!defined('ADMIN_EMAIL') && file_exists($adminCfgFile)) require_once $adminCfgFile;
     $adminEmail = (defined('ADMIN_EMAIL') && ADMIN_EMAIL && ADMIN_EMAIL !== 'your@email.com') ? ADMIN_EMAIL : 'vistecshare@gmail.com';
     if ($adminEmail) {
-        $adminLines = "New order received!\n\nOrder ID: {$order['orderId']}\nCustomer: {$custName}\nEmail: {$toEmail}\nTotal: \${$orderTotal}\n";
+        $itemRowsAdmin = '';
         foreach ($order['items'] ?? [] as $it) {
-            $adminLines .= '  - ' . ($it['name'] ?? 'Item') . ' Size ' . ($it['size'] ?? '?') . ' ×' . (int)($it['qty'] ?? 1) . "\n";
+            $itemRowsAdmin .= '<li>' . htmlspecialchars(($it['name'] ?? 'Item') . ' — Size ' . ($it['size'] ?? '?') . ' ×' . (int)($it['qty'] ?? 1)) . '</li>';
         }
-        $adminLines .= "\nView in dashboard: https://vistecprints.com/admin/dashboard.php?tab=orders";
-        $aHeaders  = "From: Vistec GraphX <noreply@vistecprints.com>\r\n";
+        $artworkImgTag = '';
+        if (!empty($artwork)) {
+            $artworkUrl = 'https://vistecprints.com/' . $artwork;
+            $artworkImgTag = "<p><img src='" . htmlspecialchars($artworkUrl) . "' alt='Design preview' style='max-width:300px;border:1px solid #ccc;border-radius:4px;display:block;'/></p>";
+        }
+        $adminBody = "
+<html><body style='font-family:sans-serif;color:#222;'>
+  <h2 style='margin:0 0 8px;'>New order received</h2>
+  <p style='margin:0 0 4px;'><strong>Order ID:</strong> {$order['orderId']}</p>
+  <p style='margin:0 0 4px;'><strong>Customer:</strong> {$custName}</p>
+  <p style='margin:0 0 4px;'><strong>Email:</strong> {$toEmail}</p>
+  <p style='margin:0 0 12px;'><strong>Total:</strong> \${$orderTotal}</p>
+  <ul style='margin:0 0 12px;padding-left:20px;'>{$itemRowsAdmin}</ul>
+  {$artworkImgTag}
+  <p style='margin-top:16px;'><a href='https://vistecprints.com/admin/dashboard.php?tab=dtf'>View in DTF Pipeline</a></p>
+</body></html>";
+        $aHeaders  = "MIME-Version: 1.0\r\n";
+        $aHeaders .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $aHeaders .= "From: Vistec GraphX <noreply@vistecprints.com>\r\n";
         $aHeaders .= "Reply-To: {$toEmail}\r\n";
-        mail($adminEmail, 'New Order — ' . $order['orderId'], $adminLines, $aHeaders);
+        mail($adminEmail, 'New Order — ' . $order['orderId'], $adminBody, $aHeaders);
     }
 }
 
