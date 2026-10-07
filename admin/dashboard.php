@@ -454,6 +454,8 @@ body{background:#f4f4f4;font-family:'DM Sans',sans-serif;font-size:14px;}
 .filter-tabs{display:flex;gap:4px;flex-wrap:wrap;}
 .ftab{background:transparent;border:1px solid #e0e0e0;color:#888;padding:6px 14px;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;border-radius:2px;transition:all 0.15s;}
 .ftab.active,.ftab:hover{background:var(--gold);border-color:var(--gold);color:#000;}
+.search-input{border:1px solid #e0e0e0;border-radius:2px;padding:7px 12px;font-size:13px;font-family:'DM Sans',sans-serif;color:#111;min-width:220px;}
+.search-input:focus{outline:none;border-color:var(--gold);}
 table{width:100%;border-collapse:collapse;}
 thead tr{background:#fafafa;border-bottom:2px solid #f0f0f0;}
 th{padding:12px 16px;text-align:left;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#888;font-weight:600;}
@@ -1714,6 +1716,7 @@ tr:hover td{background:#fafafa;}
           <button class="ftab" data-cat="<?= $key ?>"><?= $label ?></button>
           <?php endforeach; ?>
         </div>
+        <input type="text" id="productSearch" class="search-input" placeholder="Search by name or ID...">
       </div>
 
       <?php if (empty($products)): ?>
@@ -2119,14 +2122,16 @@ document.querySelectorAll('.ftab').forEach(btn => {
     // Sync select-all state
     const allVisible = [...document.querySelectorAll('#productTable tbody tr')]
       .filter(r => r.style.display !== 'none')
-      .map(r => r.querySelector('.prod-check'));
+      .map(r => r.querySelector('.prod-check'))
+      .filter(cb => cb);
     selectAll.checked = allVisible.length > 0 && allVisible.every(cb => cb.checked);
     selectAll.indeterminate = !selectAll.checked && allVisible.some(cb => cb.checked);
   }
 
   selectAll.addEventListener('change', function() {
     document.querySelectorAll('#productTable tbody tr').forEach(row => {
-      if (row.style.display !== 'none') row.querySelector('.prod-check').checked = this.checked;
+      const cb = row.querySelector('.prod-check');
+      if (row.style.display !== 'none' && cb) cb.checked = this.checked;
     });
     updateBulkBar();
   });
@@ -2172,19 +2177,29 @@ document.querySelectorAll('.ftab').forEach(btn => {
   const prevBtn   = document.getElementById('prevPageBtn');
   const nextBtn   = document.getElementById('nextPageBtn');
   const viewAllBtn = document.getElementById('viewAllBtn');
+  const searchInput = document.getElementById('productSearch');
 
   function activeCat() {
     const active = document.querySelector('.ftab.active');
     return active ? active.dataset.cat : 'all';
   }
 
+  function searchTerm() {
+    return searchInput ? searchInput.value.trim().toLowerCase() : '';
+  }
+
   function filteredRows() {
     const cat = activeCat();
-    return [...tbody.querySelectorAll('tr')].filter(r => cat === 'all' || r.dataset.cat === cat);
+    const term = searchTerm();
+    return [...tbody.querySelectorAll('tr')].filter(r => {
+      if (cat !== 'all' && r.dataset.cat !== cat) return false;
+      if (term && !r.textContent.toLowerCase().includes(term)) return false;
+      return true;
+    });
   }
 
   function render() {
-    const rows     = [...tbody.querySelectorAll('tr')];
+    const rows     = [...tbody.querySelectorAll('tr')].filter(r => r.id !== 'noResultsRow');
     const filtered = filteredRows();
     const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
     if (currentPage > totalPages) currentPage = totalPages;
@@ -2197,6 +2212,25 @@ document.querySelectorAll('.ftab').forEach(btn => {
     } else {
       const start = (currentPage - 1) * PAGE_SIZE;
       filtered.slice(start, start + PAGE_SIZE).forEach(r => r.style.display = '');
+    }
+
+    let noResultsRow = document.getElementById('noResultsRow');
+    if (filtered.length === 0) {
+      if (!noResultsRow) {
+        noResultsRow = document.createElement('tr');
+        noResultsRow.id = 'noResultsRow';
+        const td = document.createElement('td');
+        td.colSpan = rows[0] ? rows[0].children.length : 8;
+        td.style.textAlign = 'center';
+        td.style.color = '#999';
+        td.style.padding = '24px';
+        noResultsRow.appendChild(td);
+        tbody.appendChild(noResultsRow);
+      }
+      noResultsRow.querySelector('td').textContent = searchTerm() ? 'No products match your search.' : 'No products in this category.';
+      noResultsRow.style.display = '';
+    } else if (noResultsRow) {
+      noResultsRow.style.display = 'none';
     }
 
     if (filtered.length <= PAGE_SIZE) {
@@ -2212,7 +2246,7 @@ document.querySelectorAll('.ftab').forEach(btn => {
       } else {
         const start = (currentPage - 1) * PAGE_SIZE + 1;
         const end   = Math.min(currentPage * PAGE_SIZE, filtered.length);
-        info.textContent = filtered.length ? ('Showing ' + start + '–' + end + ' of ' + filtered.length + ' products') : 'No products in this category.';
+        info.textContent = filtered.length ? ('Showing ' + start + '–' + end + ' of ' + filtered.length + ' products') : (searchTerm() ? 'No products match your search.' : 'No products in this category.');
         indicator.textContent = 'Page ' + currentPage + ' of ' + totalPages;
         prevBtn.disabled = currentPage <= 1;
         nextBtn.disabled = currentPage >= totalPages;
@@ -2229,6 +2263,10 @@ document.querySelectorAll('.ftab').forEach(btn => {
 
   // Called by the category-filter tabs so filtering and pagination stay in sync
   window.resetProductPage = function() { currentPage = 1; render(); };
+
+  if (searchInput) {
+    searchInput.addEventListener('input', () => { currentPage = 1; viewingAll = false; render(); });
+  }
 
   render();
 })();
