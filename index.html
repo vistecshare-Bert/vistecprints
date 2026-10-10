@@ -851,8 +851,20 @@ fetch('get-products.php')
     products = data;
     products.forEach(p => productMap[p.id] = p);
     renderProducts('all');
+
+    // Open a specific product if URL has an id param (e.g. index.html?id=fun_xxx) — used for ad links
+    const linkedId = new URLSearchParams(location.search).get('id');
+    if (linkedId && productMap[linkedId]) openSizeModal(linkedId);
   })
   .catch(() => { products = []; renderProducts('all'); });
+
+// Keep the address bar in sync with the open product so its link can be copied/shared
+function setProductUrl(productId) {
+  const url = new URL(location.href);
+  if (productId) url.searchParams.set('id', productId);
+  else url.searchParams.delete('id');
+  history.replaceState(null, '', url);
+}
 
 // ── CART ──────────────────────────────────────────────
 let cart = JSON.parse(localStorage.getItem('vp_cart') || '[]');
@@ -1006,6 +1018,7 @@ function openSizeModal(productId) {
   const p = productMap[productId];
   if (!p) return;
   smProduct = p; smQty = 1; smSize = null; smColor = null; smEditKey = null;
+  setProductUrl(p.id);
   document.getElementById('smAddBtn').textContent = 'Add to Cart';
   document.getElementById('smImg').src = p.img || '';
   document.getElementById('smName').textContent = p.name;
@@ -1130,6 +1143,7 @@ function resetShirtPreview() {
 function closeSizeModal() {
   document.getElementById('smOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  setProductUrl(null);
 }
 document.getElementById('smOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeSizeModal();
