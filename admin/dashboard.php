@@ -13,7 +13,26 @@ function loadProducts($file) {
     return is_array($data) ? $data : [];
 }
 
+// Every product needs a unique, non-empty id — the shop uses it for Add to Cart
+// and for shareable links (products.html?id=...). Fills blanks and repeats.
+function ensureProductIds(&$products) {
+    $seen = [];
+    $changed = false;
+    foreach ($products as &$p) {
+        $id = trim($p['id'] ?? '');
+        if ($id === '' || isset($seen[$id])) {
+            do { $id = uniqid('vp_'); } while (isset($seen[$id]));
+            $p['id'] = $id;
+            $changed = true;
+        }
+        $seen[$id] = true;
+    }
+    unset($p);
+    return $changed;
+}
+
 function saveProducts($file, $products) {
+    ensureProductIds($products);
     if (!is_writable($file) && !is_writable(dirname($file))) {
         die('Error: products.json is not writable. Go to File Manager, right-click products.json â†’ Permissions â†’ set to 666.');
     }
@@ -275,7 +294,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $img      = $uploaded ?? trim($_POST['img'] ?? '');
 
         $product = [
-            'id'      => trim($_POST['id'] ?? uniqid('vp_')),
+            'id'      => trim($_POST['id'] ?? ''),
             'name'    => trim($_POST['name'] ?? ''),
             'cat'     => $cat,
             'badge'   => trim($_POST['badge'] ?? ''),
@@ -285,12 +304,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
 
         if ($action === 'add') {
+            if ($product['id'] === '') $product['id'] = uniqid('vp_');
             $products[] = $product;
             $msg = 'Product added successfully!';
         } else {
             $idx = (int)($_POST['index'] ?? -1);
             if (isset($products[$idx])) {
                 if (empty($product['img'])) $product['img'] = $products[$idx]['img'];
+                // Blank ID on edit keeps the existing one so shared links keep working
+                if ($product['id'] === '') $product['id'] = $products[$idx]['id'] ?? '';
                 $products[$idx] = $product;
                 $msg = 'Product updated successfully!';
             }
@@ -328,6 +350,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $products  = loadProducts($jsonFile);
+// Backfill ids for any products saved without one
+if (ensureProductIds($products)) saveProducts($jsonFile, $products);
 $flashMsg  = $_GET['msg'] ?? '';
 $flashType = $_GET['type'] ?? 'success';
 

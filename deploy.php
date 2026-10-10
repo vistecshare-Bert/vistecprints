@@ -59,6 +59,7 @@ $excludes = [
     'carolina-products.json', 'carolina-sync-meta.json', 'carolina-ids.json',
     'pending_orders/', 'orders/', 'quotes/', 'contacts/', 'visits/',
     'images/decorated/', 'images/designs/', 'design-images/',
+    'images/*/img_*', // product photos uploaded via admin dashboard (uniqid('img_'))
 ];
 $excludeFlags = implode(' ', array_map(fn($e) => '--exclude=' . escapeshellarg($e), $excludes));
 $cmd = "/usr/bin/rsync -a --delete --chmod=D755,F644 $excludeFlags " . escapeshellarg($src) . ' ' . escapeshellarg($dest . '/') . ' 2>&1';
