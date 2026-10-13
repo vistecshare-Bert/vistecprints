@@ -31,6 +31,10 @@ context.sessionStorage.getItem = () => { throw Error('storage blocked'); };
 analytics.add(line, 1);
 assert.equal(events.length, 4);
 assert(!('debug_mode' in events[3][2]));
+context.document.referrer = 'https://checkout.stripe.com/c/pay/cs_test_SECRET';
+analytics.purchase({ transaction_id: 'vp-test', currency: 'USD', value: 40, items: [] });
+assert.equal(events[4][2].page_referrer, '');
+assert(!JSON.stringify(events[4]).includes('cs_test_SECRET'));
 context.window.gtag = () => { throw Error('tag failure'); };
 assert.doesNotThrow(() => analytics.add(line, 1));
 for (const name of ['index.html', 'products.html', 'checkout.html', 'designer.html']) {

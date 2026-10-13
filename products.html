@@ -10,7 +10,7 @@
 
   gtag('config', 'G-5YY561Z1J8', {
     page_location: location.origin + location.pathname,
-    page_referrer: document.referrer ? new URL(document.referrer).origin + new URL(document.referrer).pathname : ''
+    page_referrer: document.referrer ? new URL(document.referrer).origin + (new URL(document.referrer).origin === location.origin ? new URL(document.referrer).pathname : '') : ''
   });
 </script>
 <script src="ecommerce-analytics.js"></script>

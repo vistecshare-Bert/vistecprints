@@ -23,7 +23,7 @@
       if (typeof window.gtag !== 'function') return;
       const extra = { send_to: measurementId, transport_type: 'beacon',
         page_location: location.origin + location.pathname,
-        page_referrer: document.referrer ? new URL(document.referrer).origin + new URL(document.referrer).pathname : '' };
+        page_referrer: name === 'purchase' ? '' : document.referrer ? new URL(document.referrer).origin + (new URL(document.referrer).origin === location.origin ? new URL(document.referrer).pathname : '') : '' };
       try { if (sessionStorage.getItem('vp_ga4_debug') === '1') extra.debug_mode = true; } catch (_) {}
       window.gtag('event', name, Object.assign({}, params, extra));
     } catch (_) { /* Analytics must never interrupt checkout. */ }
