@@ -8,8 +8,12 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-5YY561Z1J8');
+  gtag('config', 'G-5YY561Z1J8', {
+    page_location: location.origin + location.pathname,
+    page_referrer: document.referrer ? new URL(document.referrer).origin + new URL(document.referrer).pathname : ''
+  });
 </script>
+<script src="ecommerce-analytics.js"></script>
 <meta charset="UTF-8"/>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png"/>
@@ -2430,6 +2434,7 @@ function dcConfirmAdd() {
     }).catch(()=>{});
   });
   localStorage.setItem('vp_cart', JSON.stringify(cart));
+  sizesWithQty.forEach(({ qty }) => window.vpAnalytics?.add({ isCustomDesign: true, price: perShirt }, qty));
   closeDcModal();
   window.location.href = 'checkout.html';
 }
