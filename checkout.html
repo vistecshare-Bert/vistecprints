@@ -8,8 +8,12 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-5YY561Z1J8');
+  gtag('config', 'G-5YY561Z1J8', {
+    page_location: location.origin + location.pathname,
+    page_referrer: document.referrer ? new URL(document.referrer).origin + (new URL(document.referrer).origin === location.origin ? new URL(document.referrer).pathname : '') : ''
+  });
 </script>
+<script src="ecommerce-analytics.js"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Checkout — Vistec GraphX</title>
@@ -211,6 +215,13 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.97);backdrop-fi
 
 <script>
 const SHIPPING = 4.99;
+let checkoutTracked = false;
+function trackCheckoutStart() {
+  if (!checkoutTracked && cart.length && !isQuoteOrder() && !cart.some(i => !i.price)) {
+    checkoutTracked = true;
+    window.vpAnalytics?.begin(cart);
+  }
+}
 let cart = JSON.parse(localStorage.getItem('vp_cart') || '[]');
 
 // True when all items are custom designer orders (priced estimates, not direct checkout)
@@ -227,6 +238,7 @@ function init() {
   }
   document.getElementById('checkoutWrap').style.display = 'grid';
   renderSummary();
+  trackCheckoutStart();
   if (isQuoteOrder()) applyQuoteMode();
 }
 
@@ -277,6 +289,7 @@ function removeItem(idx) {
     return;
   }
   renderSummary();
+  trackCheckoutStart();
   if (isQuoteOrder()) {
     applyQuoteMode();
   } else {
@@ -328,7 +341,7 @@ async function submitOrder(e) {
     },
     notes:    document.getElementById('fNotes').value.trim(),
     // Strip base64 img to keep payload small — design preview isn't needed server-side
-    items:    cart.map(i => ({ name: i.name, size: i.size, price: i.price, priceStr: i.priceStr, qty: i.qty, garment: i.garment })),
+    items:    cart.map(i => ({ id: i.id, isCustomDesign: i.isCustomDesign === true, name: i.name, size: i.size, price: i.price, priceStr: i.priceStr, qty: i.qty, garment: i.garment })),
     subtotal: sub,
   };
 

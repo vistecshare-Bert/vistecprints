@@ -8,8 +8,12 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-5YY561Z1J8');
+  gtag('config', 'G-5YY561Z1J8', {
+    page_location: location.origin + location.pathname,
+    page_referrer: document.referrer ? new URL(document.referrer).origin + (new URL(document.referrer).origin === location.origin ? new URL(document.referrer).pathname : '') : ''
+  });
 </script>
+<script src="ecommerce-analytics.js"></script>
 <meta charset="UTF-8"/>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png"/>
@@ -662,6 +666,7 @@ function addToCart(product, size, qty, color) {
       price: priceNum, priceStr: product.price || 'TBD', size, color: color || '', qty, garment: product.garment || '' });
   }
   saveCart();
+  window.vpAnalytics?.add(cart.find(i => i._key === key), qty);
   fetch('cart-track.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -679,6 +684,7 @@ function updateCartItem(oldKey, size, qty, color) {
   const idx = cart.findIndex(i => i._key === oldKey);
   if (idx === -1) return;
   const item = cart[idx];
+  const addedQty = Math.max(0, qty - item.qty);
   const newKey = item.id + '_' + size + (color ? '_' + color.replace(/\s+/g,'_') : '');
 
   if (newKey === oldKey) {
@@ -696,6 +702,7 @@ function updateCartItem(oldKey, size, qty, color) {
     }
   }
   saveCart();
+  if (addedQty) window.vpAnalytics?.add(Object.assign({}, item, { size, color }), addedQty);
 }
 
 function updateQty(key, delta) {
@@ -704,6 +711,7 @@ function updateQty(key, delta) {
   item.qty += delta;
   if (item.qty <= 0) cart = cart.filter(i => i._key !== key);
   saveCart();
+  if (delta > 0) window.vpAnalytics?.add(item, delta);
 }
 
 function getSubtotal() { return cart.reduce((s, i) => s + i.price * i.qty, 0); }

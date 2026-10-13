@@ -3,8 +3,12 @@ $cfgFile = __DIR__ . '/stripe-config.php';
 if (!file_exists($cfgFile)) { die('Payment configuration missing.'); }
 require_once $cfgFile;
 
+require_once __DIR__ . '/ga4-purchase.php';
+header('Cache-Control: no-store, private');
+header('Referrer-Policy: no-referrer');
+
 $sid = trim($_GET['sid'] ?? '');
-if (!$sid || !preg_match('/^cs_/', $sid)) {
+if (!$sid || !preg_match('/^cs_(?:test_|live_)?[A-Za-z0-9]+$/D', $sid)) {
     http_response_code(400); die('Invalid session.');
 }
 
@@ -28,6 +32,11 @@ $pendingFile = __DIR__ . '/pending_orders/' . $sid . '.json';
 $order = [];
 if (file_exists($pendingFile)) {
     $order = json_decode(file_get_contents($pendingFile), true) ?? [];
+}
+
+$ga4Purchase = null;
+if ($isPaid) {
+    $ga4Purchase = vpGa4PurchasePayload($order, $session);
 }
 
 if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment') {
@@ -227,6 +236,12 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
     }
 }
 
+// At-most-once browser emission, independent of order fulfillment. No PII in markers.
+if ($ga4Purchase) {
+    $ga4Directory = getenv('VISTEC_GA4_PURCHASE_DIR') ?: dirname(__DIR__, 2) . '/.vistec-ga4-purchases';
+    if (!vpGa4ClaimPurchase($ga4Directory, $ga4Purchase['transaction_id'])) $ga4Purchase = null;
+}
+
 $orderId  = $order['orderId']  ?? '—';
 $customer = $order['customer'] ?? [];
 $items    = $order['items']    ?? [];
@@ -246,6 +261,23 @@ $addrStr  = htmlspecialchars(
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<?php if ($ga4Purchase): ?>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5YY561Z1J8"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5YY561Z1J8', {
+  send_page_view: false,
+  page_location: location.origin + location.pathname,
+  page_referrer: ''
+});
+</script>
+<script src="ecommerce-analytics.js"></script>
+<script>
+window.vpAnalytics?.purchase(<?= json_encode($ga4Purchase, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>);
+</script>
+<?php endif; ?>
 <title><?= $isPaid ? 'Order Confirmed' : 'Payment Pending' ?> — Vistec GraphX</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>

@@ -1,0 +1,25 @@
+name: Ecommerce analytics checks
+on:
+  pull_request:
+    paths:
+      - '*analytics*'
+      - '*purchase*'
+      - 'stripe-success.php'
+      - 'checkout.html'
+      - 'index.html'
+      - 'products.html'
+      - 'designer.html'
+      - 'tests/**'
+      - '.github/workflows/ecommerce-checks.yml'
+jobs:
+  analytics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: JavaScript payload and syntax checks
+        run: node tests/ecommerce-analytics.test.cjs
+      - name: PHP syntax and payment safeguards
+        run: |
+          php -l ga4-purchase.php
+          php -l stripe-success.php
+          php tests/ga4-purchase.test.php
