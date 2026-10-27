@@ -813,18 +813,18 @@ tr:hover td{background:#fafafa;}
         </div>
         <div class="order-section">
           <h4>Items Â· Subtotal $<?= number_format($o['subtotal']??0,2) ?> + $<?= number_format($o['shipping']??4.99,2) ?> shipping</h4>
-          <ul class=”order-items-list”>
+          <ul class="order-items-list">
           <?php foreach (($o['items'] ?? []) as $itIdx => $item):
             $hasImg = !empty($item['img']) && substr($item['img'], 0, 5) === 'data:';
           ?>
             <li>
               <?php if ($hasImg): ?>
-              <img class=”item-design-thumb” src=”<?= htmlspecialchars($item['img']) ?>” alt=”Design preview”/>
+              <img class="item-design-thumb" src="<?= htmlspecialchars($item['img']) ?>" alt="Design preview"/>
               <?php endif; ?>
-              <span class=”item-name-col”><?= htmlspecialchars($item['name'] ?? '') ?> &mdash; Size <?= htmlspecialchars($item['size'] ?? '') ?></span>
-              <span class=”item-price-tag”><?= htmlspecialchars($item['priceStr'] ?? '') ?> &times;<?= intval($item['qty'] ?? 1) ?></span>
+              <span class="item-name-col"><?= htmlspecialchars($item['name'] ?? '') ?> &mdash; Size <?= htmlspecialchars($item['size'] ?? '') ?></span>
+              <span class="item-price-tag"><?= htmlspecialchars($item['priceStr'] ?? '') ?> &times;<?= intval($item['qty'] ?? 1) ?></span>
               <?php if ($hasImg): ?>
-              <a class=”btn-dl-design” href=”<?= htmlspecialchars($item['img']) ?>” download=”design-<?= htmlspecialchars($o['id']) ?>-<?= $itIdx + 1 ?>.png” title=”Download design PNG”>&darr;</a>
+              <a class="btn-dl-design" href="<?= htmlspecialchars($item['img']) ?>" download="design-<?= htmlspecialchars($o['id']) ?>-<?= $itIdx + 1 ?>.png" title="Download design PNG">&darr;</a>
               <?php endif; ?>
             </li>
           <?php endforeach; ?>
@@ -1299,6 +1299,10 @@ tr:hover td{background:#fafafa;}
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <?= htmlspecialchars($d['artwork_name'] ?? 'Download Artwork') ?>
               </a>
+            </div>
+            <?php elseif (!empty($d['thumb'])): ?>
+            <div style="margin:6px 0;">
+              <img src="../<?= htmlspecialchars($d['thumb']) ?>" alt="Product" style="max-width:100%;max-height:140px;border-radius:4px;border:1px solid #333;display:block;object-fit:contain;background:#111;"/>
             </div>
             <?php endif; ?>
             <?php if (!empty($d['notes'])): ?>

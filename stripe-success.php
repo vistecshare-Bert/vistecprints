@@ -96,6 +96,18 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
         }
     }
 
+    // Catalog items (no custom design) carry a product photo path — use it as the card thumbnail.
+    $thumb = $artwork;
+    if (!$thumb) {
+        foreach ($dtfItems as $it) {
+            $img = $it['img'] ?? '';
+            if (is_string($img) && preg_match('#^[\w\-/]+\.(png|jpe?g|gif|webp)$#i', $img) && strpos($img, '..') === false) {
+                $thumb = $img;
+                break;
+            }
+        }
+    }
+
     $dtfRec = [
         'id'              => $dtfId,
         'web_order_id'    => $order['orderId'],
@@ -116,6 +128,7 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
         'source'          => 'web_order',
         'artwork'         => $artwork,
         'artwork_name'    => $artworkName,
+        'thumb'           => $thumb,
     ];
     file_put_contents($dtfDir . $dtfId . '.json', json_encode($dtfRec, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 

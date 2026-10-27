@@ -327,8 +327,19 @@ async function submitOrder(e) {
       }
     },
     notes:    document.getElementById('fNotes').value.trim(),
-    // Strip base64 img to keep payload small — design preview isn't needed server-side
-    items:    cart.map(i => ({ name: i.name, size: i.size, price: i.price, priceStr: i.priceStr, qty: i.qty, garment: i.garment })),
+    // Send img so the server can save a thumbnail for the DTF pipeline. Custom designs repeat the
+    // same base64 preview on every size line — only send it once to keep the payload small.
+    items:    (() => {
+      const sentImgs = new Set();
+      return cart.map(i => {
+        let img = i.img || '';
+        if (img.startsWith('data:')) {
+          if (sentImgs.has(img)) img = '';
+          else sentImgs.add(img);
+        }
+        return { name: i.name, size: i.size, price: i.price, priceStr: i.priceStr, qty: i.qty, garment: i.garment, img };
+      });
+    })(),
     subtotal: sub,
   };
 
