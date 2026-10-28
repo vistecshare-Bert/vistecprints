@@ -39,24 +39,46 @@ function saveProducts($file, $products) {
     file_put_contents($file, json_encode(array_values($products), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 }
 
-function handleImageUpload($cat) {
-    if (empty($_FILES['img_file']['name'])) return null;
+// Builds the product's photo list from the form's photos_json: each entry is either an
+// existing photo {src, color, style} or a new upload {new: <index into photo_files[]>, color, style}.
+// Order is kept as sent — the first photo is the cover.
+function handlePhotoUploads($cat, $json) {
+    $list = json_decode($json, true);
+    if (!is_array($list)) return [];
 
-    $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    $mime    = $_FILES['img_file']['type'];
-    if (!in_array($mime, $allowed)) return null;
-
+    $files   = $_FILES['photo_files'] ?? null;
+    $extByMime = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/gif' => 'gif'];
     $uploadDir = __DIR__ . '/../images/' . $cat . '/';
-    if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
-    $ext      = strtolower(pathinfo($_FILES['img_file']['name'], PATHINFO_EXTENSION));
-    $filename = uniqid('img_') . '.' . $ext;
-    $dest     = $uploadDir . $filename;
-
-    if (move_uploaded_file($_FILES['img_file']['tmp_name'], $dest)) {
-        return 'images/' . $cat . '/' . $filename;
+    $photos = [];
+    foreach ($list as $ph) {
+        if (!is_array($ph)) continue;
+        if (isset($ph['new'])) {
+            $i = (int)$ph['new'];
+            if (!$files || ($files['error'][$i] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) continue;
+            $info = @getimagesize($files['tmp_name'][$i]);
+            if (!$info || !isset($extByMime[$info['mime']])) continue;
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+            // img_ prefix keeps the file protected by deploy.php
+            $filename = uniqid('img_') . bin2hex(random_bytes(3)) . '.' . $extByMime[$info['mime']];
+            if (!move_uploaded_file($files['tmp_name'][$i], $uploadDir . $filename)) continue;
+            $src = 'images/' . $cat . '/' . $filename;
+        } else {
+            $src = (string)($ph['src'] ?? '');
+            if (!isSafeImgPath($src) && !preg_match('#^https?://[^\s"\'<>]+$#i', $src)) continue;
+        }
+        $photos[] = [
+            'src'   => $src,
+            'color' => trim((string)($ph['color'] ?? '')),
+            'style' => trim((string)($ph['style'] ?? '')),
+        ];
     }
-    return null;
+    return $photos;
+}
+
+// "Red, Blue ,, Green" → ['Red','Blue','Green']
+function splitList($str) {
+    return array_values(array_filter(array_map('trim', explode(',', (string)$str)), 'strlen'));
 }
 
 $catFile = __DIR__ . '/categories.json';
@@ -290,8 +312,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'add' || $action === 'edit') {
         $cat      = trim($_POST['cat'] ?? 'fun');
-        $uploaded = handleImageUpload($cat);
-        $img      = $uploaded ?? trim($_POST['img'] ?? '');
+        $photos   = handlePhotoUploads($cat, $_POST['photos_json'] ?? '[]');
+        $img      = $photos ? $photos[0]['src'] : trim($_POST['img'] ?? '');
 
         $product = [
             'id'      => trim($_POST['id'] ?? ''),
@@ -301,6 +323,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'img'     => $img,
             'price'   => trim($_POST['price'] ?? ''),
             'garment' => trim($_POST['garment'] ?? ''),
+            'description'   => trim($_POST['description'] ?? ''),
+            'color_options' => splitList($_POST['color_options'] ?? ''),
+            'print_styles'  => splitList($_POST['print_styles'] ?? ''),
+            'photos'        => $photos,
         ];
 
         if ($action === 'add') {
@@ -391,6 +417,28 @@ if (is_dir($dtfDir)) {
         if (is_array($d)) $dtfOrders[] = $d;
     }
     usort($dtfOrders, fn($a,$b) => strcmp($b['date']??'', $a['date']??''));
+}
+
+// Product photo lookup so orders saved without an image (catalog items, or orders placed
+// before checkout sent images) can still show a thumbnail of the product.
+function isSafeImgPath($img) {
+    return is_string($img) && preg_match('#^[\w\-/]+\.(png|jpe?g|gif|webp)$#i', $img) && strpos($img, '..') === false;
+}
+$productImgByName = [];
+foreach ($products as $prod) {
+    if (!empty($prod['name']) && isSafeImgPath($prod['img'] ?? '')) $productImgByName[$prod['name']] ??= $prod['img'];
+}
+function itemThumb($item, $productImgByName) {
+    $img = $item['img'] ?? '';
+    if (isSafeImgPath($img)) return $img;
+    return $productImgByName[$item['name'] ?? ''] ?? '';
+}
+// Web order id → first item's product photo, for DTF cards without saved artwork
+$orderThumbs = [];
+foreach ($orders as $o) {
+    foreach ($o['items'] ?? [] as $it) {
+        if ($t = itemThumb($it, $productImgByName)) { $orderThumbs[$o['id'] ?? ''] = $t; break; }
+    }
 }
 // Load cart-add events (current + previous month logs)
 $cartEventsDir = __DIR__ . '/../cart_events/';
@@ -522,6 +570,16 @@ tr:hover td{background:#fafafa;}
 .img-upload-area svg{width:32px;height:32px;stroke:#ccc;fill:none;stroke-width:1.5;margin-bottom:8px;}
 .img-upload-area p{font-size:13px;color:#aaa;margin:0;}
 .img-upload-area span{font-size:11px;color:#bbb;}
+.form-group textarea{width:100%;border:1px solid #ddd;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;border-radius:2px;outline:none;color:#111;resize:vertical;min-height:90px;}
+.form-group textarea:focus{border-color:var(--gold);}
+.photo-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+.photo-grid:empty{display:none;}
+.photo-tile{width:104px;position:relative;cursor:grab;}
+.photo-tile.dragging{opacity:0.4;}
+.photo-tile img{width:104px;height:104px;object-fit:cover;border:1px solid #ddd;border-radius:3px;display:block;background:#f5f5f5;}
+.photo-tile select{width:100%;margin-top:4px;padding:4px 5px;font-size:11px;border:1px solid #ddd;border-radius:2px;font-family:'DM Sans',sans-serif;color:#111;}
+.photo-tile .cover-tag{position:absolute;top:5px;left:5px;background:var(--gold);color:#111;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;border-radius:2px;}
+.photo-tile .photo-del{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;border:none;background:var(--red);color:#fff;font-size:13px;line-height:1;cursor:pointer;}
 .upload-preview-wrap{display:none;align-items:center;gap:12px;margin-top:12px;padding:10px;background:#f5f5f5;border-radius:3px;}
 .upload-preview-wrap img{width:60px;height:60px;object-fit:cover;border-radius:3px;border:1px solid #eee;}
 .upload-preview-wrap .preview-info{flex:1;}
@@ -701,6 +759,12 @@ tr:hover td{background:#fafafa;}
       </a>
     </li>
     <li>
+      <a href="dashboard.php?tab=slips" <?= $activeTab==='slips' ? 'class="active"' : '' ?>>
+        <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Packing Slips
+      </a>
+    </li>
+    <li>
       <a href="dashboard.php?tab=cart" <?= $activeTab==='cart' ? 'class="active"' : '' ?>>
         <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
         Cart Activity
@@ -756,6 +820,7 @@ tr:hover td{background:#fafafa;}
       elseif ($activeTab === 'quotes')   echo 'Quote Requests';
       elseif ($activeTab === 'contacts') echo 'Contact Submissions';
       elseif ($activeTab === 'dtf')      echo 'DTF Pipeline';
+      elseif ($activeTab === 'slips')    echo 'Packing Slips';
       elseif ($activeTab === 'cart')     echo 'Cart Activity';
       elseif ($activeTab === 'carolina') echo 'Carolina Made Connector';
       else echo 'Products';
@@ -815,13 +880,17 @@ tr:hover td{background:#fafafa;}
           <h4>Items Â· Subtotal $<?= number_format($o['subtotal']??0,2) ?> + $<?= number_format($o['shipping']??4.99,2) ?> shipping</h4>
           <ul class="order-items-list">
           <?php foreach (($o['items'] ?? []) as $itIdx => $item):
-            $hasImg = !empty($item['img']) && substr($item['img'], 0, 5) === 'data:';
+            $hasImg   = !empty($item['img']) && substr($item['img'], 0, 5) === 'data:';
+            // Catalog items carry a relative product photo path instead of a base64 design
+            $photo    = $hasImg ? '' : itemThumb($item, $productImgByName);
           ?>
             <li>
               <?php if ($hasImg): ?>
               <img class="item-design-thumb" src="<?= htmlspecialchars($item['img']) ?>" alt="Design preview"/>
+              <?php elseif ($photo): ?>
+              <img class="item-design-thumb" src="../<?= htmlspecialchars($photo) ?>" alt="Product"/>
               <?php endif; ?>
-              <span class="item-name-col"><?= htmlspecialchars($item['name'] ?? '') ?> &mdash; Size <?= htmlspecialchars($item['size'] ?? '') ?></span>
+              <span class="item-name-col"><?= htmlspecialchars($item['name'] ?? '') ?><?= !empty($item['color']) ? ' (' . htmlspecialchars($item['color']) . ')' : '' ?> &mdash; Size <?= htmlspecialchars($item['size'] ?? '') ?></span>
               <span class="item-price-tag"><?= htmlspecialchars($item['priceStr'] ?? '') ?> &times;<?= intval($item['qty'] ?? 1) ?></span>
               <?php if ($hasImg): ?>
               <a class="btn-dl-design" href="<?= htmlspecialchars($item['img']) ?>" download="design-<?= htmlspecialchars($o['id']) ?>-<?= $itIdx + 1 ?>.png" title="Download design PNG">&darr;</a>
@@ -1300,9 +1369,9 @@ tr:hover td{background:#fafafa;}
                 <?= htmlspecialchars($d['artwork_name'] ?? 'Download Artwork') ?>
               </a>
             </div>
-            <?php elseif (!empty($d['thumb'])): ?>
+            <?php elseif ($cardThumb = (isSafeImgPath($d['thumb'] ?? '') ? $d['thumb'] : ($orderThumbs[$d['web_order_id'] ?? ''] ?? ''))): ?>
             <div style="margin:6px 0;">
-              <img src="../<?= htmlspecialchars($d['thumb']) ?>" alt="Product" style="max-width:100%;max-height:140px;border-radius:4px;border:1px solid #333;display:block;object-fit:contain;background:#111;"/>
+              <img src="../<?= htmlspecialchars($cardThumb) ?>" alt="Product" style="max-width:100%;max-height:140px;border-radius:4px;border:1px solid #333;display:block;object-fit:contain;background:#111;"/>
             </div>
             <?php endif; ?>
             <?php if (!empty($d['notes'])): ?>
@@ -1440,6 +1509,90 @@ tr:hover td{background:#fafafa;}
         </div>
       </div>
     </div>
+
+    <?php elseif ($activeTab === 'slips'): ?>
+    <!-- ===== PACKING SLIPS TAB ===== -->
+    <?php
+      // Paid orders only — quote orders (process-order.php) are never paid online
+      $slipOrders = array_slice(array_values(array_filter($orders, fn($o) =>
+        !empty($o['id']) && (!empty($o['paid']) || strpos($o['notes'] ?? '', 'Paid via Stripe.') !== false)
+      )), 0, 150);
+      $slipStatus = [];
+      $slipError  = '';
+      try {
+        require_once __DIR__ . '/../packing-slip/src/PackingSlip.php';
+        $slipStatus = (new PackingSlip())->status();
+      } catch (\Throwable $e) {
+        $slipError = $e->getMessage();
+      }
+      $unprinted = count(array_filter($slipOrders, fn($o) => empty($slipStatus[$o['id']]['printed_at'])));
+    ?>
+    <?php if ($slipError): ?>
+    <div class="flash flash-warning">Packing slip module could not load: <?= htmlspecialchars($slipError) ?></div>
+    <?php endif; ?>
+    <div class="stats">
+      <div class="stat-card"><div class="num"><?= count($slipOrders) ?></div><div class="lbl">Paid Orders</div></div>
+      <div class="stat-card"><div class="num"><?= $unprinted ?></div><div class="lbl">Not Printed</div></div>
+      <div class="stat-card"><div class="num"><?= count($slipOrders) - $unprinted ?></div><div class="lbl">Printed</div></div>
+    </div>
+    <?php if (empty($slipOrders)): ?>
+    <div class="empty-state"><p>No paid orders yet. A packing slip is created automatically when an order is paid.</p></div>
+    <?php else: ?>
+    <form method="POST" action="packing-slips.php" target="_blank" id="slipPrintForm">
+      <input type="hidden" name="action" value="print"/>
+      <div class="table-wrap">
+        <div class="table-header" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <h2>Recent Paid Orders</h2>
+          <div style="display:flex;gap:8px;">
+            <button type="submit" class="btn btn-outline btn-sm" onclick="setTimeout(()=>location.reload(),1500)">Print Selected</button>
+            <button type="submit" name="all_unprinted" value="1" class="btn btn-gold btn-sm" <?= $unprinted ? '' : 'disabled' ?> onclick="setTimeout(()=>location.reload(),1500)">Print All Unprinted (<?= $unprinted ?>)</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr>
+            <th style="width:30px;"><input type="checkbox" onclick="document.querySelectorAll('.slip-cb').forEach(c=>c.checked=this.checked)"/></th>
+            <th>Order</th><th>Date</th><th>Customer</th><th>Items</th><th>Slip</th><th>Printed</th><th>Actions</th>
+          </tr></thead>
+          <tbody>
+          <?php foreach ($slipOrders as $o):
+            $st = $slipStatus[$o['id']] ?? [];
+            $itemCount = array_sum(array_map(fn($i) => (int)($i['qty'] ?? 1), $o['items'] ?? []));
+          ?>
+            <tr>
+              <td><input type="checkbox" class="slip-cb" name="ids[]" value="<?= htmlspecialchars($o['id']) ?>"/></td>
+              <td><strong><?= htmlspecialchars($o['id']) ?></strong></td>
+              <td><?= !empty($o['date']) ? date('M j, g:i A', strtotime($o['date'])) : '' ?></td>
+              <td><?= htmlspecialchars($o['customer']['name'] ?? '') ?></td>
+              <td><?= $itemCount ?></td>
+              <td><?= !empty($st['generated_at']) ? 'Created' : '<span style="color:#aaa;">Not yet</span>' ?></td>
+              <td><?= !empty($st['printed_at'])
+                    ? '<span style="color:#1e7e45;font-weight:600;">&#10003; ' . date('M j', strtotime($st['printed_at'])) . '</span>'
+                    : '<span style="color:#9a5c00;font-weight:600;">No</span>' ?></td>
+              <td style="white-space:nowrap;">
+                <a class="btn btn-outline btn-sm" href="packing-slips.php?action=view&amp;id=<?= urlencode($o['id']) ?>" target="_blank">View / Print</a>
+                <button type="submit" form="slipAct" class="btn btn-outline btn-sm" onclick="slipAct('regenerate','<?= htmlspecialchars($o['id']) ?>',0)">Regenerate</button>
+                <button type="submit" form="slipAct" class="btn btn-outline btn-sm" onclick="slipAct('printed','<?= htmlspecialchars($o['id']) ?>',<?= empty($st['printed_at']) ? 1 : 0 ?>)"><?= empty($st['printed_at']) ? 'Mark Printed' : 'Mark Not Printed' ?></button>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    </form>
+    <!-- Separate form for per-row actions (forms can't nest) -->
+    <form method="POST" action="packing-slips.php" id="slipAct">
+      <input type="hidden" name="action" id="slipActAction"/>
+      <input type="hidden" name="id" id="slipActId"/>
+      <input type="hidden" name="printed" id="slipActPrinted"/>
+    </form>
+    <script>
+    function slipAct(action, id, printed) {
+      document.getElementById('slipActAction').value  = action;
+      document.getElementById('slipActId').value      = id;
+      document.getElementById('slipActPrinted').value = printed ? '1' : '';
+    }
+    </script>
+    <?php endif; ?>
 
     <?php elseif ($activeTab === 'carolina'): ?>
     <!-- ===== CAROLINA MADE TAB ===== -->
@@ -1946,36 +2099,36 @@ tr:hover td{background:#fafafa;}
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Product Image</label>
-
-          <!-- Current image (edit mode) -->
-          <div class="current-img-wrap" id="currentImgWrap" style="display:none;">
-            <img id="currentImgThumb" src="" alt=""/>
-            <div>
-              <div class="cur-label">Current Image</div>
-              <div class="cur-path" id="currentImgPath"></div>
-            </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Available Colors</label>
+            <input type="text" name="color_options" id="fColorOptions" placeholder="e.g. Blue text - White Hoodie, Black &amp; Red text" oninput="renderPhotoGrid()"/>
+            <div class="hint">Comma-separated. One color = shown as-is. Two or more = customers pick one before adding to cart. Tag each photo below with a color so the shop swaps photos when a shopper picks one.</div>
           </div>
+          <div class="form-group">
+            <label>Available Print Styles</label>
+            <input type="text" name="print_styles" id="fPrintStyles" placeholder="e.g. Full cover front, Full cover back" oninput="renderPhotoGrid()"/>
+            <div class="hint">Comma-separated. Works the same as colors — tag photos with a style so the shop swaps photos.</div>
+          </div>
+        </div>
 
-          <!-- Upload area -->
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" id="fDescription" placeholder="Shown on the product popup in the shop"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Product Photos</label>
+          <input type="hidden" name="photos_json" id="fPhotosJson" value="[]"/>
+          <input type="file" name="photo_files[]" id="fPhotoFiles" multiple style="display:none;"/>
+          <div class="photo-grid" id="photoGrid"></div>
           <div class="img-upload-area" id="uploadArea">
-            <input type="file" name="img_file" id="imgFileInput" accept="image/jpeg,image/png,image/webp,image/gif" onchange="previewUpload(this)"/>
+            <input type="file" id="photoPicker" multiple accept="image/jpeg,image/png,image/webp,image/gif" onchange="addPhotos(this)"/>
             <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
-            <p id="uploadHint">Click or drag to upload image</p>
+            <p id="uploadHint">Click to upload photos — select several at once</p>
             <span id="uploadSub">Saves to <strong>images/<span id="catFolder">fun</span>/</strong> &nbsp;|&nbsp; JPG, PNG, WEBP</span>
           </div>
-
-          <!-- Upload preview -->
-          <div class="upload-preview-wrap" id="uploadPreviewWrap">
-            <img id="uploadPreviewImg" src="" alt=""/>
-            <div class="preview-info">
-              <div class="preview-name" id="uploadPreviewName"></div>
-              <div class="preview-size" id="uploadPreviewSize"></div>
-            </div>
-            <button type="button" class="remove-img" onclick="removeUpload()" title="Remove">&times;</button>
-          </div>
-
+          <div class="hint">Drag photos to reorder. The one marked <strong>Cover</strong> is shown first on the shop page.</div>
         </div>
 
         <div class="form-group">
@@ -2069,8 +2222,8 @@ function openModal(edit) {
     document.getElementById('submitBtn').textContent = 'Add Product';
     document.getElementById('productForm').reset();
     document.getElementById('fImgExisting').value = '';
-    document.getElementById('currentImgWrap').style.display = 'none';
-    document.getElementById('uploadPreviewWrap').style.display = 'none';
+    photoList = [];
+    renderPhotoGrid();
     setGarmentFields('');
     updateUploadHint();
   }
@@ -2093,43 +2246,117 @@ function editProduct(idx, data) {
   document.getElementById('fBadge').value   = data.badge   || '';
   setGarmentFields(data.garment || '');
   document.getElementById('fImgExisting').value = data.img || '';
+  document.getElementById('fDescription').value   = data.description || '';
+  document.getElementById('fColorOptions').value  = (data.color_options || []).join(', ');
+  document.getElementById('fPrintStyles').value   = (data.print_styles || []).join(', ');
 
-  // Show current image
-  if (data.img) {
-    const src = data.img.startsWith('http') ? data.img : '../' + data.img;
-    document.getElementById('currentImgThumb').src = src;
-    document.getElementById('currentImgPath').textContent = data.img;
-    document.getElementById('currentImgWrap').style.display = 'flex';
-  } else {
-    document.getElementById('currentImgWrap').style.display = 'none';
-  }
-
-  document.getElementById('uploadPreviewWrap').style.display = 'none';
+  // Products saved before multi-photo support only have a single img
+  const photos = (data.photos && data.photos.length) ? data.photos : (data.img ? [{ src: data.img }] : []);
+  photoList = photos.map(p => ({ src: p.src, url: p.src.startsWith('http') ? p.src : '../' + p.src, color: p.color || '', style: p.style || '' }));
+  renderPhotoGrid();
   updateUploadHint();
 }
+
+// ── PRODUCT PHOTOS ──────────────────────────────────────
+// Each entry: { src } for a saved photo or { file } for a new upload, plus url (preview), color, style
+let photoList = [];
+let dragFrom  = null;
+
+function optionList(inputId) {
+  return document.getElementById(inputId).value.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+function escAttr(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+}
+
+function renderPhotoGrid() {
+  const colors = optionList('fColorOptions');
+  const styles = optionList('fPrintStyles');
+  const select = (i, field, opts, blank) => {
+    const cur = photoList[i][field];
+    const all = cur && !opts.includes(cur) ? [cur, ...opts] : opts;
+    return `<select onchange="photoList[${i}].${field}=this.value">
+      <option value="">${blank}</option>
+      ${all.map(o => `<option value="${escAttr(o)}"${o === cur ? ' selected' : ''}>${escAttr(o)}</option>`).join('')}
+    </select>`;
+  };
+  document.getElementById('photoGrid').innerHTML = photoList.map((p, i) => `
+    <div class="photo-tile" draggable="true" data-i="${i}">
+      ${i === 0 ? '<span class="cover-tag">Cover</span>' : ''}
+      <button type="button" class="photo-del" onclick="removePhoto(${i})" title="Remove">&times;</button>
+      <img src="${escAttr(p.url)}" alt=""/>
+      ${colors.length ? select(i, 'color', colors, 'Any color') : ''}
+      ${styles.length ? select(i, 'style', styles, 'Any style') : ''}
+    </div>`).join('');
+
+  document.querySelectorAll('#photoGrid .photo-tile').forEach(tile => {
+    tile.addEventListener('dragstart', () => { dragFrom = +tile.dataset.i; tile.classList.add('dragging'); });
+    tile.addEventListener('dragend',   () => tile.classList.remove('dragging'));
+    tile.addEventListener('dragover',  e => e.preventDefault());
+    tile.addEventListener('drop', e => {
+      e.preventDefault();
+      const to = +tile.dataset.i;
+      if (dragFrom === null || dragFrom === to) return;
+      photoList.splice(to, 0, photoList.splice(dragFrom, 1)[0]);
+      dragFrom = null;
+      renderPhotoGrid();
+    });
+  });
+}
+
+function removePhoto(i) {
+  photoList.splice(i, 1);
+  renderPhotoGrid();
+}
+
+// Phone photos are often 3–8MB; shrink large ones so a batch stays under the server's upload limit
+function shrinkImage(file) {
+  return new Promise(resolve => {
+    if (file.size < 600 * 1024 || file.type === 'image/gif') return resolve(file);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * scale);
+      c.height = Math.round(img.height * scale);
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(img.src);
+      c.toBlob(b => resolve(b ? new File([b], file.name.replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' }) : file), 'image/jpeg', 0.85);
+    };
+    img.onerror = () => resolve(file);
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+async function addPhotos(input) {
+  const files = Array.from(input.files || []);
+  input.value = '';
+  for (const f of files) {
+    const file = await shrinkImage(f);
+    photoList.push({ file, url: URL.createObjectURL(file), color: '', style: '' });
+  }
+  renderPhotoGrid();
+}
+
+// Pack photo order/tags into photos_json and the new files into photo_files[] right before submit
+document.getElementById('productForm').addEventListener('submit', function() {
+  const dt = new DataTransfer();
+  const meta = photoList.map(p => {
+    const tags = { color: p.color || '', style: p.style || '' };
+    if (p.file) { dt.items.add(p.file); return { new: dt.files.length - 1, ...tags }; }
+    return { src: p.src, ...tags };
+  });
+  document.getElementById('fPhotoFiles').files = dt.files;
+  document.getElementById('fPhotosJson').value = JSON.stringify(meta);
+});
 
 function updateUploadHint() {
   const cat = document.getElementById('fCat').value;
   document.getElementById('catFolder').textContent = cat;
-}
-
-function previewUpload(input) {
-  if (!input.files || !input.files[0]) return;
-  const file = input.files[0];
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('uploadPreviewImg').src = e.target.result;
-    document.getElementById('uploadPreviewName').textContent = file.name;
-    document.getElementById('uploadPreviewSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
-    document.getElementById('uploadPreviewWrap').style.display = 'flex';
-    document.getElementById('fImgExisting').value = '';
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeUpload() {
-  document.getElementById('imgFileInput').value = '';
-  document.getElementById('uploadPreviewWrap').style.display = 'none';
 }
 
 document.getElementById('modalOverlay').addEventListener('click', function(e) {

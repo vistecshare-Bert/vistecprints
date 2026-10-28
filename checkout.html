@@ -261,7 +261,7 @@ function renderSummary() {
       </div>
       <div class="s-item-info">
         <div class="s-item-name">${item.name}</div>
-        <div class="s-item-meta">Size: ${item.size} · ${item.garment}</div>
+        <div class="s-item-meta">Size: ${item.size}${item.color ? ' · ' + item.color : ''} · ${item.garment}</div>
         <div class="s-item-price">${item.priceStr}</div>
       </div>
       <button class="s-item-remove" onclick="removeItem(${idx})" title="Remove item">&#215;</button>
@@ -337,7 +337,9 @@ async function submitOrder(e) {
           if (sentImgs.has(img)) img = '';
           else sentImgs.add(img);
         }
-        return { name: i.name, size: i.size, price: i.price, priceStr: i.priceStr, qty: i.qty, garment: i.garment, img };
+        // id doubles as the SKU on packing slips; variant = color / print style picked in the shop
+        const variant = i.variant ? { color: i.variant.color || '', style: i.variant.style || '' } : null;
+        return { id: i.id || '', name: i.name, size: i.size, price: i.price, priceStr: i.priceStr, qty: i.qty, garment: i.garment, color: i.color || '', variant, img };
       });
     })(),
     subtotal: sub,

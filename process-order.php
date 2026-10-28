@@ -53,7 +53,7 @@ if ($saved === false) {
 $itemLines = '';
 foreach ($items as $item) {
     $qty      = intval($item['qty'] ?? 1);
-    $name     = $item['name'] ?? 'Item';
+    $name     = ($item['name'] ?? 'Item') . (!empty($item['color']) ? ' (' . $item['color'] . ')' : '');
     $size     = $item['size'] ?? 'N/A';
     $garment  = $item['garment'] ?? '';
     $price    = $item['priceStr'] ?? '';
@@ -129,8 +129,8 @@ file_put_contents($dtfDir . $dtfId . '.json', json_encode($dtfRec, JSON_PRETTY_P
 $toStore   = 'vistecshare@gmail.com';
 $subjStore = "[New Order] #{$orderId} — {$customer['name']}";
 $artworkImgTag = '';
-if (!empty($artwork)) {
-    $artworkUrl = 'https://vistecprints.com/' . $artwork;
+if (!empty($thumb)) {
+    $artworkUrl = 'https://vistecprints.com/' . $thumb;
     $artworkImgTag = "<p><img src='" . htmlspecialchars($artworkUrl) . "' alt='Design preview' style='max-width:300px;border:1px solid #ccc;border-radius:4px;display:block;'/></p>";
 }
 $bodyStore = "

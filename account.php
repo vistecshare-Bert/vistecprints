@@ -183,7 +183,10 @@ nav{position:sticky;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,.9
         <div class="order-body">
           <ul class="order-items">
             <?php foreach ($items as $item):
-              $hasImg = !empty($item['img']) && str_starts_with($item['img'], 'data:');
+              // Custom designs carry a base64 preview; catalog items carry a relative product photo path
+              $hasImg = !empty($item['img']) && is_string($item['img'])
+                && (str_starts_with($item['img'], 'data:')
+                    || (preg_match('#^[\w\-/]+\.(png|jpe?g|gif|webp)$#i', $item['img']) && strpos($item['img'], '..') === false));
             ?>
             <li class="order-item">
               <?php if ($hasImg): ?>

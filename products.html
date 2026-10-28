@@ -210,6 +210,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(10,10,10,0.9
 .sm-color-dot.sel{border-color:var(--gold);transform:scale(1.18);box-shadow:0 0 0 1px var(--gold);}
 .sm-color-dot.light{border:2px solid rgba(0,0,0,0.15);}
 .sm-color-dot.light.sel{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
+.sm-thumbs{display:flex;gap:6px;flex-wrap:wrap;}
+.sm-thumbs:empty{display:none;}
+.sm-thumbs img{width:52px;height:52px;object-fit:cover;border:2px solid transparent;border-radius:2px;cursor:pointer;opacity:0.7;transition:opacity 0.2s,border-color 0.2s;}
+.sm-thumbs img:hover{opacity:1;}
+.sm-thumbs img.sel{border-color:var(--gold);opacity:1;}
+.sm-desc{font-size:13px;line-height:1.6;color:var(--gray);margin:0;white-space:pre-line;}
+.sm-opts{display:flex;gap:8px;flex-wrap:wrap;}
+.sm-opt{padding:9px 14px;background:var(--dark3);border:1px solid rgba(255,255,255,0.1);color:var(--offwhite);font-size:12px;border-radius:2px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.sm-opt:hover{border-color:rgba(212,152,72,0.5);}
+.sm-opt.sel{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:700;}
 .sm-qty-row{display:flex;align-items:center;gap:16px;}
 .sm-qty-label{font-size:13px;color:var(--gray);}
 .sm-qctrl{display:flex;align-items:center;gap:10px;}
@@ -350,6 +360,17 @@ footer{background:var(--black);border-top:1px solid var(--dark3);padding:70px 5%
           <div class="sm-garment" id="smGarment"></div>
         </div>
         <div class="sm-price" id="smPrice"></div>
+        <div class="sm-thumbs" id="smThumbs"></div>
+        <p class="sm-desc" id="smDesc" style="display:none;"></p>
+        <div id="smOptColorSection" style="display:none;">
+          <div class="sm-lbl">Select Color</div>
+          <div class="sm-opts" id="smOptColors"></div>
+        </div>
+        <div id="smOptStyleSection" style="display:none;">
+          <div class="sm-lbl">Select Print Style</div>
+          <div class="sm-opts" id="smOptStyles"></div>
+        </div>
+        <div class="sm-size-err" id="smOptErr"></div>
         <div>
           <div class="sm-lbl">Select Size <a onclick="openSizeGuide()">Size Guide</a></div>
           <div class="sm-sizes">
@@ -652,14 +673,14 @@ let cart = JSON.parse(localStorage.getItem('vp_cart') || '[]');
 
 function saveCart() { localStorage.setItem('vp_cart', JSON.stringify(cart)); updateCartUI(); }
 
-function addToCart(product, size, qty, color) {
+function addToCart(product, size, qty, color, variant) {
   const key = product.id + '_' + size + (color ? '_' + color.replace(/\s+/g,'_') : '');
   const priceNum = parseFloat((product.price || '0').replace(/[^0-9.]/g,'')) || 0;
   const existing = cart.find(i => i._key === key);
   if (existing) { existing.qty += qty; }
   else {
-    cart.push({ _key: key, id: product.id, name: product.name, img: product.img,
-      price: priceNum, priceStr: product.price || 'TBD', size, color: color || '', qty, garment: product.garment || '' });
+    cart.push({ _key: key, id: product.id, name: product.name, img: (variant && variant.img) || product.img,
+      price: priceNum, priceStr: product.price || 'TBD', size, color: color || '', qty, garment: product.garment || '', variant: variant || null });
   }
   saveCart();
   fetch('cart-track.php', {
@@ -675,7 +696,7 @@ function removeFromCart(key) { cart = cart.filter(i => i._key !== key); saveCart
 // Change the size/color of an item already in the cart. If the new
 // size/color combo matches another line already in the cart, merge
 // quantities into that line instead of creating a duplicate.
-function updateCartItem(oldKey, size, qty, color) {
+function updateCartItem(oldKey, size, qty, color, variant) {
   const idx = cart.findIndex(i => i._key === oldKey);
   if (idx === -1) return;
   const item = cart[idx];
@@ -692,6 +713,7 @@ function updateCartItem(oldKey, size, qty, color) {
       item._key = newKey;
       item.size = size;
       item.color = color || '';
+      if (variant) { item.variant = variant; item.img = variant.img || item.img; }
       item.qty = qty;
     }
   }
@@ -824,6 +846,7 @@ function openSizeModal(productId) {
     colorSection.style.display = 'none';
     colorWrap.innerHTML = '';
   }
+  setupVariantOptions(p);
   document.getElementById('smOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -844,6 +867,8 @@ function openEditCartItem(key) {
     const colorDot = document.querySelector('#smColors .sm-color-dot[data-color="' + item.color + '"]');
     if (colorDot) colorDot.click();
   }
+
+  if (item.variant) restoreVariant(item.variant);
 
   smQty = item.qty;
   document.getElementById('smQtyVal').textContent = smQty;
@@ -948,16 +973,107 @@ function changeSmQty(delta) {
   smQty = Math.max(1, Math.min(20, smQty + delta));
   document.getElementById('smQtyVal').textContent = smQty;
 }
+// ── PRODUCT OPTIONS ───────────────────────────────────
+// Products with color_options / print_styles show pickable buttons; picking one swaps the
+// main photo to the photo tagged with that color/style (set in the admin dashboard).
+let smOptColor = '', smOptStyle = '';
+
+function smEsc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+}
+
+function setupVariantOptions(p) {
+  const colors = p.color_options || [], styles = p.print_styles || [], photos = p.photos || [];
+  // A single option has nothing to pick, but is still recorded on the order
+  smOptColor = colors.length === 1 ? colors[0] : '';
+  smOptStyle = styles.length === 1 ? styles[0] : '';
+  const desc = document.getElementById('smDesc');
+  desc.textContent = p.description || '';
+  desc.style.display = p.description ? '' : 'none';
+  document.getElementById('smThumbs').innerHTML = photos.length > 1
+    ? photos.map((ph, i) => `<img src="${smEsc(ph.src)}" alt="" class="${i === 0 ? 'sel' : ''}" onclick="showSmPhotoAt(${i})"/>`).join('')
+    : '';
+  renderOptButtons('smOptColors', 'smOptColorSection', colors, 'color');
+  renderOptButtons('smOptStyles', 'smOptStyleSection', styles, 'style');
+  document.getElementById('smOptErr').classList.remove('show');
+}
+
+function renderOptButtons(wrapId, sectionId, opts, kind) {
+  document.getElementById(sectionId).style.display = opts.length > 1 ? '' : 'none';
+  document.getElementById(wrapId).innerHTML = opts.length > 1
+    ? opts.map((o, i) => `<button type="button" class="sm-opt" data-kind="${kind}" data-i="${i}" onclick="pickVariantOpt(this)">${smEsc(o)}</button>`).join('')
+    : '';
+}
+
+function pickVariantOpt(el) {
+  const isColor = el.dataset.kind === 'color';
+  const val = (isColor ? smProduct.color_options : smProduct.print_styles)[+el.dataset.i];
+  if (isColor) smOptColor = val; else smOptStyle = val;
+  el.parentElement.querySelectorAll('.sm-opt').forEach(b => b.classList.toggle('sel', b === el));
+  document.getElementById('smOptErr').classList.remove('show');
+  const ph = matchVariantPhoto();
+  if (ph) showSmPhotoAt(smProduct.photos.indexOf(ph));
+}
+
+// Best photo for the current picks: exact color+style match, then color only, then style only
+function matchVariantPhoto() {
+  const photos = smProduct.photos || [];
+  const c = smOptColor, s = smOptStyle;
+  return photos.find(ph => (!c || ph.color === c) && (!s || ph.style === s))
+      || photos.find(ph => c && ph.color === c)
+      || photos.find(ph => s && ph.style === s)
+      || null;
+}
+
+function showSmPhotoAt(i) {
+  const ph = (smProduct.photos || [])[i];
+  if (!ph) return;
+  resetShirtPreview();
+  document.getElementById('smImg').src = ph.src;
+  document.querySelectorAll('#smThumbs img').forEach((t, j) => t.classList.toggle('sel', j === i));
+}
+
+function variantChosen() {
+  const needColor = (smProduct.color_options || []).length > 1 && !smOptColor;
+  const needStyle = (smProduct.print_styles || []).length > 1 && !smOptStyle;
+  if (!needColor && !needStyle) return true;
+  const err = document.getElementById('smOptErr');
+  err.textContent = 'Please select a ' + (needColor ? 'color' : 'print style') + '.';
+  err.classList.add('show');
+  return false;
+}
+
+// Saved on the cart line so the order (and its thumbnail) shows the exact variant bought
+function currentVariant() {
+  if (!smOptColor && !smOptStyle) return null;
+  const ph = matchVariantPhoto();
+  return { color: smOptColor, style: smOptStyle, img: ph ? ph.src : '' };
+}
+
+function variantLabel() {
+  return [smOptColor, smOptStyle].filter(Boolean).join(' · ');
+}
+
+function restoreVariant(v) {
+  ['color', 'style'].forEach(kind => {
+    const list = (kind === 'color' ? smProduct.color_options : smProduct.print_styles) || [];
+    const i = list.indexOf(v[kind]);
+    const btn = document.querySelector(`.sm-opt[data-kind="${kind}"][data-i="${i}"]`);
+    if (btn) btn.click();
+  });
+}
+
 function confirmAddToCart() {
   if (!smSize) { document.getElementById('smSizeErr').classList.add('show'); return; }
   if (smProduct.colors && smProduct.colors.length > 0 && !smColor) {
     document.getElementById('smColorErr').classList.add('show'); return;
   }
+  if (!variantChosen()) return;
   if (smEditKey) {
-    updateCartItem(smEditKey, smSize, smQty, smColor);
+    updateCartItem(smEditKey, smSize, smQty, variantLabel() || smColor, currentVariant());
     smEditKey = null;
   } else {
-    addToCart(smProduct, smSize, smQty, smColor);
+    addToCart(smProduct, smSize, smQty, variantLabel() || smColor, currentVariant());
   }
   closeSizeModal();
   openCart();

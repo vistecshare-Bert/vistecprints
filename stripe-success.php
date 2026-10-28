@@ -54,6 +54,13 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
         'subtotal' => $order['subtotal'] ?? 0,
         'shipping' => $order['shipping'] ?? 4.99,
         'total'    => $order['total'] ?? 0,
+        'paid'     => true,
+        'paidAt'   => $order['paidAt'],
+        // Billing address as entered in Stripe Checkout (packing slip shows it when it differs)
+        'billing'  => array_merge(
+            ['name' => $session['customer_details']['name'] ?? ''],
+            $session['customer_details']['address'] ?? []
+        ),
     ]);
     file_put_contents($ordersJsonFile, json_encode($ordersList, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
@@ -67,7 +74,7 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
     $itemLines = '';
     $sizesSummary = [];
     foreach ($dtfItems as $it) {
-        $itName = $it['name'] ?? 'Item';
+        $itName = ($it['name'] ?? 'Item') . (!empty($it['color']) ? ' (' . $it['color'] . ')' : '');
         $itSize = $it['size'] ?? '?';
         $itQty  = (int)($it['qty'] ?? 1);
         $itemLines      .= "  - {$itName} | Size: {$itSize} ×{$itQty}\n";
@@ -214,11 +221,11 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
     if ($adminEmail) {
         $itemRowsAdmin = '';
         foreach ($order['items'] ?? [] as $it) {
-            $itemRowsAdmin .= '<li>' . htmlspecialchars(($it['name'] ?? 'Item') . ' — Size ' . ($it['size'] ?? '?') . ' ×' . (int)($it['qty'] ?? 1)) . '</li>';
+            $itemRowsAdmin .= '<li>' . htmlspecialchars(($it['name'] ?? 'Item') . (!empty($it['color']) ? ' (' . $it['color'] . ')' : '') . ' — Size ' . ($it['size'] ?? '?') . ' ×' . (int)($it['qty'] ?? 1)) . '</li>';
         }
         $artworkImgTag = '';
-        if (!empty($artwork)) {
-            $artworkUrl = 'https://vistecprints.com/' . $artwork;
+        if (!empty($thumb)) {
+            $artworkUrl = 'https://vistecprints.com/' . $thumb;
             $artworkImgTag = "<p><img src='" . htmlspecialchars($artworkUrl) . "' alt='Design preview' style='max-width:300px;border:1px solid #ccc;border-radius:4px;display:block;'/></p>";
         }
         $adminBody = "
@@ -237,6 +244,19 @@ if ($isPaid && !empty($order) && ($order['status'] ?? '') === 'pending_payment')
         $aHeaders .= "From: Vistec GraphX <noreply@vistecprints.com>\r\n";
         $aHeaders .= "Reply-To: {$toEmail}\r\n";
         mail($adminEmail, 'New Order — ' . $order['orderId'], $adminBody, $aHeaders);
+    }
+
+    // ── Packing slip PDF (saved + emailed) ──────────────────────
+    // Runs last and can never break checkout: PackingSlip logs and emails an alert on failure,
+    // and this catch covers the module itself being missing or broken.
+    try {
+        $psFile = __DIR__ . '/packing-slip/src/PackingSlip.php';
+        if (is_file($psFile)) {
+            require_once $psFile;
+            (new PackingSlip())->processPaidOrder($ordersList[0]);
+        }
+    } catch (\Throwable $e) {
+        error_log('[packing-slip] ' . $e->getMessage());
     }
 }
 
