@@ -10,3 +10,15 @@ RewriteRule ^(.*)$ https://vistecprints.com/$1 [L,R=301]
 # Serve our logo PNG when any browser auto-requests favicon.ico
 RewriteRule ^favicon\.ico$ /favicon-32x32.png [L,R=301]
 
+# Private data files — read by PHP only, never served to browsers
+# (orders.json has customer contact details; admin/users.json has password hashes)
+<FilesMatch "^(orders|users)\.json$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
